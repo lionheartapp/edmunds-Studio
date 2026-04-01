@@ -14,7 +14,7 @@ const SCENARIOS = [
   {
     type: "oem" as UserType,
     label: "OEM Campaign",
-    brand: "Rivian",
+    brand: "",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <rect x="3" y="3" width="18" height="18" rx="2" />
@@ -24,11 +24,14 @@ const SCENARIOS = [
     desc: "Launch a national brand campaign",
     example: "e.g. Rivian, Ford, Toyota USA",
     color: "#818cf8",
+    inputPrompt: "What OEM are you running for?",
+    inputPlaceholder: "e.g. Rivian, Toyota, Ford",
+    submitLabel: "Analyze Brand →",
   },
   {
     type: "dealer-group" as UserType,
     label: "Dealer Group",
-    brand: "Valley Subaru",
+    brand: "",
     icon: (
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
         <path d="M3 21h18" /><path d="M5 21V7l8-4v18" /><path d="M19 21V11l-6-4" />
@@ -38,6 +41,9 @@ const SCENARIOS = [
     desc: "Consistent ads across all your stores",
     example: "e.g. Valley Subaru, AutoNation Honda",
     color: "#a78bfa",
+    inputPrompt: "What's your dealer group name?",
+    inputPlaceholder: "e.g. Valley Subaru, AutoNation Honda",
+    submitLabel: "Analyze Dealer Group →",
   },
   {
     type: "single-dealer" as UserType,
@@ -53,6 +59,9 @@ const SCENARIOS = [
     desc: "Quick local ads, no experience needed",
     example: "e.g. your dealership name",
     color: "#c084fc",
+    inputPrompt: "What's the name of your dealership?",
+    inputPlaceholder: "e.g. AutoNation Toyota Tempe",
+    submitLabel: "Analyze My Dealership →",
   },
 ]
 
@@ -87,11 +96,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
 
   const handleScenarioClick = (scenario: typeof SCENARIOS[0]) => {
     setSelectedScenario(scenario)
-    setBrand(scenario.brand)
-    // If the scenario has a pre-set brand, go immediately
-    if (scenario.brand) {
-      onSubmit(scenario.brand, scenario.type)
-    }
+    setBrand("")
   }
 
   const handleCustomSubmit = (e: React.FormEvent) => {
@@ -348,7 +353,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
               {selectedScenario.label}
             </h2>
             <p className="text-zinc-500 text-center mb-8">
-              What&apos;s the name of your dealership?
+              {selectedScenario.inputPrompt}
             </p>
 
             <form onSubmit={handleCustomSubmit} className="w-full">
@@ -356,7 +361,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                 type="text"
                 value={brand}
                 onChange={(e) => setBrand(e.target.value)}
-                placeholder="e.g. AutoNation Toyota Tempe"
+                placeholder={selectedScenario.inputPlaceholder}
                 className="w-full px-5 py-4 text-base rounded-xl bg-zinc-900 border border-zinc-800
                          focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
                          placeholder:text-zinc-600 transition-all"
@@ -368,7 +373,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                 className="w-full mt-4 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl
                          disabled:opacity-30 disabled:cursor-not-allowed transition-all glow-sm"
               >
-                Analyze My Dealership →
+                {selectedScenario.submitLabel}
               </button>
             </form>
           </motion.div>
