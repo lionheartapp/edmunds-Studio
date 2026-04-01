@@ -615,11 +615,29 @@ function CompetitorLoader() {
       exit={{ opacity: 0, y: -20 }}
       className="flex flex-col items-center justify-center py-24"
     >
-      {/* Animated blob — CSS animations instead of framer-motion */}
+      {/* Animated blob — framer-motion (only visible during loading, not a perf concern) */}
       <div className="relative w-20 h-20 mb-8">
-        <div className="absolute inset-[-6px] bg-eds-50/20 blur-md animate-blob-glow" />
-        <div className="absolute inset-0 bg-eds-50/25 animate-blob-morph" />
-        <div className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80 animate-spin-slow" />
+        <motion.div
+          animate={{
+            scale: [1, 1.2, 1],
+            borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
+          }}
+          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute inset-[-6px] bg-eds-50/20 blur-md"
+        />
+        <motion.div
+          animate={{
+            scale: [1, 1.15, 1],
+            borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
+          }}
+          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+          className="absolute inset-0 bg-eds-50/25"
+        />
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+          className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80"
+        />
         {/* Crosshair / target icon */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80">
