@@ -49,20 +49,45 @@ export default function BrandDNACard({
       >
         {/* Header */}
         <motion.div variants={cardVariant} className="mb-6 flex items-end justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-5">
+            {/* Brand Logo or color dot */}
+            {brandDna.logoUrl ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-16 h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center p-2 overflow-hidden"
+              >
+                <img
+                  src={brandDna.logoUrl}
+                  alt={`${brandDna.name} logo`}
+                  className="w-full h-full object-contain"
+                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
+                />
+              </motion.div>
+            ) : (
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
                 className="w-3 h-3 rounded-full"
                 style={{ backgroundColor: brandDna.colors.primary, boxShadow: `0 0 12px ${brandDna.colors.primary}60` }}
               />
-              <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
-                Brand DNA
-              </span>
+            )}
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                {!brandDna.logoUrl && (
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                    Brand DNA
+                  </span>
+                )}
+                {brandDna.logoUrl && (
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                    Brand DNA
+                  </span>
+                )}
+              </div>
+              <h2 className="text-4xl font-bold tracking-tight">{brandDna.name}</h2>
+              <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
             </div>
-            <h2 className="text-4xl font-bold tracking-tight">{brandDna.name}</h2>
-            <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
           </div>
         </motion.div>
 

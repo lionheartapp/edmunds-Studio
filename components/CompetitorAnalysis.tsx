@@ -95,12 +95,15 @@ export default function CompetitorAnalysis({
             >
               Competitive Landscape
             </motion.h1>
-            <motion.p
-              className="text-lg md:text-xl text-zinc-400"
+            <motion.div
+              className="flex items-center gap-3 text-lg md:text-xl text-zinc-400"
               variants={itemVariants}
             >
-              {brandDna.name} vs. the competition
-            </motion.p>
+              {brandDna.logoUrl && (
+                <img src={brandDna.logoUrl} alt={brandDna.name} className="w-8 h-8 object-contain" />
+              )}
+              <span>{brandDna.name} vs. the competition</span>
+            </motion.div>
           </motion.div>
         </motion.div>
 

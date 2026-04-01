@@ -16,6 +16,9 @@ export interface BrandDNA {
     fallback: string
     headingWeight: string
   }
+  logoUrl?: string // Real logo from Brandfetch (SVG/PNG)
+  fullLogoUrl?: string // Full-width logo from Brandfetch
+  description?: string // Brand description from Brandfetch
   voice: string[] // e.g. ["Bold", "Adventurous", "Premium"]
   visualStyle: string[] // e.g. ["Cinematic", "Outdoor", "Golden hour"]
   currentAds: AdSample[]

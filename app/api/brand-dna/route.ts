@@ -10,6 +10,15 @@ import {
 import { BrandDNA } from "@/lib/types"
 import { readFile } from "fs/promises"
 import path from "path"
+import {
+  fetchBrand,
+  isBrandfetchConfigured,
+  getBestLogoUrl,
+  getFullLogoUrl,
+  extractColors,
+  extractFonts,
+  BrandfetchResult,
+} from "@/lib/brandfetch"
 
 // Allow up to 60s for scraper + AI
 export const maxDuration = 60
@@ -69,24 +78,33 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1: Run the scraper to get live web intelligence
+    // Step 1: Run scraper + Brandfetch in parallel
     let scraperContext = ""
-    try {
-      const scraperResult = await scrapeBrand(brandName)
-      scraperContext = buildScraperContext(scraperResult)
 
-      // If scraper got strong enough data on its own (colors + fonts),
-      // merge it as overrides later
-      if (scraperResult.raw.colors && scraperResult.raw.typography) {
-        console.log(
-          `[brand-dna] Scraper found colors + fonts for ${brandName}`
-        )
-      }
-    } catch (error) {
-      console.log(
-        `[brand-dna] Scraper failed, continuing with Claude only:`,
-        error
-      )
+    const [scraperSettled, bfSettled] = await Promise.allSettled([
+      scrapeBrand(brandName).then(result => {
+        scraperContext = buildScraperContext(result)
+        if (result.raw.colors && result.raw.typography) {
+          console.log(`[brand-dna] Scraper found colors + fonts for ${brandName}`)
+        }
+        return result
+      }),
+      isBrandfetchConfigured() ? fetchBrand(brandName) : Promise.resolve(null),
+    ])
+
+    if (scraperSettled.status === "rejected") {
+      console.log(`[brand-dna] Scraper failed, continuing:`, scraperSettled.reason)
+    }
+    if (bfSettled.status === "rejected") {
+      console.log(`[brand-dna] Brandfetch failed, continuing:`, bfSettled.reason)
+    }
+
+    // Extract Brandfetch data if available
+    const brandfetchData: BrandfetchResult | null =
+      bfSettled.status === "fulfilled" ? bfSettled.value : null
+
+    if (brandfetchData) {
+      console.log(`[brand-dna] Brandfetch: ${brandfetchData.logos?.length || 0} logos, ${brandfetchData.colors?.length || 0} colors, ${brandfetchData.fonts?.length || 0} fonts`)
     }
 
     // Step 2: Ask AI for full Brand DNA analysis, enriched with scraper context
@@ -101,6 +119,46 @@ export async function POST(request: NextRequest) {
           { temperature: 0.5 }
         )
 
+        // Step 3: Override AI-generated colors/fonts/logos with Brandfetch data
+        // Brandfetch is authoritative for visual identity
+        if (brandfetchData) {
+          const bfColors = extractColors(brandfetchData)
+          const bfFonts = extractFonts(brandfetchData)
+          const logoUrl = getBestLogoUrl(brandfetchData)
+          const fullLogoUrl = getFullLogoUrl(brandfetchData)
+
+          // Override colors with real brand colors
+          if (brandfetchData.colors && brandfetchData.colors.length > 0) {
+            profile.colors = bfColors
+            console.log(`[brand-dna] Overriding colors with Brandfetch: ${JSON.stringify(bfColors)}`)
+          }
+
+          // Override fonts with real brand fonts
+          if (brandfetchData.fonts && brandfetchData.fonts.length > 0) {
+            profile.typography = bfFonts
+            console.log(`[brand-dna] Overriding fonts with Brandfetch: ${bfFonts.primaryFont}`)
+          }
+
+          // Add real logos
+          if (logoUrl) {
+            profile.logoUrl = logoUrl
+            console.log(`[brand-dna] Logo URL: ${logoUrl}`)
+          }
+          if (fullLogoUrl) {
+            profile.fullLogoUrl = fullLogoUrl
+          }
+
+          // Add description if AI didn't provide one
+          if (brandfetchData.description && !profile.description) {
+            profile.description = brandfetchData.description
+          }
+
+          // Ensure domain is correct
+          if (brandfetchData.domain) {
+            profile.domain = brandfetchData.domain
+          }
+        }
+
         console.log(`[brand-dna] Success for: ${brandName}`)
         return NextResponse.json({ brandDna: profile })
       } catch (aiError) {
@@ -110,10 +168,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    // Fall back to demo brief if AI fails
+    // Fall back to demo brief if AI fails (still apply Brandfetch if available)
     const demo = await loadDemoBrief(brandName)
     if (demo) {
       console.log("[brand-dna] Falling back to demo brief for:", brandName)
+      if (brandfetchData) {
+        const bfColors = extractColors(brandfetchData)
+        const logoUrl = getBestLogoUrl(brandfetchData)
+        const fullLogoUrl = getFullLogoUrl(brandfetchData)
+        if (brandfetchData.colors.length > 0) demo.colors = bfColors
+        if (logoUrl) demo.logoUrl = logoUrl
+        if (fullLogoUrl) demo.fullLogoUrl = fullLogoUrl
+      }
       return NextResponse.json({ brandDna: demo })
     }
     return NextResponse.json(
