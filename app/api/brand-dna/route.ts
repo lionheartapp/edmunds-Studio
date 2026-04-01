@@ -1,7 +1,7 @@
 // app/api/brand-dna/route.ts — Brand DNA Analysis Endpoint
 
 import { NextRequest, NextResponse } from "next/server"
-import { askClaudeJSON } from "@/lib/claude"
+import { askAIJSON, isAIConfigured } from "@/lib/ai"
 import { scrapeBrand, buildScraperContext } from "@/lib/scraper"
 import {
   BRAND_DNA_SYSTEM_PROMPT,
@@ -11,7 +11,7 @@ import { BrandDNA } from "@/lib/types"
 import { readFile } from "fs/promises"
 import path from "path"
 
-// Allow up to 60s for scraper + Claude
+// Allow up to 60s for scraper + AI
 export const maxDuration = 60
 
 // Demo brief lookup for fallback when API keys aren't configured
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     }
 
     // If no API key, fall back to demo briefs
-    if (!process.env.ANTHROPIC_API_KEY) {
+    if (!isAIConfigured()) {
       const demo = await loadDemoBrief(brandName)
       if (demo) {
         return NextResponse.json({ brandDna: demo })
@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error:
-            "No API key configured. Try a demo brand: Rivian, Subaru, or Toyota.",
+            "No AI API key configured. Set GOOGLE_GEMINI_API_KEY in environment variables. Try a demo brand: Rivian, Subaru, or Toyota.",
         },
         { status: 503 }
       )
@@ -89,13 +89,13 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 2: Ask Claude for full Brand DNA analysis, enriched with scraper context
+    // Step 2: Ask AI for full Brand DNA analysis, enriched with scraper context
     // Retry up to 2 times on failure
     let lastError = ""
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        console.log(`[brand-dna] Claude attempt ${attempt + 1} for: ${brandName}`)
-        const profile = await askClaudeJSON<BrandDNA>(
+        console.log(`[brand-dna] AI attempt ${attempt + 1} for: ${brandName}`)
+        const profile = await askAIJSON<BrandDNA>(
           BRAND_DNA_SYSTEM_PROMPT,
           BRAND_DNA_USER_PROMPT(brandName, scraperContext),
           { temperature: 0.5 }
@@ -103,15 +103,14 @@ export async function POST(request: NextRequest) {
 
         console.log(`[brand-dna] Success for: ${brandName}`)
         return NextResponse.json({ brandDna: profile })
-      } catch (claudeError) {
-        lastError = claudeError instanceof Error ? claudeError.message : String(claudeError)
-        console.error(`[brand-dna] Claude attempt ${attempt + 1} failed:`, lastError)
-        // Wait a beat before retry
+      } catch (aiError) {
+        lastError = aiError instanceof Error ? aiError.message : String(aiError)
+        console.error(`[brand-dna] AI attempt ${attempt + 1} failed:`, lastError)
         if (attempt < 1) await new Promise(r => setTimeout(r, 1000))
       }
     }
 
-    // Fall back to demo brief if Claude fails
+    // Fall back to demo brief if AI fails
     const demo = await loadDemoBrief(brandName)
     if (demo) {
       console.log("[brand-dna] Falling back to demo brief for:", brandName)

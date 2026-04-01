@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.81.0",
+    "@google/generative-ai": "^0.24.1",
     "framer-motion": "^12.38.0",
     "geist": "^1.7.0",
     "next": "16.2.2",

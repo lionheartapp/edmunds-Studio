@@ -1,55 +1,41 @@
-// app/api/test-claude/route.ts — Diagnostic endpoint to test Claude connectivity
+// app/api/test-claude/route.ts — Diagnostic endpoint to test AI connectivity
 import { NextResponse } from "next/server"
-import Anthropic from "@anthropic-ai/sdk"
+import { askAI, isAIConfigured } from "@/lib/ai"
 
 export const maxDuration = 30
 
 export async function GET() {
-  const hasKey = !!process.env.ANTHROPIC_API_KEY
-  const keyPrefix = process.env.ANTHROPIC_API_KEY?.substring(0, 10) || "NOT SET"
+  const configured = isAIConfigured()
+  const keyPrefix = (process.env.GOOGLE_GEMINI_API_KEY || process.env.GEMINI_API_KEY)?.substring(0, 10) || "NOT SET"
 
-  if (!hasKey) {
+  if (!configured) {
     return NextResponse.json({
       status: "error",
-      message: "ANTHROPIC_API_KEY is not set",
+      message: "No AI API key set. Add GOOGLE_GEMINI_API_KEY to environment variables.",
       keyPrefix,
     })
   }
 
   try {
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY,
-    })
+    const response = await askAI(
+      "You are a helpful assistant.",
+      "Say hello in 5 words",
+      { maxTokens: 50 }
+    )
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 50,
-      messages: [{ role: "user", content: "Say hello in 5 words" }],
-    })
-
-    const text = response.content.find((b) => b.type === "text")
     return NextResponse.json({
       status: "ok",
-      model: response.model,
-      message: text?.type === "text" ? text.text : "no text",
+      provider: "gemini",
+      message: response,
       keyPrefix,
     })
   } catch (error) {
-    const errObj: Record<string, unknown> = {
+    return NextResponse.json({
       status: "error",
+      provider: "gemini",
       keyPrefix,
       name: error instanceof Error ? error.name : "unknown",
       message: error instanceof Error ? error.message : String(error),
-    }
-
-    // Anthropic SDK errors have extra fields
-    if (error && typeof error === "object") {
-      const e = error as Record<string, unknown>
-      if (e.status) errObj.httpStatus = e.status
-      if (e.error) errObj.apiError = e.error
-      if (e.type) errObj.type = e.type
-    }
-
-    return NextResponse.json(errObj, { status: 500 })
+    }, { status: 500 })
   }
 }
