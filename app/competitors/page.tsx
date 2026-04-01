@@ -11,10 +11,30 @@ export default function CompetitorsPage() {
   const [isLoadingEdge, setIsLoadingEdge] = useState(false)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("eds_brand_dna")
-    if (stored) {
-      setBrandDna(JSON.parse(stored))
-    } else {
+    try {
+      const stored = sessionStorage.getItem("eds_brand_dna")
+      if (stored) {
+        const parsed = JSON.parse(stored) as BrandDNA
+        // Ensure competitorProfiles is always an array with safe defaults
+        if (parsed.competitorProfiles) {
+          parsed.competitorProfiles = parsed.competitorProfiles.map(cp => ({
+            ...cp,
+            ads: cp.ads || [],
+            strengths: cp.strengths || [],
+            weaknesses: cp.weaknesses || [],
+            audienceOverlap: cp.audienceOverlap || 0,
+            adSpend: cp.adSpend || "Unknown",
+            topPlatform: cp.topPlatform || "Unknown",
+          }))
+        } else {
+          parsed.competitorProfiles = []
+        }
+        setBrandDna(parsed)
+      } else {
+        router.push("/")
+      }
+    } catch (e) {
+      console.error("Failed to parse brand DNA:", e)
       router.push("/")
     }
   }, [router])

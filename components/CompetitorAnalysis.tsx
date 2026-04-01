@@ -55,12 +55,12 @@ export default function CompetitorAnalysis({
 
   // Calculate metrics for competitive summary
   const competitorMetrics = useMemo(() => {
-    const avgOverlap =
-      competitors.reduce((sum, c) => sum + c.audienceOverlap, 0) /
-      competitors.length;
+    const avgOverlap = competitors.length > 0
+      ? competitors.reduce((sum, c) => sum + (c.audienceOverlap || 0), 0) / competitors.length
+      : 0;
     const totalAdSpend = competitors.length;
     const totalAds = competitors.reduce(
-      (sum, c) => sum + c.ads.length,
+      (sum, c) => sum + (c.ads?.length || 0),
       0
     );
 
@@ -230,10 +230,10 @@ export default function CompetitorAnalysis({
                 {/* Competitor Ads Grid */}
                 <div className="p-6 md:p-8">
                   <h4 className="text-lg font-semibold text-white mb-6">
-                    Recent Campaigns ({competitor.ads.length})
+                    Recent Campaigns ({(competitor.ads || []).length})
                   </h4>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {competitor.ads.map((ad, adIndex) => (
+                    {(competitor.ads || []).map((ad, adIndex) => (
                       <CompetitorAdCard
                         key={adIndex}
                         ad={ad}
