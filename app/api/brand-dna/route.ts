@@ -96,15 +96,18 @@ export async function POST(request: NextRequest) {
 
       return NextResponse.json({ brandDna: profile })
     } catch (claudeError) {
-      console.error("[brand-dna] Claude analysis failed:", claudeError)
+      const errMsg = claudeError instanceof Error ? claudeError.message : String(claudeError)
+      console.error("[brand-dna] Claude analysis failed:", errMsg)
+      console.error("[brand-dna] Full error:", JSON.stringify(claudeError, Object.getOwnPropertyNames(claudeError instanceof Error ? claudeError : {})))
 
       // Fall back to demo brief if Claude fails
       const demo = await loadDemoBrief(brandName)
       if (demo) {
+        console.log("[brand-dna] Falling back to demo brief for:", brandName)
         return NextResponse.json({ brandDna: demo })
       }
       return NextResponse.json(
-        { error: "Failed to analyze brand" },
+        { error: `Failed to analyze brand: ${errMsg}` },
         { status: 500 }
       )
     }

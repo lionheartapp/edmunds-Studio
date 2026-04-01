@@ -121,7 +121,7 @@ async function scrapeWebsite(
           "Mozilla/5.0 (compatible; AdGenAI/1.0; +https://edmunds-studio.vercel.app)",
         Accept: "text/html",
       },
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(5000),
     })
 
     if (!response.ok) return null
@@ -176,7 +176,7 @@ async function analyzeSocialPresence(
         const resp = await fetch(url, {
           method: "HEAD",
           redirect: "follow",
-          signal: AbortSignal.timeout(3000),
+          signal: AbortSignal.timeout(2000),
         })
         return resp.ok ? url : null
       })
