@@ -66,7 +66,7 @@ const SCENARIOS = [
 ]
 
 const LOADING_SAYINGS = [
-  "Stalking their Instagram aesthetic...",
+  "Analyzing their Instagram aesthetic...",
   "Judging their font choices...",
   "Extracting brand vibes...",
   "Reading their About page so you don't have to...",
@@ -125,64 +125,29 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             exit={{ opacity: 0, scale: 1.1 }}
             transition={{ duration: 0.5 }}
             className="relative z-10 flex flex-col items-center"
+            aria-live="polite"
           >
-            {/* Organic Morphing Orb */}
+            {/* Simplified Morphing Orb — 3 layers with CSS animations */}
             <div className="relative w-48 h-48 mb-10">
-              <motion.div
-                animate={{ scale: [1, 1.3, 1.1, 1.25, 1], opacity: [0.2, 0.5, 0.3, 0.45, 0.2] }}
-                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                className="absolute inset-[-20px] rounded-full bg-eds-50/20 blur-3xl"
+              {/* Layer 1: Outer glow */}
+              <div
+                className="absolute inset-[-20px] rounded-full bg-eds-50/20 blur-3xl animate-blob-glow"
               />
-              <motion.div
-                animate={{ y: [0, -14, -4, -18, 0], x: [0, 6, -4, 8, 0], rotate: [0, 3, -2, 4, 0] }}
-                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-                className="absolute inset-0"
-              >
-                <motion.div
-                  animate={{
-                    borderRadius: [
-                      "42% 58% 62% 38% / 45% 55% 45% 55%",
-                      "55% 45% 38% 62% / 58% 42% 58% 42%",
-                      "38% 62% 55% 45% / 42% 58% 38% 62%",
-                      "62% 38% 45% 55% / 55% 45% 62% 38%",
-                      "42% 58% 62% 38% / 45% 55% 45% 55%",
-                    ],
-                    scale: [1, 1.04, 0.98, 1.02, 1],
-                  }}
-                  transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
-                  className="absolute inset-0 overflow-hidden"
-                  style={{
-                    background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
-                    boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
-                  }}
-                >
-                  <motion.div
-                    animate={{ x: [0, 10, -5, 15, 0], y: [0, -8, 5, -12, 0], opacity: [0.5, 0.7, 0.4, 0.65, 0.5] }}
-                    transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                    className="absolute top-3 left-5 w-16 h-10 rounded-full"
-                    style={{ background: "radial-gradient(ellipse, rgba(255,255,255,0.6), transparent)" }}
-                  />
-                  <motion.div
-                    animate={{ x: [0, -15, 10, -8, 0], y: [0, 12, -8, 15, 0], opacity: [0.15, 0.3, 0.1, 0.25, 0.15] }}
-                    transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }}
-                    className="absolute bottom-4 right-4 w-20 h-20 rounded-full"
-                    style={{ background: "radial-gradient(circle, rgba(122, 175, 255, 0.5), transparent 70%)" }}
-                  />
-                </motion.div>
-              </motion.div>
-              <motion.div
-                animate={{ scaleX: [1, 0.8, 0.9, 0.75, 1], opacity: [0.25, 0.12, 0.2, 0.1, 0.25], x: [0, 6, -4, 8, 0] }}
-                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-                className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-eds-50/30 blur-lg"
+              {/* Layer 2: Morphing shape */}
+              <div
+                className="absolute inset-0 overflow-hidden animate-blob-morph"
+                style={{
+                  background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
+                  boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
+                }}
               />
-              <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 5, ease: "linear" }} className="absolute inset-[-12px]">
-                <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="absolute top-0 left-1/2 w-2 h-2 rounded-full bg-eds-60" style={{ boxShadow: "0 0 8px rgba(78, 145, 245, 0.8)" }} />
-              </motion.div>
-              <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 8, ease: "linear" }} className="absolute inset-[-20px]">
-                <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                  className="absolute bottom-0 right-1/4 w-1.5 h-1.5 rounded-full bg-eds-60" style={{ boxShadow: "0 0 6px rgba(122, 175, 255, 0.7)" }} />
-              </motion.div>
+              {/* Layer 3: Orbiting dot */}
+              <div className="absolute inset-[-12px] animate-spin-slow">
+                <div
+                  className="absolute top-0 left-1/2 w-2.5 h-2.5 rounded-full bg-eds-60"
+                  style={{ boxShadow: "0 0 10px rgba(78, 145, 245, 0.8)" }}
+                />
+              </div>
             </div>
 
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-zinc-200 mb-3">
@@ -280,12 +245,12 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
               {SCENARIOS.map((scenario, i) => (
                 <motion.button
                   key={scenario.type}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 1, y: 0 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.4 + i * 0.1 }}
                   whileHover={{ y: -4, borderColor: `${scenario.color}40` }}
                   onClick={() => handleScenarioClick(scenario)}
-                  className="relative flex flex-col items-start text-left p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-all group"
+                  className="relative flex flex-col items-start text-left p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-all group cursor-pointer"
                   style={{
                     background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
                     backdropFilter: "blur(12px)",
@@ -367,6 +332,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
           >
             <motion.button
               onClick={() => setSelectedScenario(null)}
+              aria-label="Go back"
               className="mb-6 text-sm text-zinc-500 hover:text-zinc-300 transition-colors flex items-center gap-2"
             >
               ← Back

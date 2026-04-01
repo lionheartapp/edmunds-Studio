@@ -4,7 +4,7 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import type { UserType } from "@/components/BrandInput"
 
-type BriefMode = "talk" | "form" | "import"
+type BriefMode = "talk" | "form"
 
 interface BriefFormProps {
   brandName: string
@@ -125,7 +125,6 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
             [
               { key: "talk", label: "Just Talk", icon: "💬" },
               { key: "form", label: "Quick Form", icon: "📋" },
-              { key: "import", label: "Import", icon: "📎" },
             ] as const
           ).map(({ key, label, icon }) => (
             <button
@@ -174,27 +173,6 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
                 placeholder={field.placeholder}
               />
             ))}
-          </motion.div>
-        )}
-
-        {/* Import Mode */}
-        {mode === "import" && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="border border-dashed border-zinc-700 rounded-xl p-12 text-center bg-zinc-900/50"
-          >
-            <div className="text-3xl mb-3">📄</div>
-            <p className="text-zinc-500 mb-4 text-sm">
-              Drop a PDF brief or paste a URL
-            </p>
-            <input
-              type="text"
-              placeholder="Paste URL to existing brief..."
-              className="w-full max-w-sm mx-auto px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700
-                       focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20 text-center text-sm"
-              onChange={(e) => setDescription(e.target.value)}
-            />
           </motion.div>
         )}
 

@@ -136,7 +136,7 @@ export default function CompetitorAnalysis({
             {competitors.map((competitor, compIndex) => (
               <motion.div
                 key={competitor.domain}
-                className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl hover:border-white/20 transition-colors"
+                className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl hover:border-white/20 transition-colors cursor-pointer"
                 variants={itemVariants}
               >
                 {/* Competitor Header Card */}
@@ -365,9 +365,13 @@ export default function CompetitorAnalysis({
           </div>
         </motion.div>
 
-        {/* Continue Button */}
+        {/* Sticky Continue CTA */}
         <motion.div
-          className="px-6 sm:px-8 md:px-12 py-12 border-t border-white/5"
+          className="sticky bottom-0 z-30 px-6 sm:px-8 md:px-12 py-5 border-t border-white/5"
+          style={{
+            background: "linear-gradient(to top, rgba(9,9,11,0.95) 0%, rgba(9,9,11,0.85) 100%)",
+            backdropFilter: "blur(12px)",
+          }}
           variants={itemVariants}
           initial="hidden"
           animate="visible"

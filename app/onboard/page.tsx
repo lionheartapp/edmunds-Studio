@@ -1,8 +1,10 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react"
+import { useEffect, useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import BrandDNACard from "@/components/BrandDNACard"
+import StepIndicator from "@/components/StepIndicator"
+import ErrorState from "@/components/ErrorState"
 import { BrandDNA, EdmundsAdsData, SocialAdsData } from "@/lib/types"
 
 export default function OnboardPage() {
@@ -16,6 +18,7 @@ export default function OnboardPage() {
   // Loading states for each section
   const [edmundsAdsLoading, setEdmundsAdsLoading] = useState(false)
   const [socialAdsLoading, setSocialAdsLoading] = useState(false)
+  const [fetchError, setFetchError] = useState<string | null>(null)
 
   const fetchStarted = useRef(false)
 
@@ -47,93 +50,109 @@ export default function OnboardPage() {
     if (fetchStarted.current) return
     fetchStarted.current = true
 
-    // ── Sequential fetch pipeline ──
-    // Each section loads one at a time with its own loading state.
-    // This avoids hammering the server and creates a nice reveal experience.
-    runSequentialFetches(parsed, !!cachedEdmunds, !!cachedSocial)
+    // ── Parallel fetch pipeline ──
+    // Steps 1+2 run in parallel, step 3 (competitors) deferred after both resolve.
+    runParallelFetches(parsed, !!cachedEdmunds, !!cachedSocial)
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router])
 
-  async function runSequentialFetches(
+  const retryFetches = useCallback(() => {
+    if (!brandDna) return
+    setFetchError(null)
+    fetchStarted.current = false
+    const cachedEdmunds = sessionStorage.getItem("eds_edmunds_ads")
+    const cachedSocial = sessionStorage.getItem("eds_social_ads")
+    if (cachedEdmunds && cachedSocial) return
+    fetchStarted.current = true
+    runParallelFetches(brandDna, !!cachedEdmunds, !!cachedSocial)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [brandDna])
+
+  async function runParallelFetches(
     parsed: BrandDNA,
     hasEdmunds: boolean,
     hasSocial: boolean,
   ) {
-    // ── Step 1: Edmunds ad activity from Databricks ──
+    // ── Steps 1+2: Edmunds ads + Social ads in parallel ──
+    const fetches: Promise<void>[] = []
+
     if (!hasEdmunds) {
       setEdmundsAdsLoading(true)
-      try {
-        const ctrl = new AbortController()
-        const timer = setTimeout(() => ctrl.abort(), 20000)
-
-        const res = await fetch("/api/edmunds-ads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ make: parsed.name }),
-          signal: ctrl.signal,
-        })
-        clearTimeout(timer)
-        const data = await res.json()
-
-        if (data.edmundsAds) {
-          sessionStorage.setItem("eds_edmunds_ads", JSON.stringify(data.edmundsAds))
-          setEdmundsAds(data.edmundsAds)
-          console.log(`[fetch] Edmunds ads ready: ${data.edmundsAds.models?.length || 0} models, source=${data.edmundsAds.source}`)
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== "AbortError") {
-          console.warn("[fetch] Edmunds ads failed:", err)
-        }
-      } finally {
-        setEdmundsAdsLoading(false)
-      }
+      fetches.push(
+        (async () => {
+          try {
+            const ctrl = new AbortController()
+            const timer = setTimeout(() => ctrl.abort(), 20000)
+            const res = await fetch("/api/edmunds-ads", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ make: parsed.name }),
+              signal: ctrl.signal,
+            })
+            clearTimeout(timer)
+            const data = await res.json()
+            if (data.edmundsAds) {
+              sessionStorage.setItem("eds_edmunds_ads", JSON.stringify(data.edmundsAds))
+              setEdmundsAds(data.edmundsAds)
+            }
+          } catch (err) {
+            if (err instanceof Error && err.name !== "AbortError") {
+              console.warn("[fetch] Edmunds ads failed:", err)
+              setFetchError("Failed to load Edmunds ad data.")
+            }
+          } finally {
+            setEdmundsAdsLoading(false)
+          }
+        })()
+      )
     }
 
-    // ── Step 2: Social ads from Meta Ad Library ──
     if (!hasSocial) {
       setSocialAdsLoading(true)
-      try {
-        const ctrl = new AbortController()
-        const timer = setTimeout(() => ctrl.abort(), 15000)
-
-        const res = await fetch("/api/social-ads", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ brandName: parsed.name, limit: 6 }),
-          signal: ctrl.signal,
-        })
-        clearTimeout(timer)
-        const data = await res.json()
-
-        if (data.socialAds) {
-          sessionStorage.setItem("eds_social_ads", JSON.stringify(data.socialAds))
-          setSocialAds(data.socialAds)
-          console.log(`[fetch] Social ads ready: ${data.socialAds.ads?.length || 0} ads, source=${data.socialAds.source}`)
-        }
-      } catch (err) {
-        if (err instanceof Error && err.name !== "AbortError") {
-          console.warn("[fetch] Social ads failed:", err)
-        }
-      } finally {
-        setSocialAdsLoading(false)
-      }
+      fetches.push(
+        (async () => {
+          try {
+            const ctrl = new AbortController()
+            const timer = setTimeout(() => ctrl.abort(), 15000)
+            const res = await fetch("/api/social-ads", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ brandName: parsed.name, limit: 6 }),
+              signal: ctrl.signal,
+            })
+            clearTimeout(timer)
+            const data = await res.json()
+            if (data.socialAds) {
+              sessionStorage.setItem("eds_social_ads", JSON.stringify(data.socialAds))
+              setSocialAds(data.socialAds)
+            }
+          } catch (err) {
+            if (err instanceof Error && err.name !== "AbortError") {
+              console.warn("[fetch] Social ads failed:", err)
+              setFetchError("Failed to load social ad data.")
+            }
+          } finally {
+            setSocialAdsLoading(false)
+          }
+        })()
+      )
     }
 
+    // Wait for both visible-data fetches to complete
+    await Promise.allSettled(fetches)
+
     // ── Step 3: Competitors — deferred background prefetch ──
-    // This data isn't shown on this page, so fetch it quietly after visible data loads
     if (
       parsed.competitors &&
       parsed.competitors.length > 0 &&
       (!parsed.competitorProfiles || parsed.competitorProfiles.length === 0)
     ) {
       sessionStorage.setItem("eds_competitors_fetching", "true")
-      console.log("[fetch] Starting deferred competitor profiles fetch")
 
       try {
         const ctrl = new AbortController()
         const timer = setTimeout(() => ctrl.abort(), 30000)
-
         const res = await fetch("/api/competitors", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -159,7 +178,6 @@ export default function OnboardPage() {
 
           const updated = { ...parsed, competitorProfiles: profiles }
           sessionStorage.setItem("eds_brand_dna", JSON.stringify(updated))
-          console.log(`[fetch] Competitor profiles ready: ${profiles.length} profiles cached`)
         }
       } catch (err) {
         if (err instanceof Error && err.name !== "AbortError") {
@@ -175,14 +193,16 @@ export default function OnboardPage() {
     router.push("/competitors")
   }
 
-  const handleEdit = (field: string) => {
-    console.log("Edit field:", field)
-  }
-
   if (!brandDna) return null
 
   return (
     <div className="min-h-screen">
+      <StepIndicator />
+      {fetchError && (
+        <div className="max-w-2xl mx-auto px-4 mb-4">
+          <ErrorState message={fetchError} onRetry={retryFetches} />
+        </div>
+      )}
       <BrandDNACard
         brandDna={brandDna}
         edmundsAds={edmundsAds}
@@ -191,7 +211,6 @@ export default function OnboardPage() {
         edmundsAdsLoading={edmundsAdsLoading}
         socialAdsLoading={socialAdsLoading}
         onContinue={handleContinue}
-        onEdit={handleEdit}
       />
     </div>
   )

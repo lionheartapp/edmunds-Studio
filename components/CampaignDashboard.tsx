@@ -93,24 +93,28 @@ export default function CampaignDashboard({
             value: campaigns.length,
             icon: Zap,
             color: '#2070E8',
+            isEstimate: false,
           },
           {
             label: 'Opportunities Found',
             value: opportunitiesCount,
             icon: Target,
             color: '#8B5CF6',
+            isEstimate: false,
           },
           {
-            label: 'Est. Reach',
+            label: 'Estimated Reach',
             value: `${(estimatedReach / 1000).toFixed(0)}K`,
             icon: TrendingUp,
             color: '#06B6D4',
+            isEstimate: true,
           },
           {
             label: 'Competitor Gaps',
             value: competitorGaps,
             icon: Lock,
             color: '#EC4899',
+            isEstimate: false,
           },
         ].map((stat, idx) => {
           const Icon = stat.icon;
@@ -136,7 +140,10 @@ export default function CampaignDashboard({
                     style={{ color: stat.color }}
                   />
                 </div>
-                <p className="text-3xl font-bold">{stat.value}</p>
+                <p className={`text-3xl font-bold ${stat.isEstimate ? 'text-zinc-300' : ''}`}>
+                  {stat.value}
+                  {stat.isEstimate && <span className="text-xs font-normal text-zinc-500 ml-2">est.</span>}
+                </p>
               </div>
             </motion.div>
           );
@@ -260,6 +267,7 @@ export default function CampaignDashboard({
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     onClick={() => setDrawerOpen(false)}
+                    aria-label="Close drawer"
                     className="p-2 rounded-lg hover:bg-zinc-800 transition-colors"
                   >
                     <ChevronDown className="w-5 h-5" />

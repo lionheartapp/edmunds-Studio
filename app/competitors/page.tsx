@@ -4,6 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { AnimatePresence } from "framer-motion"
 import CompetitorAnalysis from "@/components/CompetitorAnalysis"
+import StepIndicator from "@/components/StepIndicator"
 import { BrandDNA } from "@/lib/types"
 
 const EDGE_MESSAGES = [
@@ -306,6 +307,7 @@ export default function CompetitorsPage() {
 
   return (
     <div className="min-h-screen">
+      <StepIndicator />
       <CompetitorAnalysis
         brandDna={brandDna}
         onContinue={handleContinue}

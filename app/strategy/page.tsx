@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import StrategicEdge from "@/components/StrategicEdge"
+import StepIndicator from "@/components/StepIndicator"
 import { BrandDNA, StrategicEdge as StrategicEdgeType } from "@/lib/types"
 
 export default function StrategyPage() {
@@ -43,6 +44,7 @@ export default function StrategyPage() {
 
   return (
     <div className="min-h-screen">
+      <StepIndicator />
       <StrategicEdge
         edge={edge}
         brandName={brandDna.name}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import CampaignDashboard from "@/components/CampaignDashboard"
+import StepIndicator from "@/components/StepIndicator"
 import { BrandDNA, StrategicEdge, PreBuiltCampaign } from "@/lib/types"
 
 export default function DashboardPage() {
@@ -56,6 +57,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen">
+      <StepIndicator />
       <CampaignDashboard
         brandDna={brandDna}
         edge={edgeData}
