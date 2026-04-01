@@ -77,74 +77,138 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             transition={{ duration: 0.5 }}
             className="relative z-10 flex flex-col items-center"
           >
-            {/* 3D Orb */}
-            <div className="relative w-40 h-40 mb-10">
-              {/* Outer glow */}
+            {/* Organic Morphing Orb */}
+            <div className="relative w-48 h-48 mb-10">
+              {/* Pulsing ambient glow */}
               <motion.div
                 animate={{
-                  scale: [1, 1.2, 1],
-                  opacity: [0.3, 0.6, 0.3],
+                  scale: [1, 1.3, 1.1, 1.25, 1],
+                  opacity: [0.2, 0.5, 0.3, 0.45, 0.2],
                 }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full bg-indigo-500/20 blur-2xl"
+                transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+                className="absolute inset-[-20px] rounded-full bg-indigo-500/20 blur-3xl"
               />
-              {/* Orb body */}
+
+              {/* Floating + rotating wrapper */}
               <motion.div
                 animate={{
-                  y: [0, -12, 0],
+                  y: [0, -14, -4, -18, 0],
+                  x: [0, 6, -4, 8, 0],
+                  rotate: [0, 3, -2, 4, 0],
                 }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                className="absolute inset-0 rounded-full"
-                style={{
-                  background: "radial-gradient(circle at 35% 35%, #818cf8, #6366f1 40%, #4338ca 70%, #312e81 100%)",
-                  boxShadow: "0 0 60px rgba(99, 102, 241, 0.4), 0 0 120px rgba(99, 102, 241, 0.15), inset 0 -20px 40px rgba(0,0,0,0.3)",
-                }}
+                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
+                className="absolute inset-0"
               >
-                {/* Highlight/shine */}
-                <div
-                  className="absolute top-4 left-6 w-12 h-8 rounded-full opacity-60"
-                  style={{
-                    background: "radial-gradient(ellipse, rgba(255,255,255,0.5), transparent)",
+                {/* Orb body — morphing blob */}
+                <motion.div
+                  animate={{
+                    borderRadius: [
+                      "42% 58% 62% 38% / 45% 55% 45% 55%",
+                      "55% 45% 38% 62% / 58% 42% 58% 42%",
+                      "38% 62% 55% 45% / 42% 58% 38% 62%",
+                      "62% 38% 45% 55% / 55% 45% 62% 38%",
+                      "42% 58% 62% 38% / 45% 55% 45% 55%",
+                    ],
+                    scale: [1, 1.04, 0.98, 1.02, 1],
                   }}
-                />
+                  transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
+                  className="absolute inset-0 overflow-hidden"
+                  style={{
+                    background: "radial-gradient(circle at 35% 30%, #a5b4fc, #818cf8 25%, #6366f1 45%, #4338ca 70%, #312e81 100%)",
+                    boxShadow: "0 0 80px rgba(99, 102, 241, 0.5), 0 0 160px rgba(99, 102, 241, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
+                  }}
+                >
+                  {/* Moving highlight — simulates light source shifting */}
+                  <motion.div
+                    animate={{
+                      x: [0, 10, -5, 15, 0],
+                      y: [0, -8, 5, -12, 0],
+                      scale: [1, 1.2, 0.9, 1.1, 1],
+                      opacity: [0.5, 0.7, 0.4, 0.65, 0.5],
+                    }}
+                    transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                    className="absolute top-3 left-5 w-16 h-10 rounded-full"
+                    style={{
+                      background: "radial-gradient(ellipse, rgba(255,255,255,0.6), rgba(255,255,255,0.1) 60%, transparent)",
+                    }}
+                  />
+                  {/* Secondary inner glow that drifts */}
+                  <motion.div
+                    animate={{
+                      x: [0, -15, 10, -8, 0],
+                      y: [0, 12, -8, 15, 0],
+                      opacity: [0.15, 0.3, 0.1, 0.25, 0.15],
+                    }}
+                    transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }}
+                    className="absolute bottom-4 right-4 w-20 h-20 rounded-full"
+                    style={{
+                      background: "radial-gradient(circle, rgba(167, 139, 250, 0.5), transparent 70%)",
+                    }}
+                  />
+                  {/* Subtle surface noise / texture shimmer */}
+                  <motion.div
+                    animate={{ opacity: [0.03, 0.08, 0.03] }}
+                    transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                    style={{
+                      backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")",
+                      mixBlendMode: "overlay",
+                    }}
+                  />
+                </motion.div>
               </motion.div>
-              {/* Shadow underneath */}
+
+              {/* Shadow — morphs with the orb */}
               <motion.div
                 animate={{
-                  scaleX: [1, 0.85, 1],
-                  opacity: [0.3, 0.15, 0.3],
+                  scaleX: [1, 0.8, 0.9, 0.75, 1],
+                  scaleY: [1, 1.1, 0.95, 1.05, 1],
+                  opacity: [0.25, 0.12, 0.2, 0.1, 0.25],
+                  x: [0, 6, -4, 8, 0],
                 }}
-                transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-4 rounded-full bg-indigo-500/30 blur-md"
+                transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
+                className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-indigo-500/30 blur-lg"
               />
-              {/* Orbiting ring */}
+
+              {/* Orbiting particle 1 */}
               <motion.div
                 animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 4, ease: "linear" }}
-                className="absolute inset-[-8px]"
+                transition={{ repeat: Infinity, duration: 5, ease: "linear" }}
+                className="absolute inset-[-12px]"
               >
-                <div
-                  className="w-full h-full rounded-full"
-                  style={{
-                    border: "2px solid transparent",
-                    borderTopColor: "rgba(129, 140, 248, 0.6)",
-                    borderRightColor: "rgba(129, 140, 248, 0.2)",
-                  }}
+                <motion.div
+                  animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }}
+                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                  className="absolute top-0 left-1/2 w-2 h-2 rounded-full bg-indigo-400"
+                  style={{ boxShadow: "0 0 8px rgba(129, 140, 248, 0.8)" }}
                 />
               </motion.div>
-              {/* Second orbiting ring (opposite direction) */}
+
+              {/* Orbiting particle 2 */}
               <motion.div
                 animate={{ rotate: -360 }}
-                transition={{ repeat: Infinity, duration: 6, ease: "linear" }}
-                className="absolute inset-[-16px]"
+                transition={{ repeat: Infinity, duration: 8, ease: "linear" }}
+                className="absolute inset-[-20px]"
               >
-                <div
-                  className="w-full h-full rounded-full"
-                  style={{
-                    border: "1.5px solid transparent",
-                    borderBottomColor: "rgba(167, 139, 250, 0.4)",
-                    borderLeftColor: "rgba(167, 139, 250, 0.1)",
-                  }}
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="absolute bottom-0 right-1/4 w-1.5 h-1.5 rounded-full bg-purple-400"
+                  style={{ boxShadow: "0 0 6px rgba(167, 139, 250, 0.7)" }}
+                />
+              </motion.div>
+
+              {/* Orbiting particle 3 */}
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ repeat: Infinity, duration: 12, ease: "linear" }}
+                className="absolute inset-[-28px]"
+              >
+                <motion.div
+                  animate={{ scale: [1, 1.8, 1], opacity: [0.3, 0.6, 0.3] }}
+                  transition={{ repeat: Infinity, duration: 2.5, ease: "easeInOut" }}
+                  className="absolute top-1/3 right-0 w-1 h-1 rounded-full bg-indigo-300"
+                  style={{ boxShadow: "0 0 4px rgba(165, 180, 252, 0.6)" }}
                 />
               </motion.div>
             </div>
