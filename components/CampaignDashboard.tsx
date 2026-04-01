@@ -1,110 +1,476 @@
-"use client"
+'use client';
 
-import { motion } from "framer-motion"
-import { CampaignPerformance, PLATFORM_DIMENSIONS } from "@/lib/types"
+import React, { useState } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { BrandDNA, StrategicEdge, PreBuiltCampaign } from '@/lib/types';
+import { ChevronDown, Plus, Zap, Target, TrendingUp, Lock } from 'lucide-react';
 
 interface CampaignDashboardProps {
-  performance: CampaignPerformance[]
-  insightSummary: string
-  onCreateNext: () => void
+  brandDna: BrandDNA;
+  edge: StrategicEdge;
+  showDrawerOnMount?: boolean;
 }
 
 export default function CampaignDashboard({
-  performance,
-  insightSummary,
-  onCreateNext,
+  brandDna,
+  edge,
+  showDrawerOnMount = false,
 }: CampaignDashboardProps) {
-  const totals = performance.reduce(
-    (acc, p) => ({
-      impressions: acc.impressions + p.impressions,
-      clicks: acc.clicks + p.clicks,
-      engagement: acc.engagement + p.engagement,
-      spend: acc.spend + p.spend,
-      conversions: acc.conversions + p.conversions,
-    }),
-    { impressions: 0, clicks: 0, engagement: 0, spend: 0, conversions: 0 }
-  )
+  const [drawerOpen, setDrawerOpen] = useState(showDrawerOnMount);
+  const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
+
+  const campaigns = edge.preBuiltCampaigns || [];
+  const opportunitiesCount = campaigns.length;
+  const estimatedReach = campaigns.length * 50000; // Placeholder calculation
+  const competitorGaps = Math.max(0, 5 - opportunitiesCount);
+
+  // Generate gradient for each campaign based on index and brand colors
+  const getGradientForCampaign = (index: number) => {
+    const brandColor = brandDna.colors.primary || '#3B82F6';
+    const secondaryColor = brandDna.colors.secondary || '#8B5CF6';
+
+    const gradients = [
+      `linear-gradient(135deg, ${brandColor}20 0%, ${secondaryColor}30 100%)`,
+      `linear-gradient(135deg, ${secondaryColor}20 0%, ${brandColor}30 100%)`,
+      `linear-gradient(135deg, ${brandColor}30 0%, #EC4899 20%)`,
+      `linear-gradient(135deg, #06B6D4 20%, ${brandColor}30 100%)`,
+    ];
+
+    return gradients[index % gradients.length];
+  };
 
   return (
-    <div className="max-w-4xl mx-auto p-8 bg-zinc-950 min-h-screen">
-      <motion.h2
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="text-3xl font-bold mb-2 accent-gradient-text"
-      >
-        Campaign Performance
-      </motion.h2>
-      <p className="text-zinc-400 mb-8">Real-time results across all platforms</p>
-
-      {/* Summary Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-        <MetricCard label="Impressions" value={totals.impressions.toLocaleString()} />
-        <MetricCard label="Clicks" value={totals.clicks.toLocaleString()} />
-        <MetricCard label="Conversions" value={totals.conversions.toLocaleString()} />
-        <MetricCard label="Total Spend" value={`$${totals.spend.toLocaleString()}`} />
-      </div>
-
-      {/* Claude Insight - Indigo-tinted Glass */}
+    <div className="relative min-h-screen bg-gradient-to-br from-zinc-950 via-zinc-900 to-black text-white overflow-hidden">
+      {/* Top Bar */}
       <motion.div
-        initial={{ opacity: 0, y: 10 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 bg-indigo-500/5 backdrop-blur border border-indigo-500/20 rounded-xl mb-8"
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="sticky top-0 z-40 border-b border-zinc-800/50 backdrop-blur-xl bg-zinc-950/80"
       >
-        <div className="flex items-start gap-3">
-          <span className="text-2xl flex-shrink-0">🧠</span>
-          <div>
-            <h3 className="font-semibold text-indigo-300 mb-1">Claude&apos;s Insight</h3>
-            <p className="text-zinc-300">{insightSummary}</p>
+        <div className="flex items-center justify-between px-6 py-4">
+          {/* Brand Section */}
+          <div className="flex items-center gap-3">
+            <div className="flex items-center gap-2">
+              <motion.div
+                className="w-4 h-4 rounded-full"
+                style={{ backgroundColor: brandDna.colors.primary || '#3B82F6' }}
+                animate={{ boxShadow: `0 0 20px ${brandDna.colors.primary || '#3B82F6'}80` }}
+                transition={{ duration: 2, repeat: Infinity }}
+              />
+              <h1 className="font-bold text-lg">{brandDna.name}</h1>
+            </div>
           </div>
+
+          {/* Center Title */}
+          <div className="absolute left-1/2 -translate-x-1/2">
+            <h2 className="text-xl font-semibold bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
+              Campaign Dashboard
+            </h2>
+          </div>
+
+          {/* New Campaign Button */}
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            onClick={() => setDrawerOpen(true)}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all"
+            style={{
+              backgroundColor: brandDna.colors.primary || '#3B82F6',
+              boxShadow: `0 0 20px ${brandDna.colors.primary || '#3B82F6'}40`,
+            }}
+          >
+            <Plus className="w-4 h-4" />
+            New Campaign
+          </motion.button>
         </div>
       </motion.div>
 
-      {/* Per-Platform Breakdown */}
-      <div className="space-y-3 mb-8">
-        {performance.map((p, i) => (
+      {/* Stats Row */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.1 }}
+        className="px-6 py-8 grid grid-cols-1 md:grid-cols-4 gap-4"
+      >
+        {[
+          {
+            label: 'Pre-built Campaigns',
+            value: campaigns.length,
+            icon: Zap,
+            color: brandDna.colors.primary,
+          },
+          {
+            label: 'Opportunities Found',
+            value: opportunitiesCount,
+            icon: Target,
+            color: '#8B5CF6',
+          },
+          {
+            label: 'Est. Reach',
+            value: `${(estimatedReach / 1000).toFixed(0)}K`,
+            icon: TrendingUp,
+            color: '#06B6D4',
+          },
+          {
+            label: 'Competitor Gaps',
+            value: competitorGaps,
+            icon: Lock,
+            color: '#EC4899',
+          },
+        ].map((stat, idx) => {
+          const Icon = stat.icon;
+          return (
+            <motion.div
+              key={idx}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.15 + idx * 0.1 }}
+              className="relative overflow-hidden rounded-xl border border-zinc-800/50 backdrop-blur-xl bg-zinc-900/50 p-6 group hover:border-zinc-700/50 transition-all"
+            >
+              {/* Animated background gradient */}
+              <motion.div
+                className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity"
+                style={{ background: stat.color }}
+              />
+
+              <div className="relative z-10">
+                <div className="flex items-center justify-between mb-4">
+                  <p className="text-zinc-400 text-sm font-medium">{stat.label}</p>
+                  <Icon
+                    className="w-5 h-5"
+                    style={{ color: stat.color }}
+                  />
+                </div>
+                <p className="text-3xl font-bold">{stat.value}</p>
+              </div>
+            </motion.div>
+          );
+        })}
+      </motion.div>
+
+      {/* Campaign Grid Preview (visible behind drawer when closed) */}
+      <motion.div
+        animate={{ opacity: drawerOpen ? 0.5 : 1 }}
+        transition={{ duration: 0.3 }}
+        className="px-6 pb-12"
+      >
+        <div className="mb-6">
+          <h3 className="text-lg font-semibold mb-4">Your Campaigns</h3>
+          {campaigns.length === 0 ? (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="rounded-xl border border-dashed border-zinc-700 backdrop-blur-xl bg-zinc-900/30 p-12 text-center"
+            >
+              <div className="mb-3">
+                <Zap className="w-8 h-8 mx-auto text-zinc-600 mb-2" />
+              </div>
+              <p className="text-zinc-400">
+                Click "New Campaign" or "View Campaigns" to get started
+              </p>
+            </motion.div>
+          ) : (
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              onClick={() => setDrawerOpen(true)}
+              className="w-full text-left"
+            >
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="rounded-xl border border-zinc-800/50 backdrop-blur-xl bg-gradient-to-br from-zinc-900/80 to-zinc-800/40 p-6 hover:border-zinc-700/50 transition-all cursor-pointer"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="font-semibold mb-1">
+                      {campaigns.length} AI-Generated Campaign{campaigns.length !== 1 ? 's' : ''}
+                    </p>
+                    <p className="text-sm text-zinc-400">
+                      Ready to review and customize
+                    </p>
+                  </div>
+                  <ChevronDown className="w-5 h-5 text-zinc-400" />
+                </div>
+              </motion.div>
+            </motion.button>
+          )}
+        </div>
+      </motion.div>
+
+      {/* Backdrop Overlay */}
+      <AnimatePresence>
+        {drawerOpen && (
           <motion.div
-            key={p.platform}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.1 }}
-            className="flex items-center gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors"
+            key="backdrop"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+            onClick={() => setDrawerOpen(false)}
+            className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm"
+          />
+        )}
+      </AnimatePresence>
+
+      {/* Slide-Up Drawer */}
+      <AnimatePresence>
+        {drawerOpen && (
+          <motion.div
+            key="drawer"
+            initial={{ y: '100%' }}
+            animate={{ y: 0 }}
+            exit={{ y: '100%' }}
+            transition={{
+              type: 'spring',
+              damping: 30,
+              stiffness: 300,
+              mass: 0.8,
+            }}
+            className="fixed inset-x-0 bottom-0 z-50 max-h-[90vh] overflow-hidden rounded-t-3xl border-t border-zinc-800/50 bg-zinc-900/95 backdrop-blur-xl"
           >
-            <span className="font-medium text-sm w-32 text-zinc-100">
-              {PLATFORM_DIMENSIONS[p.platform]?.label || p.platform}
-            </span>
-            <div className="flex-1 grid grid-cols-4 gap-4 text-sm text-zinc-400">
-              <span>{p.impressions.toLocaleString()} imp</span>
-              <span>{p.clicks.toLocaleString()} clicks</span>
-              <span>{(p.ctr * 100).toFixed(1)}% CTR</span>
-              <span>{p.roas.toFixed(1)}x ROAS</span>
+            {/* Drag Handle */}
+            <div className="flex justify-center pt-3 pb-2">
+              <motion.div
+                drag="y"
+                dragElastic={0.2}
+                dragMomentum={false}
+                onDragEnd={(_, { offset, velocity }) => {
+                  if (offset.y > 100 || velocity.y > 500) {
+                    setDrawerOpen(false);
+                  }
+                }}
+                className="w-12 h-1 rounded-full bg-zinc-700 cursor-grab active:cursor-grabbing hover:bg-zinc-600 transition-colors"
+              />
+            </div>
+
+            {/* Drawer Content */}
+            <div className="overflow-y-auto max-h-[calc(90vh-2rem)]">
+              {/* Drawer Header */}
+              <motion.div
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.1 }}
+                className="sticky top-0 z-10 px-6 py-4 border-b border-zinc-800/50 bg-zinc-900/95 backdrop-blur-xl"
+              >
+                <div className="flex items-center justify-between">
+                  <div>
+                    <h2 className="text-2xl font-bold">
+                      Your AI-Generated Campaigns
+                    </h2>
+                    <p className="text-sm text-zinc-400 mt-1">
+                      {campaigns.length} campaign{campaigns.length !== 1 ? 's' : ''} ready to launch
+                    </p>
+                  </div>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => setDrawerOpen(false)}
+                    className="p-2 rounded-lg hover:bg-zinc-800 transition-colors"
+                  >
+                    <ChevronDown className="w-5 h-5" />
+                  </motion.button>
+                </div>
+              </motion.div>
+
+              {/* Campaign Cards Grid */}
+              <div className="px-6 py-8">
+                {campaigns.length === 0 ? (
+                  <motion.div
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    className="text-center py-12"
+                  >
+                    <p className="text-zinc-400">
+                      No campaigns generated yet. Go back and complete the strategy phase.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    layout
+                    className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-8"
+                  >
+                    {campaigns.map((campaign, idx) => (
+                      <CampaignCard
+                        key={campaign.id}
+                        campaign={campaign}
+                        index={idx}
+                        brandColor={brandDna.colors.primary}
+                        gradient={getGradientForCampaign(idx)}
+                        isSelected={selectedCampaign === campaign.id}
+                        onSelect={() => setSelectedCampaign(campaign.id)}
+                      />
+                    ))}
+                  </motion.div>
+                )}
+              </div>
             </div>
           </motion.div>
-        ))}
-      </div>
-
-      {/* Create Next Campaign CTA */}
-      <motion.button
-        whileHover={{ scale: 1.01 }}
-        whileTap={{ scale: 0.99 }}
-        onClick={onCreateNext}
-        className="w-full py-4 bg-indigo-600 text-zinc-100 font-semibold rounded-xl
-                 hover:bg-indigo-500 transition-colors text-lg glow-sm shadow-lg shadow-indigo-500/20"
-      >
-        Create Next Campaign →
-      </motion.button>
+        )}
+      </AnimatePresence>
     </div>
-  )
+  );
 }
 
-function MetricCard({ label, value }: { label: string; value: string }) {
+// Campaign Card Component
+interface CampaignCardProps {
+  campaign: PreBuiltCampaign;
+  index: number;
+  brandColor?: string;
+  gradient: string;
+  isSelected: boolean;
+  onSelect: () => void;
+}
+
+function CampaignCard({
+  campaign,
+  index,
+  brandColor = '#3B82F6',
+  gradient,
+  isSelected,
+  onSelect,
+}: CampaignCardProps) {
   return (
     <motion.div
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-      className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg text-center hover:border-indigo-500/30 transition-colors"
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{
+        duration: 0.4,
+        delay: 0.15 + index * 0.08,
+        ease: 'easeOut',
+      }}
+      onClick={onSelect}
+      className={`group relative overflow-hidden rounded-xl border transition-all cursor-pointer ${
+        isSelected
+          ? 'border-blue-500/50 bg-blue-950/20'
+          : 'border-zinc-800/50 hover:border-zinc-700/50 bg-zinc-900/40'
+      }`}
     >
-      <p className="text-2xl font-bold text-zinc-100">{value}</p>
-      <p className="text-xs text-zinc-400 mt-1">{label}</p>
+      {/* Animated background glow on hover */}
+      <motion.div
+        className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at 50% 50%, ${brandColor}10 0%, transparent 70%)`,
+        }}
+      />
+
+      {/* Visual Area with Gradient */}
+      <motion.div
+        className="relative overflow-hidden h-32 rounded-t-lg"
+        style={{ background: gradient }}
+      >
+        <motion.div
+          className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity"
+          animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
+          transition={{ duration: 3, repeat: Infinity }}
+          style={{
+            backgroundImage: `linear-gradient(45deg, transparent 30%, white 50%, transparent 70%)`,
+            backgroundSize: '200% 200%',
+          }}
+        />
+        <div className="relative z-10 h-full flex items-end p-4">
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2 + index * 0.08 }}
+            className="text-xs font-semibold px-2 py-1 rounded-full bg-white/20 backdrop-blur text-white"
+          >
+            {campaign.angle}
+          </motion.div>
+        </div>
+      </motion.div>
+
+      {/* Content Area */}
+      <div className="relative z-10 p-5">
+        {/* Campaign Name */}
+        <h3 className="font-bold text-lg mb-3 line-clamp-2">
+          {campaign.name}
+        </h3>
+
+        {/* Headline */}
+        <p className="text-sm font-semibold text-zinc-200 mb-2 line-clamp-2 leading-tight">
+          {campaign.headline}
+        </p>
+
+        {/* Body Text */}
+        <p className="text-xs text-zinc-400 mb-4 line-clamp-2">
+          {campaign.bodyText}
+        </p>
+
+        {/* CTA Preview */}
+        <div className="mb-4 p-2 rounded bg-zinc-800/50 text-xs text-zinc-300">
+          CTA: "{campaign.cta}"
+        </div>
+
+        {/* Badges Row 1 */}
+        <div className="flex gap-2 mb-4 flex-wrap">
+          <motion.span
+            className="px-2 py-1 rounded text-xs font-medium bg-zinc-800/60 text-zinc-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            {campaign.platform}
+          </motion.span>
+          <motion.span
+            className="px-2 py-1 rounded text-xs font-medium bg-zinc-800/60 text-zinc-300"
+            whileHover={{ scale: 1.05 }}
+          >
+            {campaign.format}
+          </motion.span>
+        </div>
+
+        {/* Target & Impact Badges */}
+        <div className="flex gap-2 mb-5 flex-wrap">
+          <motion.span
+            className="px-2 py-1 rounded text-xs font-medium bg-amber-900/40 text-amber-200"
+            whileHover={{ scale: 1.05 }}
+          >
+            {campaign.targetAudience}
+          </motion.span>
+          <motion.span
+            className="px-2 py-1 rounded text-xs font-medium"
+            style={{
+              backgroundColor: `${brandColor}20`,
+              color: brandColor,
+            }}
+            whileHover={{ scale: 1.05 }}
+          >
+            {campaign.estimatedImpact}
+          </motion.span>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="grid grid-cols-2 gap-3 pt-3 border-t border-zinc-800/30">
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="py-2 px-3 rounded-lg font-semibold text-sm transition-all text-white"
+            style={{
+              backgroundColor: brandColor,
+              boxShadow: `0 0 12px ${brandColor}40`,
+            }}
+          >
+            Edit & Launch
+          </motion.button>
+          <motion.button
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className="py-2 px-3 rounded-lg font-semibold text-sm border border-zinc-700 hover:border-zinc-600 hover:bg-zinc-800/50 transition-all"
+          >
+            Save Draft
+          </motion.button>
+        </div>
+
+        {/* Selection Indicator */}
+        {isSelected && (
+          <motion.div
+            layoutId="selected-indicator"
+            className="absolute top-3 right-3 w-2 h-2 rounded-full"
+            style={{ backgroundColor: brandColor }}
+            animate={{ scale: [1, 1.2, 1] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        )}
+      </div>
     </motion.div>
-  )
+  );
 }

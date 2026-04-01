@@ -18,8 +18,8 @@ export default function OnboardPage() {
     }
   }, [router])
 
-  const handleConfirm = () => {
-    router.push("/brief")
+  const handleContinue = () => {
+    router.push("/competitors")
   }
 
   const handleEdit = (field: string) => {
@@ -30,8 +30,8 @@ export default function OnboardPage() {
   if (!brandDna) return null
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <BrandDNACard brandDna={brandDna} onConfirm={handleConfirm} onEdit={handleEdit} />
+    <div className="min-h-screen">
+      <BrandDNACard brandDna={brandDna} onContinue={handleContinue} onEdit={handleEdit} />
     </div>
   )
 }

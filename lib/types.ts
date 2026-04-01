@@ -20,6 +20,7 @@ export interface BrandDNA {
   visualStyle: string[] // e.g. ["Cinematic", "Outdoor", "Golden hour"]
   currentAds: AdSample[]
   competitors: string[]
+  competitorProfiles?: CompetitorProfile[]
   guidelinesUrl?: string
 }
 
@@ -30,6 +31,74 @@ export interface AdSample {
   imageUrl?: string
   format: string
   dateSpotted?: string
+  bodyText?: string
+  thumbnailDesc?: string // AI-generated description of the ad visual
+  engagementRate?: number
+  estimatedSpend?: string
+}
+
+// ─── Competitor Intelligence ────────────────────────────────
+
+export interface CompetitorProfile {
+  name: string
+  domain: string
+  logoColor: string // hex color for the avatar placeholder
+  adSpend: string // e.g. "$50k-100k/mo"
+  topPlatform: string
+  audienceOverlap: number // 0-100%
+  ads: CompetitorAd[]
+  strengths: string[]
+  weaknesses: string[]
+}
+
+export interface CompetitorAd {
+  platform: string
+  headline: string
+  bodyText: string
+  cta: string
+  format: string // "Image", "Video", "Carousel"
+  thumbnailDesc: string // description of the ad visual for mockup rendering
+  dateSpotted: string
+  estimatedImpressions: string
+  engagementRate: number
+  sentiment: "positive" | "neutral" | "negative"
+  whyItWorks?: string
+}
+
+// ─── Strategic Edge ─────────────────────────────────────────
+
+export interface StrategicEdge {
+  opportunities: Opportunity[]
+  overallStrategy: string
+  quickWins: string[]
+  preBuiltCampaigns: PreBuiltCampaign[]
+}
+
+export interface Opportunity {
+  id: string
+  title: string
+  category: "audience_gap" | "format_gap" | "platform_gap" | "messaging_gap" | "timing_gap" | "creative_gap"
+  impact: "high" | "medium" | "low"
+  insight: string
+  suggestedAngle: string
+  suggestedPlatforms: string[]
+  estimatedEdge: string
+}
+
+export interface PreBuiltCampaign {
+  id: string
+  name: string
+  opportunityId: string
+  angle: string
+  headline: string
+  bodyText: string
+  cta: string
+  platform: string
+  format: string
+  thumbnailDesc: string
+  tone: string
+  targetAudience: string
+  estimatedImpact: string
 }
 
 // ─── Creative Brief ──────────────────────────────────────────

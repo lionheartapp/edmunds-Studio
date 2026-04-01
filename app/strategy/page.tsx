@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
-import CampaignDashboard from "@/components/CampaignDashboard"
-import { BrandDNA, StrategicEdge } from "@/lib/types"
+import StrategicEdge from "@/components/StrategicEdge"
+import { BrandDNA, StrategicEdge as StrategicEdgeType } from "@/lib/types"
 
-export default function DashboardPage() {
+export default function StrategyPage() {
   const router = useRouter()
   const [brandDna, setBrandDna] = useState<BrandDNA | null>(null)
-  const [edge, setEdge] = useState<StrategicEdge | null>(null)
-  const [ready, setReady] = useState(false)
+  const [edge, setEdge] = useState<StrategicEdgeType | null>(null)
 
   useEffect(() => {
     const storedDna = sessionStorage.getItem("adgenai_brand_dna")
@@ -25,35 +24,30 @@ export default function DashboardPage() {
     if (storedEdge) {
       setEdge(JSON.parse(storedEdge))
     }
-
-    setReady(true)
   }, [router])
 
-  if (!ready || !brandDna) {
+  const handleLaunchCampaign = () => {
+    router.push("/dashboard")
+  }
+
+  if (!brandDna || !edge) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mx-auto mb-4" />
-          <p className="text-zinc-400 text-sm">Preparing your dashboard...</p>
+          <p className="text-zinc-400 text-sm">Loading strategic analysis...</p>
         </div>
       </div>
     )
   }
 
-  // If we don't have edge data, create a minimal fallback
-  const edgeData: StrategicEdge = edge || {
-    opportunities: [],
-    overallStrategy: "Complete the onboarding flow to unlock AI-generated strategic insights.",
-    quickWins: [],
-    preBuiltCampaigns: [],
-  }
-
   return (
     <div className="min-h-screen">
-      <CampaignDashboard
-        brandDna={brandDna}
-        edge={edgeData}
-        showDrawerOnMount={true}
+      <StrategicEdge
+        edge={edge}
+        brandName={brandDna.name}
+        brandColors={{ primary: brandDna.colors.primary, accent: brandDna.colors.accent }}
+        onLaunchCampaign={handleLaunchCampaign}
       />
     </div>
   )
