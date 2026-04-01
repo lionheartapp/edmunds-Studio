@@ -57,7 +57,12 @@ export async function POST(request: NextRequest) {
               body: JSON.stringify({ brandDna, campaignDescription }),
             }
           )
-          const { brief } = (await briefResponse.json()) as { brief: CreativeBrief }
+          const briefData = await briefResponse.json()
+          const brief: CreativeBrief = {
+            ...briefData.brief,
+            // Ensure platforms always exists
+            platforms: briefData.brief?.platforms || ["instagram_feed", "facebook_feed", "tiktok"],
+          }
 
           sendEvent("creative_brief", {
             stage: "creative_brief",
@@ -128,7 +133,7 @@ export async function POST(request: NextRequest) {
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
                 brief,
-                platform: brief.platforms[0] || "instagram_feed",
+                platform: (brief.platforms && brief.platforms[0]) || "instagram_feed",
               }),
             }
           )
