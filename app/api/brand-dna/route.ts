@@ -1,4 +1,5 @@
 // app/api/brand-dna/route.ts — Brand DNA Analysis Endpoint
+// FAST: Runs scraper, Brandfetch, and AI all in parallel
 
 import { NextRequest, NextResponse } from "next/server"
 import { askAIJSON, isAIConfigured } from "@/lib/ai"
@@ -20,10 +21,10 @@ import {
   BrandfetchResult,
 } from "@/lib/brandfetch"
 
-// Allow up to 60s for scraper + AI
 export const maxDuration = 60
 
-// Demo brief lookup for fallback when API keys aren't configured
+// ─── Demo Briefs ────────────────────────────────────────────
+
 const DEMO_BRANDS: Record<string, string> = {
   rivian: "rivian.json",
   subaru: "subaru.json",
@@ -39,12 +40,7 @@ async function loadDemoBrief(brandName: string): Promise<BrandDNA | null> {
   if (!fileName) return null
 
   try {
-    const filePath = path.join(
-      process.cwd(),
-      "public",
-      "demo-briefs",
-      fileName
-    )
+    const filePath = path.join(process.cwd(), "public", "demo-briefs", fileName)
     const data = JSON.parse(await readFile(filePath, "utf-8"))
     return data.brandDna as BrandDNA
   } catch {
@@ -52,160 +48,163 @@ async function loadDemoBrief(brandName: string): Promise<BrandDNA | null> {
   }
 }
 
+// ─── Helpers ────────────────────────────────────────────────
+
+/** Race a promise against a timeout — returns null on timeout */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.log(`[brand-dna] ${label} timed out after ${ms}ms`)
+        resolve(null)
+      }, ms)
+    ),
+  ])
+}
+
+/** Apply Brandfetch overrides to a BrandDNA profile */
+function applyBrandfetch(profile: BrandDNA, bf: BrandfetchResult): BrandDNA {
+  const result = { ...profile }
+
+  if (bf.colors && bf.colors.length > 0) {
+    result.colors = extractColors(bf)
+  }
+  if (bf.fonts && bf.fonts.length > 0) {
+    result.typography = extractFonts(bf)
+  }
+
+  const logoUrl = getBestLogoUrl(bf)
+  const fullLogoUrl = getFullLogoUrl(bf)
+  if (logoUrl) result.logoUrl = logoUrl
+  if (fullLogoUrl) result.fullLogoUrl = fullLogoUrl
+  if (bf.description && !result.description) result.description = bf.description
+  if (bf.domain) result.domain = bf.domain
+
+  return result
+}
+
+// ─── Main Handler ───────────────────────────────────────────
+
 export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
   try {
     const { brandName } = await request.json()
 
     if (!brandName) {
-      return NextResponse.json(
-        { error: "Brand name is required" },
-        { status: 400 }
-      )
+      return NextResponse.json({ error: "Brand name is required" }, { status: 400 })
     }
 
     // If no API key, fall back to demo briefs
     if (!isAIConfigured()) {
       const demo = await loadDemoBrief(brandName)
-      if (demo) {
-        return NextResponse.json({ brandDna: demo })
-      }
+      if (demo) return NextResponse.json({ brandDna: demo })
       return NextResponse.json(
-        {
-          error:
-            "No AI API key configured. Set GOOGLE_GEMINI_API_KEY in environment variables. Try a demo brand: Rivian, Subaru, or Toyota.",
-        },
+        { error: "No AI API key configured. Set GOOGLE_GEMINI_API_KEY. Try: Rivian, Subaru, Toyota." },
         { status: 503 }
       )
     }
 
-    // Step 1: Run scraper + Brandfetch in parallel (with timeouts)
+    // ═══════════════════════════════════════════════════════════
+    // FAST PATH: Run ALL three in parallel
+    // - AI gets called immediately (no waiting for scraper)
+    // - Brandfetch runs simultaneously
+    // - Scraper runs simultaneously (enriches retry if needed)
+    // ═══════════════════════════════════════════════════════════
+
     let scraperContext = ""
 
-    // Helper: race a promise against a timeout
-    const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> =>
-      Promise.race([
-        promise,
-        new Promise<null>((resolve) => setTimeout(() => {
-          console.log(`[brand-dna] ${label} timed out after ${ms}ms`)
-          resolve(null)
-        }, ms)),
-      ])
+    const [aiResult, bfResult, scraperResult] = await Promise.allSettled([
+      // 1. AI — fire immediately without scraper context
+      withTimeout(
+        askAIJSON<BrandDNA>(
+          BRAND_DNA_SYSTEM_PROMPT,
+          BRAND_DNA_USER_PROMPT(brandName, ""),
+          { temperature: 0.5 }
+        ),
+        40000, // 40s max for AI
+        "AI"
+      ),
 
-    const [scraperSettled, bfSettled] = await Promise.allSettled([
+      // 2. Brandfetch — fast API call
+      isBrandfetchConfigured()
+        ? withTimeout(fetchBrand(brandName), 6000, "Brandfetch")
+        : Promise.resolve(null),
+
+      // 3. Scraper — for retry enrichment
       withTimeout(
         scrapeBrand(brandName).then(result => {
           scraperContext = buildScraperContext(result)
           return result
         }),
-        15000, // 15s max for scraper
+        10000, // 10s max
         "Scraper"
       ),
-      isBrandfetchConfigured()
-        ? withTimeout(fetchBrand(brandName), 8000, "Brandfetch")
-        : Promise.resolve(null),
     ])
 
-    if (scraperSettled.status === "rejected") {
-      console.log(`[brand-dna] Scraper failed:`, scraperSettled.reason)
-    }
-    if (bfSettled.status === "rejected") {
-      console.log(`[brand-dna] Brandfetch failed:`, bfSettled.reason)
-    }
-
-    // Extract Brandfetch data if available
+    // Extract results
+    const aiProfile = aiResult.status === "fulfilled" ? aiResult.value : null
     const brandfetchData: BrandfetchResult | null =
-      bfSettled.status === "fulfilled" ? bfSettled.value : null
+      bfResult.status === "fulfilled" ? bfResult.value : null
 
-    if (brandfetchData) {
-      console.log(`[brand-dna] Brandfetch: ${brandfetchData.logos?.length || 0} logos, ${brandfetchData.colors?.length || 0} colors, ${brandfetchData.fonts?.length || 0} fonts`)
-    } else {
-      console.log(`[brand-dna] Brandfetch: no data available`)
+    const elapsed = Date.now() - startTime
+    console.log(`[brand-dna] Parallel phase done in ${elapsed}ms — AI: ${aiResult.status}, BF: ${bfResult.status}, Scraper: ${scraperResult.status}`)
+
+    // ─── Success: AI worked on first try ────────────────────
+    if (aiProfile) {
+      const profile = brandfetchData
+        ? applyBrandfetch(aiProfile, brandfetchData)
+        : aiProfile
+
+      console.log(`[brand-dna] Success for ${brandName} in ${Date.now() - startTime}ms`)
+      return NextResponse.json({ brandDna: profile })
     }
 
-    console.log(`[brand-dna] Scraper context length: ${scraperContext.length} chars`)
+    // ─── Retry: AI failed, try once more with scraper context ─
+    console.log(`[brand-dna] AI first attempt failed, retrying with scraper context (${scraperContext.length} chars)`)
 
-    // Step 2: Ask AI for full Brand DNA analysis, enriched with scraper context
-    // Retry up to 2 times on failure
-    let lastError = ""
-    for (let attempt = 0; attempt < 2; attempt++) {
-      try {
-        console.log(`[brand-dna] AI attempt ${attempt + 1} for: ${brandName}`)
-        const profile = await askAIJSON<BrandDNA>(
+    try {
+      const retryProfile = await withTimeout(
+        askAIJSON<BrandDNA>(
           BRAND_DNA_SYSTEM_PROMPT,
           BRAND_DNA_USER_PROMPT(brandName, scraperContext),
           { temperature: 0.5 }
-        )
+        ),
+        30000,
+        "AI retry"
+      )
 
-        // Step 3: Override AI-generated colors/fonts/logos with Brandfetch data
-        // Brandfetch is authoritative for visual identity
-        if (brandfetchData) {
-          const bfColors = extractColors(brandfetchData)
-          const bfFonts = extractFonts(brandfetchData)
-          const logoUrl = getBestLogoUrl(brandfetchData)
-          const fullLogoUrl = getFullLogoUrl(brandfetchData)
+      if (retryProfile) {
+        const profile = brandfetchData
+          ? applyBrandfetch(retryProfile, brandfetchData)
+          : retryProfile
 
-          // Override colors with real brand colors
-          if (brandfetchData.colors && brandfetchData.colors.length > 0) {
-            profile.colors = bfColors
-            console.log(`[brand-dna] Overriding colors with Brandfetch: ${JSON.stringify(bfColors)}`)
-          }
-
-          // Override fonts with real brand fonts
-          if (brandfetchData.fonts && brandfetchData.fonts.length > 0) {
-            profile.typography = bfFonts
-            console.log(`[brand-dna] Overriding fonts with Brandfetch: ${bfFonts.primaryFont}`)
-          }
-
-          // Add real logos
-          if (logoUrl) {
-            profile.logoUrl = logoUrl
-            console.log(`[brand-dna] Logo URL: ${logoUrl}`)
-          }
-          if (fullLogoUrl) {
-            profile.fullLogoUrl = fullLogoUrl
-          }
-
-          // Add description if AI didn't provide one
-          if (brandfetchData.description && !profile.description) {
-            profile.description = brandfetchData.description
-          }
-
-          // Ensure domain is correct
-          if (brandfetchData.domain) {
-            profile.domain = brandfetchData.domain
-          }
-        }
-
-        console.log(`[brand-dna] Success for: ${brandName}`)
+        console.log(`[brand-dna] Retry success for ${brandName} in ${Date.now() - startTime}ms`)
         return NextResponse.json({ brandDna: profile })
-      } catch (aiError) {
-        lastError = aiError instanceof Error ? aiError.message : String(aiError)
-        console.error(`[brand-dna] AI attempt ${attempt + 1} failed:`, lastError)
-        if (attempt < 1) await new Promise(r => setTimeout(r, 1000))
       }
+    } catch (retryError) {
+      console.error(`[brand-dna] Retry failed:`, retryError instanceof Error ? retryError.message : retryError)
     }
 
-    // Fall back to demo brief if AI fails (still apply Brandfetch if available)
+    // ─── Fallback: demo brief ───────────────────────────────
     const demo = await loadDemoBrief(brandName)
     if (demo) {
-      console.log("[brand-dna] Falling back to demo brief for:", brandName)
-      if (brandfetchData) {
-        const bfColors = extractColors(brandfetchData)
-        const logoUrl = getBestLogoUrl(brandfetchData)
-        const fullLogoUrl = getFullLogoUrl(brandfetchData)
-        if (brandfetchData.colors.length > 0) demo.colors = bfColors
-        if (logoUrl) demo.logoUrl = logoUrl
-        if (fullLogoUrl) demo.fullLogoUrl = fullLogoUrl
-      }
-      return NextResponse.json({ brandDna: demo })
+      console.log(`[brand-dna] Falling back to demo brief for: ${brandName}`)
+      const profile = brandfetchData ? applyBrandfetch(demo, brandfetchData) : demo
+      return NextResponse.json({ brandDna: profile })
     }
+
+    const firstError = aiResult.status === "rejected"
+      ? (aiResult.reason instanceof Error ? aiResult.reason.message : String(aiResult.reason))
+      : "AI returned null (timeout)"
+
     return NextResponse.json(
-      { error: `Failed to analyze brand: ${lastError}` },
+      { error: `Failed to analyze brand: ${firstError}` },
       { status: 500 }
     )
   } catch (error) {
     console.error("[brand-dna] Unhandled error:", error instanceof Error ? error.message : error)
-    console.error("[brand-dna] Stack:", error instanceof Error ? error.stack : "no stack")
     return NextResponse.json(
       { error: `Internal server error: ${error instanceof Error ? error.message : "Unknown"}` },
       { status: 500 }
