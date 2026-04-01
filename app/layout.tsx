@@ -21,7 +21,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className={`${sans.variable} h-full antialiased`}>
-      <body className="min-h-full flex flex-col bg-white text-gray-900 font-sans">
+      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 font-sans">
         <main className="flex-1">{children}</main>
       </body>
     </html>
