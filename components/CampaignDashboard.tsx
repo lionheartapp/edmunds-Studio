@@ -9,12 +9,14 @@ interface CampaignDashboardProps {
   brandDna: BrandDNA;
   edge: StrategicEdge;
   showDrawerOnMount?: boolean;
+  onPlaceOnEdmunds?: (campaign: PreBuiltCampaign) => void;
 }
 
 export default function CampaignDashboard({
   brandDna,
   edge,
   showDrawerOnMount = false,
+  onPlaceOnEdmunds,
 }: CampaignDashboardProps) {
   const [drawerOpen, setDrawerOpen] = useState(showDrawerOnMount);
   const [selectedCampaign, setSelectedCampaign] = useState<string | null>(null);
@@ -299,6 +301,7 @@ export default function CampaignDashboard({
                         gradient={getGradientForCampaign(idx)}
                         isSelected={selectedCampaign === campaign.id}
                         onSelect={() => setSelectedCampaign(campaign.id)}
+                        onPlace={onPlaceOnEdmunds}
                       />
                     ))}
                   </motion.div>
@@ -320,6 +323,7 @@ interface CampaignCardProps {
   gradient: string;
   isSelected: boolean;
   onSelect: () => void;
+  onPlace?: (campaign: PreBuiltCampaign) => void;
 }
 
 function CampaignCard({
@@ -329,6 +333,7 @@ function CampaignCard({
   gradient,
   isSelected,
   onSelect,
+  onPlace,
 }: CampaignCardProps) {
   return (
     <motion.div
@@ -443,13 +448,14 @@ function CampaignCard({
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
+            onClick={() => onPlace?.(campaign)}
             className="py-2 px-3 rounded-lg font-semibold text-sm transition-all text-white"
             style={{
               backgroundColor: brandColor,
               boxShadow: `0 0 12px ${brandColor}40`,
             }}
           >
-            Edit & Launch
+            Place on Edmunds
           </motion.button>
           <motion.button
             whileHover={{ scale: 1.05 }}

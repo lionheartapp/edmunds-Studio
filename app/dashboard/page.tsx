@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import CampaignDashboard from "@/components/CampaignDashboard"
-import { BrandDNA, StrategicEdge } from "@/lib/types"
+import { BrandDNA, StrategicEdge, PreBuiltCampaign } from "@/lib/types"
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -28,6 +28,12 @@ export default function DashboardPage() {
 
     setReady(true)
   }, [router])
+
+  const handlePlaceOnEdmunds = (campaign: PreBuiltCampaign) => {
+    // Store selected campaign and navigate to placement flow
+    sessionStorage.setItem("adgenai_selected_campaign", JSON.stringify(campaign))
+    router.push("/placement")
+  }
 
   if (!ready || !brandDna) {
     return (
@@ -54,6 +60,7 @@ export default function DashboardPage() {
         brandDna={brandDna}
         edge={edgeData}
         showDrawerOnMount={true}
+        onPlaceOnEdmunds={handlePlaceOnEdmunds}
       />
     </div>
   )
