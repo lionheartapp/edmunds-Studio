@@ -13,13 +13,18 @@ const stagger = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.06 },
+    transition: { staggerChildren: 0.07 },
   },
 }
 
-const fadeUp = {
-  hidden: { opacity: 0, y: 12 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+const cardVariant = {
+  hidden: { opacity: 0, y: 16, scale: 0.97 },
+  show: {
+    opacity: 1,
+    y: 0,
+    scale: 1,
+    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] },
+  },
 }
 
 export default function BrandDNACard({
@@ -28,170 +33,187 @@ export default function BrandDNACard({
   onEdit,
 }: BrandDNACardProps) {
   return (
-    <div className="relative min-h-screen py-12 px-6">
-      {/* Background accent based on brand primary color */}
+    <div className="relative min-h-screen py-10 px-4 md:px-8">
+      {/* Background ambient glow based on brand color */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] rounded-full blur-3xl opacity-10 pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${brandDna.colors.primary}, transparent)` }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-[0.07] pointer-events-none"
+        style={{ background: `radial-gradient(circle, ${brandDna.colors.primary}, ${brandDna.colors.accent}, transparent)` }}
       />
 
       <motion.div
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="relative z-10 max-w-5xl mx-auto"
+        className="relative z-10 max-w-6xl mx-auto"
       >
-        {/* Header — full width */}
-        <motion.div variants={fadeUp} className="mb-8">
-          <div className="flex items-center gap-3 mb-1">
-            <div
-              className="w-3 h-3 rounded-full"
-              style={{ backgroundColor: brandDna.colors.primary }}
-            />
-            <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
-              Brand DNA
-            </span>
+        {/* Header */}
+        <motion.div variants={cardVariant} className="mb-6 flex items-end justify-between">
+          <div>
+            <div className="flex items-center gap-3 mb-2">
+              <motion.div
+                animate={{ scale: [1, 1.2, 1] }}
+                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                className="w-3 h-3 rounded-full"
+                style={{ backgroundColor: brandDna.colors.primary, boxShadow: `0 0 12px ${brandDna.colors.primary}60` }}
+              />
+              <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                Brand DNA
+              </span>
+            </div>
+            <h2 className="text-4xl font-bold tracking-tight">{brandDna.name}</h2>
+            <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
           </div>
-          <h2 className="text-4xl font-bold tracking-tight">{brandDna.name}</h2>
-          <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
         </motion.div>
 
-        {/* Two-column grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-0">
-          {/* ── Left Column ──────────────────────── */}
-          <div>
-            {/* Color Palette */}
-            <Section title="Colors" onEdit={() => onEdit?.("colors")}>
-              <div className="flex gap-4">
-                {Object.entries(brandDna.colors).map(([name, hex]) => (
-                  <div key={name} className="flex flex-col items-center gap-2">
-                    <div
-                      className="w-14 h-14 rounded-2xl border border-zinc-800 shadow-lg transition-transform hover:scale-105"
-                      style={{ backgroundColor: hex }}
-                    />
-                    <span className="text-[11px] text-zinc-500 capitalize">{name}</span>
-                    <span className="text-[11px] font-mono text-zinc-600">{hex}</span>
-                  </div>
-                ))}
-              </div>
-            </Section>
+        {/* ── Bento Grid ──────────────────────────── */}
+        <div className="grid grid-cols-12 gap-3 auto-rows-auto">
 
-            {/* Typography */}
-            <Section title="Typography" onEdit={() => onEdit?.("typography")}>
+          {/* Colors — spans 5 cols */}
+          <GlassCard className="col-span-12 md:col-span-5" onEdit={() => onEdit?.("colors")} label="Colors">
+            <div className="flex gap-3 mt-1">
+              {Object.entries(brandDna.colors).map(([name, hex]) => (
+                <motion.div
+                  key={name}
+                  whileHover={{ scale: 1.08, y: -4 }}
+                  className="flex flex-col items-center gap-2 flex-1"
+                >
+                  <div
+                    className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
+                    style={{
+                      backgroundColor: hex,
+                      boxShadow: `0 8px 32px ${hex}30`,
+                    }}
+                  />
+                  <span className="text-[10px] text-zinc-500 capitalize">{name}</span>
+                  <span className="text-[10px] font-mono text-zinc-600">{hex}</span>
+                </motion.div>
+              ))}
+            </div>
+          </GlassCard>
+
+          {/* Typography — spans 4 cols */}
+          <GlassCard className="col-span-12 md:col-span-4" onEdit={() => onEdit?.("typography")} label="Typography">
+            <div className="flex flex-col justify-center h-full">
               <p
-                className="text-2xl text-zinc-100"
+                className="text-3xl text-zinc-100 tracking-tight"
                 style={{ fontWeight: parseInt(brandDna.typography.headingWeight) || 700 }}
               >
                 {brandDna.typography.primaryFont}
               </p>
-              <p className="text-sm text-zinc-500 mt-1">
-                Fallback: {brandDna.typography.fallback} · Weight: {brandDna.typography.headingWeight}
-              </p>
-            </Section>
-
-            {/* Voice */}
-            <Section title="Voice" onEdit={() => onEdit?.("voice")}>
-              <div className="flex flex-wrap gap-2">
-                {brandDna.voice.map((attr) => (
-                  <span
-                    key={attr}
-                    className="px-3 py-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg text-sm font-medium
-                             border border-indigo-500/20"
-                  >
-                    {attr}
-                  </span>
-                ))}
+              <div className="flex items-center gap-3 mt-3">
+                <span className="text-[11px] px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
+                  {brandDna.typography.fallback}
+                </span>
+                <span className="text-[11px] px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
+                  Weight {brandDna.typography.headingWeight}
+                </span>
               </div>
-            </Section>
+            </div>
+          </GlassCard>
 
-            {/* Visual Style */}
-            <Section title="Visual Style" onEdit={() => onEdit?.("visualStyle")}>
-              <div className="flex flex-wrap gap-2">
-                {brandDna.visualStyle.map((style) => (
-                  <span
-                    key={style}
-                    className="px-3 py-1.5 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium
-                             border border-zinc-700"
-                  >
-                    {style}
-                  </span>
-                ))}
-              </div>
-            </Section>
-          </div>
-
-          {/* ── Right Column ─────────────────────── */}
-          <div>
-            {/* Competitors */}
-            <Section title="Competitors">
-              <div className="flex flex-wrap gap-2">
-                {brandDna.competitors.map((comp) => (
-                  <div
-                    key={comp}
-                    className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-400"
-                  >
-                    {comp}
-                  </div>
-                ))}
-              </div>
-            </Section>
-
-            {/* Current Ads */}
-            {brandDna.currentAds.length > 0 && (
-              <Section title="Ad Intelligence">
-                <div className="grid gap-3">
-                  {brandDna.currentAds.map((ad, i) => (
-                    <motion.div
-                      key={i}
-                      variants={fadeUp}
-                      className="p-4 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
-                    >
-                      <div className="flex items-center gap-2 mb-2">
-                        <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">
-                          {ad.platform}
-                        </span>
-                        <span className="text-[11px] text-zinc-600">·</span>
-                        <span className="text-[11px] text-zinc-600">{ad.format}</span>
-                        {ad.dateSpotted && (
-                          <>
-                            <span className="text-[11px] text-zinc-600">·</span>
-                            <span className="text-[11px] text-zinc-600">{ad.dateSpotted}</span>
-                          </>
-                        )}
-                      </div>
-                      <p className="text-sm font-medium text-zinc-200">&ldquo;{ad.headline}&rdquo;</p>
-                      <p className="text-xs text-indigo-400 mt-1.5 font-medium">{ad.cta} →</p>
-                    </motion.div>
-                  ))}
-                </div>
-              </Section>
-            )}
-
-            {/* Guidelines URL if available */}
-            {brandDna.guidelinesUrl && (
-              <Section title="Brand Guidelines">
-                <a
-                  href={brandDna.guidelinesUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors underline underline-offset-2"
+          {/* Competitors — spans 3 cols */}
+          <GlassCard className="col-span-12 md:col-span-3" label="Competitors">
+            <div className="flex flex-col gap-2">
+              {brandDna.competitors.map((comp, i) => (
+                <motion.div
+                  key={comp}
+                  initial={{ opacity: 0, x: 10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.4 + i * 0.1 }}
+                  className="flex items-center gap-2.5 px-3 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700/30"
                 >
-                  {brandDna.guidelinesUrl} ↗
-                </a>
-              </Section>
-            )}
-          </div>
+                  <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                    {i + 1}
+                  </div>
+                  <span className="text-sm text-zinc-300">{comp}</span>
+                </motion.div>
+              ))}
+            </div>
+          </GlassCard>
+
+          {/* Voice — spans 6 cols */}
+          <GlassCard className="col-span-12 md:col-span-6" onEdit={() => onEdit?.("voice")} label="Voice">
+            <div className="flex flex-wrap gap-2">
+              {brandDna.voice.map((attr, i) => (
+                <motion.span
+                  key={attr}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.08 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  className="px-4 py-2 bg-indigo-500/10 text-indigo-400 rounded-xl text-sm font-medium
+                           border border-indigo-500/20 backdrop-blur-sm cursor-default"
+                  style={{ boxShadow: "0 0 20px rgba(99, 102, 241, 0.05)" }}
+                >
+                  {attr}
+                </motion.span>
+              ))}
+            </div>
+          </GlassCard>
+
+          {/* Visual Style — spans 6 cols */}
+          <GlassCard className="col-span-12 md:col-span-6" onEdit={() => onEdit?.("visualStyle")} label="Visual Style">
+            <div className="flex flex-wrap gap-2">
+              {brandDna.visualStyle.map((style, i) => (
+                <motion.span
+                  key={style}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.08 }}
+                  whileHover={{ scale: 1.05, y: -2 }}
+                  className="px-4 py-2 bg-zinc-800/80 text-zinc-300 rounded-xl text-sm font-medium
+                           border border-zinc-700/50 backdrop-blur-sm cursor-default"
+                >
+                  {style}
+                </motion.span>
+              ))}
+            </div>
+          </GlassCard>
+
+          {/* Ad Intelligence — full width */}
+          {brandDna.currentAds.length > 0 && (
+            <GlassCard className="col-span-12" label="Ad Intelligence">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {brandDna.currentAds.slice(0, 3).map((ad, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 + i * 0.1 }}
+                    whileHover={{ y: -3, borderColor: "rgba(99, 102, 241, 0.3)" }}
+                    className="p-4 bg-zinc-800/40 rounded-xl border border-zinc-700/30 transition-colors"
+                  >
+                    <div className="flex items-center gap-2 mb-3">
+                      <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded-md">
+                        {ad.platform}
+                      </span>
+                      {ad.dateSpotted && (
+                        <span className="text-[10px] text-zinc-600">{ad.dateSpotted}</span>
+                      )}
+                    </div>
+                    <p className="text-sm font-medium text-zinc-200 mb-1">&ldquo;{ad.headline}&rdquo;</p>
+                    <div className="flex items-center justify-between mt-3">
+                      <span className="text-[11px] text-zinc-500">{ad.format}</span>
+                      <span className="text-xs text-indigo-400 font-medium">{ad.cta} →</span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </GlassCard>
+          )}
         </div>
 
-        {/* Confirm Button — full width */}
-        <motion.div variants={fadeUp} className="mt-6">
-          <button
+        {/* Confirm Button */}
+        <motion.div variants={cardVariant} className="mt-6">
+          <motion.button
+            whileHover={{ scale: 1.005 }}
+            whileTap={{ scale: 0.995 }}
             onClick={onConfirm}
             className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold
                      rounded-xl transition-all glow-sm text-base"
           >
             Looks Right — Continue →
-          </button>
+          </motion.button>
           <p className="text-center text-xs text-zinc-600 mt-3">
             You can edit any section above before continuing
           </p>
@@ -201,31 +223,54 @@ export default function BrandDNACard({
   )
 }
 
-function Section({
-  title,
+/* ── Glass Card Component ─────────────────────── */
+
+function GlassCard({
   children,
+  className = "",
+  label,
   onEdit,
 }: {
-  title: string
   children: React.ReactNode
+  className?: string
+  label?: string
   onEdit?: () => void
 }) {
   return (
-    <motion.div variants={fadeUp} className="mb-6 pb-6 border-b border-zinc-800/50">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
-          {title}
-        </h3>
-        {onEdit && (
-          <button
-            onClick={onEdit}
-            className="text-xs text-zinc-600 hover:text-indigo-400 transition-colors px-2 py-1 rounded-md
-                     hover:bg-zinc-800"
-          >
-            Edit
-          </button>
-        )}
-      </div>
+    <motion.div
+      variants={cardVariant}
+      whileHover={{ borderColor: "rgba(255,255,255,0.08)" }}
+      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors ${className}`}
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+      }}
+    >
+      {/* Subtle top highlight */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 50%, transparent)",
+        }}
+      />
+
+      {label && (
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+            {label}
+          </span>
+          {onEdit && (
+            <button
+              onClick={onEdit}
+              className="text-[11px] text-zinc-600 hover:text-indigo-400 transition-colors px-2 py-0.5 rounded-md
+                       hover:bg-white/[0.03]"
+            >
+              Edit
+            </button>
+          )}
+        </div>
+      )}
       {children}
     </motion.div>
   )
