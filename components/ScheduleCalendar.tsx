@@ -16,9 +16,15 @@ export default function ScheduleCalendar({
   onScheduleAll,
 }: ScheduleCalendarProps) {
   return (
-    <div className="max-w-3xl mx-auto p-8">
-      <h2 className="text-3xl font-bold mb-2">Schedule Campaign</h2>
-      <p className="text-gray-500 mb-8">
+    <div className="max-w-3xl mx-auto p-8 bg-zinc-950 min-h-screen">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-3xl font-bold mb-2 accent-gradient-text"
+      >
+        Schedule Campaign
+      </motion.h2>
+      <p className="text-zinc-400 mb-8">
         Claude picked optimal posting times. Adjust if needed.
       </p>
 
@@ -29,10 +35,10 @@ export default function ScheduleCalendar({
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl"
+            className="flex items-center gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors"
           >
             {/* Platform Badge */}
-            <div className="flex-shrink-0 px-3 py-1 bg-gray-100 rounded-lg text-sm font-medium">
+            <div className="flex-shrink-0 px-3 py-1 bg-zinc-800 border border-zinc-700 rounded-lg text-sm font-medium text-zinc-300">
               {PLATFORM_DIMENSIONS[slot.platform]?.label || slot.platform}
             </div>
 
@@ -43,15 +49,17 @@ export default function ScheduleCalendar({
               onChange={(e) =>
                 onUpdateSlot(i, { scheduledAt: new Date(e.target.value).toISOString() })
               }
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-lg
-                       focus:border-blue-500 focus:outline-none text-sm"
+              className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500
+                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 text-sm"
             />
 
-            {/* Status */}
-            <span className={`text-xs font-medium px-2 py-1 rounded-full ${
-              slot.status === "scheduled" ? "bg-green-100 text-green-700" :
-              slot.status === "published" ? "bg-blue-100 text-blue-700" :
-              "bg-gray-100 text-gray-500"
+            {/* Status Badge */}
+            <span className={`text-xs font-medium px-3 py-1 rounded-full transition-colors ${
+              slot.status === "scheduled"
+                ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
+                : slot.status === "published"
+                ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/30"
+                : "bg-zinc-800 text-zinc-400 border border-zinc-700"
             }`}>
               {slot.status}
             </span>
@@ -63,8 +71,8 @@ export default function ScheduleCalendar({
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={onScheduleAll}
-        className="w-full py-4 bg-blue-600 text-white font-semibold rounded-2xl
-                 hover:bg-blue-700 transition-colors text-lg"
+        className="w-full py-4 bg-indigo-600 text-zinc-100 font-semibold rounded-xl
+                 hover:bg-indigo-500 transition-colors text-lg glow-sm shadow-lg shadow-indigo-500/20"
       >
         Schedule All
       </motion.button>

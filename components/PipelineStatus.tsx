@@ -33,15 +33,15 @@ export default function PipelineStatusView({
   error,
 }: PipelineStatusProps) {
   return (
-    <div className="max-w-2xl mx-auto p-8">
+    <div className="max-w-2xl mx-auto p-8 bg-zinc-950 min-h-screen">
       <motion.h2
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        className="text-3xl font-bold mb-2"
+        className="text-3xl font-bold mb-2 accent-gradient-text"
       >
         Building Your Campaign
       </motion.h2>
-      <p className="text-gray-500 mb-10">Watch your ads come to life</p>
+      <p className="text-zinc-400 mb-10">Watch your ads come to life</p>
 
       <div className="space-y-4">
         <AnimatePresence>
@@ -56,12 +56,12 @@ export default function PipelineStatusView({
                 initial={{ opacity: 0, x: -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: i * 0.1 }}
-                className={`flex items-center gap-4 p-4 rounded-xl transition-all ${
+                className={`flex items-center gap-4 p-4 rounded-xl transition-all border ${
                   isCurrent
-                    ? "bg-blue-50 border-2 border-blue-200"
+                    ? "bg-zinc-900 border-indigo-500 border-2 glow-sm shadow-lg shadow-indigo-500/20"
                     : isComplete
-                    ? "bg-gray-50 border border-gray-100"
-                    : "border border-gray-100 opacity-40"
+                    ? "bg-zinc-900 border-zinc-800"
+                    : "bg-zinc-900/40 border-zinc-800 opacity-50"
                 }`}
               >
                 {/* Status Indicator */}
@@ -71,7 +71,7 @@ export default function PipelineStatusView({
                       initial={{ scale: 0 }}
                       animate={{ scale: 1 }}
                       transition={{ type: "spring", stiffness: 500, damping: 25 }}
-                      className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center"
+                      className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center"
                     >
                       <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
@@ -81,10 +81,10 @@ export default function PipelineStatusView({
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                      className="w-8 h-8 border-3 border-blue-500 border-t-transparent rounded-full"
+                      className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full"
                     />
                   ) : (
-                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center text-sm">
+                    <div className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-sm">
                       {stage.icon}
                     </div>
                   )}
@@ -92,10 +92,22 @@ export default function PipelineStatusView({
 
                 {/* Content */}
                 <div className="flex-1">
-                  <h3 className={`font-semibold ${isCurrent ? "text-blue-700" : isComplete ? "text-gray-700" : "text-gray-400"}`}>
+                  <h3 className={`font-semibold ${
+                    isCurrent
+                      ? "text-zinc-100"
+                      : isComplete
+                      ? "text-zinc-100"
+                      : "text-zinc-500"
+                  }`}>
                     {stage.label}
                   </h3>
-                  <p className="text-sm text-gray-500">
+                  <p className={`text-sm ${
+                    isCurrent
+                      ? "text-zinc-400"
+                      : isComplete
+                      ? "text-emerald-400"
+                      : "text-zinc-600"
+                  }`}>
                     {isCurrent ? stage.description : isComplete ? "Complete" : "Waiting..."}
                   </p>
                 </div>
@@ -105,7 +117,7 @@ export default function PipelineStatusView({
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-xs text-blue-600 font-mono bg-blue-100 px-2 py-1 rounded"
+                    className="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20"
                   >
                     Live Preview
                   </motion.div>
@@ -120,10 +132,10 @@ export default function PipelineStatusView({
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mt-6 p-4 bg-red-50 border border-red-200 rounded-xl"
+          className="mt-6 p-4 bg-zinc-900 border border-amber-500/30 rounded-xl"
         >
-          <p className="text-red-700 font-medium">Something went wrong</p>
-          <p className="text-red-600 text-sm mt-1">{error}</p>
+          <p className="text-amber-400 font-medium">Something went wrong</p>
+          <p className="text-amber-300/70 text-sm mt-1">{error}</p>
         </motion.div>
       )}
     </div>

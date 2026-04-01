@@ -26,9 +26,15 @@ export default function CampaignDashboard({
   )
 
   return (
-    <div className="max-w-4xl mx-auto p-8">
-      <h2 className="text-3xl font-bold mb-2">Campaign Performance</h2>
-      <p className="text-gray-500 mb-8">Real-time results across all platforms</p>
+    <div className="max-w-4xl mx-auto p-8 bg-zinc-950 min-h-screen">
+      <motion.h2
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="text-3xl font-bold mb-2 accent-gradient-text"
+      >
+        Campaign Performance
+      </motion.h2>
+      <p className="text-zinc-400 mb-8">Real-time results across all platforms</p>
 
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
@@ -38,17 +44,17 @@ export default function CampaignDashboard({
         <MetricCard label="Total Spend" value={`$${totals.spend.toLocaleString()}`} />
       </div>
 
-      {/* Claude Insight */}
+      {/* Claude Insight - Indigo-tinted Glass */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
-        className="p-6 bg-blue-50 rounded-2xl mb-8"
+        className="p-6 bg-indigo-500/5 backdrop-blur border border-indigo-500/20 rounded-xl mb-8"
       >
         <div className="flex items-start gap-3">
-          <span className="text-2xl">🧠</span>
+          <span className="text-2xl flex-shrink-0">🧠</span>
           <div>
-            <h3 className="font-semibold text-blue-900 mb-1">Claude&apos;s Insight</h3>
-            <p className="text-blue-800">{insightSummary}</p>
+            <h3 className="font-semibold text-indigo-300 mb-1">Claude&apos;s Insight</h3>
+            <p className="text-zinc-300">{insightSummary}</p>
           </div>
         </div>
       </motion.div>
@@ -61,12 +67,12 @@ export default function CampaignDashboard({
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.1 }}
-            className="flex items-center gap-4 p-4 border border-gray-200 rounded-xl"
+            className="flex items-center gap-4 p-4 bg-zinc-900 border border-zinc-800 rounded-lg hover:border-zinc-700 transition-colors"
           >
-            <span className="font-medium text-sm w-32">
+            <span className="font-medium text-sm w-32 text-zinc-100">
               {PLATFORM_DIMENSIONS[p.platform]?.label || p.platform}
             </span>
-            <div className="flex-1 grid grid-cols-4 gap-4 text-sm text-gray-600">
+            <div className="flex-1 grid grid-cols-4 gap-4 text-sm text-zinc-400">
               <span>{p.impressions.toLocaleString()} imp</span>
               <span>{p.clicks.toLocaleString()} clicks</span>
               <span>{(p.ctr * 100).toFixed(1)}% CTR</span>
@@ -76,14 +82,16 @@ export default function CampaignDashboard({
         ))}
       </div>
 
-      {/* Next Campaign CTA */}
-      <button
+      {/* Create Next Campaign CTA */}
+      <motion.button
+        whileHover={{ scale: 1.01 }}
+        whileTap={{ scale: 0.99 }}
         onClick={onCreateNext}
-        className="w-full py-4 bg-blue-600 text-white font-semibold rounded-2xl
-                 hover:bg-blue-700 transition-colors text-lg"
+        className="w-full py-4 bg-indigo-600 text-zinc-100 font-semibold rounded-xl
+                 hover:bg-indigo-500 transition-colors text-lg glow-sm shadow-lg shadow-indigo-500/20"
       >
         Create Next Campaign →
-      </button>
+      </motion.button>
     </div>
   )
 }
@@ -93,10 +101,10 @@ function MetricCard({ label, value }: { label: string; value: string }) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="p-4 bg-gray-50 rounded-xl text-center"
+      className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg text-center hover:border-indigo-500/30 transition-colors"
     >
-      <p className="text-2xl font-bold">{value}</p>
-      <p className="text-xs text-gray-500 mt-1">{label}</p>
+      <p className="text-2xl font-bold text-zinc-100">{value}</p>
+      <p className="text-xs text-zinc-400 mt-1">{label}</p>
     </motion.div>
   )
 }
