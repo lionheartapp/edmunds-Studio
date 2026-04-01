@@ -1,0 +1,47 @@
+{
+  "brandDna": {
+    "name": "AutoNation Toyota Tempe",
+    "domain": "autonationtoyotatempe.com",
+    "colors": {
+      "primary": "#EB0A1E",
+      "secondary": "#282830",
+      "accent": "#1A73E8",
+      "background": "#FFFFFF"
+    },
+    "typography": {
+      "primaryFont": "Toyota Type",
+      "fallback": "Helvetica Neue",
+      "headingWeight": "700"
+    },
+    "voice": ["Trustworthy", "Value-driven", "Straightforward", "Community"],
+    "visualStyle": ["Clean product photography", "Desert Southwest", "Dealership lifestyle", "Bright and warm"],
+    "currentAds": [
+      {
+        "platform": "Facebook",
+        "headline": "New 2026 Camry — Starting at $28,495",
+        "cta": "View Inventory",
+        "format": "Carousel",
+        "dateSpotted": "2026-03"
+      },
+      {
+        "platform": "Instagram",
+        "headline": "Spring into savings",
+        "cta": "Get Pre-Approved",
+        "format": "Story",
+        "dateSpotted": "2026-03"
+      }
+    ],
+    "competitors": ["Larry H. Miller Toyota", "Camelback Toyota", "Earnhardt Toyota"],
+    "guidelinesUrl": null
+  },
+  "campaignDescription": "Spring Sales Event for AutoNation Toyota Tempe. Pushing new 2026 Camry and RAV4 inventory. Camry from $28,495, RAV4 from $32,990. Toyota is offering $2,000 customer cash on both models plus 2.9% APR for 72 months. Target: first-time buyers and young families in the Phoenix metro area. Emphasize reliability, fuel economy, and Toyota Safety Sense. Need Instagram, Facebook, and TikTok ads. 3-week campaign timing with Memorial Day weekend push.",
+  "expectedBrief": {
+    "brand": "AutoNation Toyota Tempe",
+    "product": "2026 Camry & RAV4 Spring Sales Event",
+    "tagline": "Spring Into Your New Toyota",
+    "headline": "$2,000 Cash Back",
+    "subheadline": "2026 Camry from $28,495 — 2.9% APR for 72 months at AutoNation Toyota Tempe",
+    "cta": "Shop Spring Deals",
+    "platforms": ["instagram_feed", "instagram_story", "tiktok", "facebook_feed"]
+  }
+}

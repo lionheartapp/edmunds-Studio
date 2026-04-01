@@ -1,0 +1,47 @@
+{
+  "brandDna": {
+    "name": "Subaru",
+    "domain": "subaru.com",
+    "colors": {
+      "primary": "#003D7C",
+      "secondary": "#0054A4",
+      "accent": "#E8A317",
+      "background": "#FFFFFF"
+    },
+    "typography": {
+      "primaryFont": "Helvetica Neue",
+      "fallback": "Arial",
+      "headingWeight": "700"
+    },
+    "voice": ["Dependable", "Community-focused", "Warm", "Safety-conscious", "Adventurous"],
+    "visualStyle": ["Family-oriented", "Pacific Northwest landscapes", "Dogs and outdoor", "Authentic moments"],
+    "currentAds": [
+      {
+        "platform": "Facebook",
+        "headline": "Love. It's what makes a Subaru, a Subaru.",
+        "cta": "Find a Dealer",
+        "format": "Single image",
+        "dateSpotted": "2026-03"
+      },
+      {
+        "platform": "Instagram",
+        "headline": "Where family meets adventure",
+        "cta": "Build & Price",
+        "format": "Story",
+        "dateSpotted": "2026-02"
+      }
+    ],
+    "competitors": ["Toyota RAV4", "Honda CR-V", "Mazda CX-50"],
+    "guidelinesUrl": null
+  },
+  "campaignDescription": "Valley Subaru Summer Clearance Event. Local dealer in Fresno, CA. 2025 model year closeout — Outback, Forester, and Crosstrek. Up to $4,500 off MSRP plus 0% APR for 60 months on select models. Target: families and outdoor-active buyers in the Central Valley. Emphasize reliability, all-wheel drive for mountain trips, and the clearance pricing. Need Instagram and Facebook ads. 2-week campaign.",
+  "expectedBrief": {
+    "brand": "Valley Subaru",
+    "product": "2025 Model Year Clearance",
+    "tagline": "Adventure Starts Here — For Less",
+    "headline": "Up to $4,500 Off",
+    "subheadline": "2025 Outback, Forester & Crosstrek — 0% APR for 60 months at Valley Subaru",
+    "cta": "Shop Inventory",
+    "platforms": ["instagram_feed", "instagram_story", "facebook_feed"]
+  }
+}

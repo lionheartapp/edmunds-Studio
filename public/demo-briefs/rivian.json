@@ -1,0 +1,54 @@
+{
+  "brandDna": {
+    "name": "Rivian",
+    "domain": "rivian.com",
+    "colors": {
+      "primary": "#48814A",
+      "secondary": "#1A1A1A",
+      "accent": "#F5A623",
+      "background": "#FAFAFA"
+    },
+    "typography": {
+      "primaryFont": "Rivian Gothic",
+      "fallback": "Arial",
+      "headingWeight": "700"
+    },
+    "voice": ["Adventurous", "Premium", "Sustainable", "Bold", "Authentic"],
+    "visualStyle": ["Cinematic outdoor", "Golden hour", "Rugged terrain", "Minimalist product shots"],
+    "currentAds": [
+      {
+        "platform": "Instagram",
+        "headline": "Built for the journey ahead",
+        "cta": "Reserve Now",
+        "format": "Carousel",
+        "dateSpotted": "2026-03"
+      },
+      {
+        "platform": "YouTube",
+        "headline": "R1T — Every road is an invitation",
+        "cta": "Configure Yours",
+        "format": "Pre-roll 15s",
+        "dateSpotted": "2026-02"
+      },
+      {
+        "platform": "TikTok",
+        "headline": "POV: Your office has no walls",
+        "cta": "Learn More",
+        "format": "Native vertical",
+        "dateSpotted": "2026-03"
+      }
+    ],
+    "competitors": ["Tesla", "Ford Lightning", "GMC Hummer EV"],
+    "guidelinesUrl": null
+  },
+  "campaignDescription": "Launch campaign for the 2026 Rivian R1T Adventure Package. Targeting outdoor enthusiasts and adventure-seeking millennials aged 28-42. Highlight the new extended range battery (400+ miles), integrated camp kitchen, and gear tunnel. Key markets: Colorado, Pacific Northwest, Northern California. Summer timing — emphasize road trips and outdoor adventure. Platforms: Instagram, TikTok, Facebook. Budget: $50K media spend over 4 weeks.",
+  "expectedBrief": {
+    "brand": "Rivian",
+    "product": "2026 R1T Adventure Package",
+    "tagline": "Adventure Has a New Address",
+    "headline": "400 Miles of Freedom",
+    "subheadline": "The R1T Adventure Package — built for the roads you haven't found yet",
+    "cta": "Reserve Yours",
+    "platforms": ["instagram_feed", "instagram_story", "tiktok", "facebook_feed"]
+  }
+}
