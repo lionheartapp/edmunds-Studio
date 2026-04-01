@@ -501,7 +501,7 @@ export default function BrandDNACard({
             whileHover={{ scale: 1.005 }}
             whileTap={{ scale: 0.995 }}
             onClick={onContinue}
-            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-50"
+            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 active:scale-[0.98]"
             style={{
               boxShadow: "0 0 30px rgba(32, 112, 232, 0.25)",
             }}

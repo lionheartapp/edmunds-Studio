@@ -147,3 +147,62 @@ input::placeholder,
 textarea::placeholder {
   color: #52525b;
 }
+
+/* ── Performance-friendly CSS animations (replaces framer-motion Infinity loops) ── */
+
+@keyframes blob-glow {
+  0%, 100% {
+    transform: scale(1);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+  50% {
+    transform: scale(1.2);
+    border-radius: 50%;
+  }
+}
+
+@keyframes blob-morph {
+  0%, 100% {
+    transform: scale(1);
+    border-radius: 50%;
+  }
+  50% {
+    transform: scale(1.15);
+    border-radius: 30% 70% 70% 30% / 30% 30% 70% 70%;
+  }
+}
+
+@keyframes spin-slow {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes nudge-right {
+  0%, 100% { transform: translateX(0); }
+  50% { transform: translateX(4px); }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-blob-glow {
+  animation: blob-glow 3s ease-in-out infinite;
+}
+
+.animate-blob-morph {
+  animation: blob-morph 2.5s ease-in-out 0.3s infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 8s linear infinite;
+}
+
+.animate-nudge-right {
+  animation: nudge-right 1.5s ease-in-out infinite;
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out;
+}

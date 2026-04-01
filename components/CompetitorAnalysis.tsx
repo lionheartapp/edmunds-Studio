@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useMemo } from "react";
-import { motion } from "framer-motion";
+import React, { useEffect, useMemo, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { BrandDNA, CompetitorProfile, CompetitorAd } from "@/lib/types";
 import {
   TrendingUp,
@@ -119,15 +119,7 @@ export default function CompetitorAnalysis({
           <div className="max-w-6xl mx-auto space-y-16">
             {/* Loading state while competitor profiles are fetched */}
             {isLoadingCompetitors && competitors.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20"
-              >
-                <div className="w-12 h-12 rounded-full border-2 border-eds-50 border-t-transparent animate-spin mx-auto mb-6" />
-                <p className="text-zinc-300 text-lg font-medium mb-2">Analyzing competitors...</p>
-                <p className="text-zinc-500 text-sm">Pulling ad strategies, audience overlap, and performance data</p>
-              </motion.div>
+              <CompetitorLoader />
             )}
 
             {!isLoadingCompetitors && competitors.length === 0 && (
@@ -397,13 +389,9 @@ export default function CompetitorAnalysis({
               {/* Button content */}
               <span className="relative z-10 flex items-center gap-2">
                 See Your Strategic Edge
-                <motion.span
-                  className="inline-block"
-                  animate={{ x: [0, 4, 0] }}
-                  transition={{ duration: 1.5, repeat: Infinity }}
-                >
+                <span className="inline-block animate-nudge-right">
                   <ArrowRight size={20} />
-                </motion.span>
+                </span>
               </span>
             </motion.button>
           </div>
@@ -463,19 +451,11 @@ function CompetitorAdCard({
           }}
         />
 
-        {/* Animated decorative elements */}
-        <motion.div
+        {/* Static decorative elements — no infinite JS animation */}
+        <div
           className="absolute inset-0 opacity-30"
           style={{
             backgroundImage: `radial-gradient(circle at 20% 30%, ${competitor.logoColor}40 0%, transparent 50%), radial-gradient(circle at 80% 70%, ${competitor.logoColor}30 0%, transparent 50%)`,
-          }}
-          animate={{
-            backgroundPosition: ["0% 0%", "100% 100%"],
-          }}
-          transition={{
-            duration: 6,
-            repeat: Infinity,
-            repeatType: "reverse",
           }}
         />
 
@@ -598,5 +578,73 @@ function Eye({ size = 24 }: { size?: number }) {
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
+  );
+}
+
+/* ── Competitor Loader — blob with playful messages ── */
+
+const COMPETITOR_MESSAGES = [
+  "Sizing up the competition...",
+  "Reading their ad copy so you don't have to...",
+  "Calculating audience overlap with scary precision...",
+  "Finding where they're spending and where they're not...",
+  "Reverse-engineering their ad strategy...",
+  "Judging their creative choices (objectively, of course)...",
+  "Pulling market share data from the vault...",
+  "Comparing apples to slightly different apples...",
+];
+
+function CompetitorLoader() {
+  const [msgIndex, setMsgIndex] = useState(() => Math.floor(Math.random() * COMPETITOR_MESSAGES.length));
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex(prev => (prev + 1) % COMPETITOR_MESSAGES.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -20 }}
+      className="flex flex-col items-center justify-center py-24"
+    >
+      {/* Animated blob — CSS animations instead of framer-motion */}
+      <div className="relative w-20 h-20 mb-8">
+        <div className="absolute inset-[-6px] bg-eds-50/20 blur-md animate-blob-glow" />
+        <div className="absolute inset-0 bg-eds-50/25 animate-blob-morph" />
+        <div className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80 animate-spin-slow" />
+        {/* Crosshair / target icon */}
+        <div className="absolute inset-0 flex items-center justify-center z-10">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80">
+            <circle cx="12" cy="12" r="10" />
+            <circle cx="12" cy="12" r="6" />
+            <circle cx="12" cy="12" r="2" />
+            <line x1="12" y1="2" x2="12" y2="6" />
+            <line x1="12" y1="18" x2="12" y2="22" />
+            <line x1="2" y1="12" x2="6" y2="12" />
+            <line x1="18" y1="12" x2="22" y2="12" />
+          </svg>
+        </div>
+      </div>
+
+      <p className="text-lg font-semibold text-zinc-200 mb-3">Competitive Landscape</p>
+      <div className="h-6 overflow-hidden">
+        <AnimatePresence mode="wait">
+          <motion.p
+            key={msgIndex}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+            className="text-sm text-zinc-500 text-center"
+          >
+            {COMPETITOR_MESSAGES[msgIndex]}
+          </motion.p>
+        </AnimatePresence>
+      </div>
+    </motion.div>
   );
 }
