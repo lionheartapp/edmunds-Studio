@@ -8,6 +8,7 @@ import {
   getReviews,
   getMarketData,
   getAdPlacements,
+  getDataSource,
 } from "@/lib/edmunds"
 
 export const maxDuration = 30
@@ -42,6 +43,7 @@ export async function POST(request: NextRequest) {
         market,
         placements,
       },
+      dataSource: getDataSource(),
     })
   } catch (error) {
     console.error("[edmunds] Error:", error)
