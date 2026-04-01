@@ -11,6 +11,9 @@ import { BrandDNA } from "@/lib/types"
 import { readFile } from "fs/promises"
 import path from "path"
 
+// Allow up to 60s for scraper + Claude
+export const maxDuration = 60
+
 // Demo brief lookup for fallback when API keys aren't configured
 const DEMO_BRANDS: Record<string, string> = {
   rivian: "rivian.json",
@@ -87,30 +90,37 @@ export async function POST(request: NextRequest) {
     }
 
     // Step 2: Ask Claude for full Brand DNA analysis, enriched with scraper context
-    try {
-      const profile = await askClaudeJSON<BrandDNA>(
-        BRAND_DNA_SYSTEM_PROMPT,
-        BRAND_DNA_USER_PROMPT(brandName, scraperContext),
-        { temperature: 0.5 }
-      )
+    // Retry up to 2 times on failure
+    let lastError = ""
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        console.log(`[brand-dna] Claude attempt ${attempt + 1} for: ${brandName}`)
+        const profile = await askClaudeJSON<BrandDNA>(
+          BRAND_DNA_SYSTEM_PROMPT,
+          BRAND_DNA_USER_PROMPT(brandName, scraperContext),
+          { temperature: 0.5 }
+        )
 
-      return NextResponse.json({ brandDna: profile })
-    } catch (claudeError) {
-      const errMsg = claudeError instanceof Error ? claudeError.message : String(claudeError)
-      console.error("[brand-dna] Claude analysis failed:", errMsg)
-      console.error("[brand-dna] Full error:", JSON.stringify(claudeError, Object.getOwnPropertyNames(claudeError instanceof Error ? claudeError : {})))
-
-      // Fall back to demo brief if Claude fails
-      const demo = await loadDemoBrief(brandName)
-      if (demo) {
-        console.log("[brand-dna] Falling back to demo brief for:", brandName)
-        return NextResponse.json({ brandDna: demo })
+        console.log(`[brand-dna] Success for: ${brandName}`)
+        return NextResponse.json({ brandDna: profile })
+      } catch (claudeError) {
+        lastError = claudeError instanceof Error ? claudeError.message : String(claudeError)
+        console.error(`[brand-dna] Claude attempt ${attempt + 1} failed:`, lastError)
+        // Wait a beat before retry
+        if (attempt < 1) await new Promise(r => setTimeout(r, 1000))
       }
-      return NextResponse.json(
-        { error: `Failed to analyze brand: ${errMsg}` },
-        { status: 500 }
-      )
     }
+
+    // Fall back to demo brief if Claude fails
+    const demo = await loadDemoBrief(brandName)
+    if (demo) {
+      console.log("[brand-dna] Falling back to demo brief for:", brandName)
+      return NextResponse.json({ brandDna: demo })
+    }
+    return NextResponse.json(
+      { error: `Failed to analyze brand: ${lastError}` },
+      { status: 500 }
+    )
   } catch (error) {
     console.error("[brand-dna] Error:", error)
     return NextResponse.json(

@@ -48,13 +48,19 @@ export async function askClaudeJSON<T>(
   const text = await askClaude(systemPrompt, userMessage, options)
 
   // Extract JSON from response — Claude may wrap it in ```json blocks
-  const jsonMatch = text.match(/```json\s*([\s\S]*?)\s*```/) || text.match(/\{[\s\S]*\}/)
+  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || text.match(/(\{[\s\S]*\})/)
   if (!jsonMatch) {
+    console.error("[claude] No JSON found in response. First 200 chars:", text.substring(0, 200))
     throw new Error("Could not parse JSON from Claude response")
   }
 
   const jsonStr = jsonMatch[1] || jsonMatch[0]
-  return JSON.parse(jsonStr) as T
+  try {
+    return JSON.parse(jsonStr) as T
+  } catch (parseError) {
+    console.error("[claude] JSON parse failed. First 200 chars of extracted:", jsonStr.substring(0, 200))
+    throw new Error(`JSON parse error: ${parseError instanceof Error ? parseError.message : String(parseError)}`)
+  }
 }
 
 /**
