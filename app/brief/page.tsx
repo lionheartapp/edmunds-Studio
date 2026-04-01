@@ -13,8 +13,8 @@ export default function BriefPage() {
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("adgenai_brand_dna")
-    const storedType = sessionStorage.getItem("adgenai_user_type") as UserType
+    const stored = sessionStorage.getItem("eds_brand_dna")
+    const storedType = sessionStorage.getItem("eds_user_type") as UserType
     if (stored) {
       setBrandDna(JSON.parse(stored))
       setUserType(storedType)
@@ -25,7 +25,7 @@ export default function BriefPage() {
 
   const handleSubmit = async (description: string) => {
     setIsLoading(true)
-    sessionStorage.setItem("adgenai_campaign_description", description)
+    sessionStorage.setItem("eds_campaign_description", description)
     router.push("/pipeline")
   }
 

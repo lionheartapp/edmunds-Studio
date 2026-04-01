@@ -118,7 +118,7 @@ async function scrapeWebsite(
     const response = await fetch(url, {
       headers: {
         "User-Agent":
-          "Mozilla/5.0 (compatible; AdGenAI/1.0; +https://edmunds-studio.vercel.app)",
+          "Mozilla/5.0 (compatible; EdmundsStudio/1.0; +https://edmunds-studio.vercel.app)",
         Accept: "text/html",
       },
       signal: AbortSignal.timeout(5000),

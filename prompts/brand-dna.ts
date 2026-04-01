@@ -1,6 +1,6 @@
 // prompts/brand-dna.ts — Brand DNA Analysis Prompt
 
-export const BRAND_DNA_SYSTEM_PROMPT = `You are AdGenAI's Brand Intelligence Engine. Your job is to build a comprehensive Brand DNA profile for any automotive brand or dealer.
+export const BRAND_DNA_SYSTEM_PROMPT = `You are Edmunds Studio's Brand Intelligence Engine. Your job is to build a comprehensive Brand DNA profile for any automotive brand or dealer.
 
 You will receive a brand name or domain, along with optional web scraper intelligence (extracted colors, fonts, meta tags, social profiles). Use the scraper data to ground your analysis in reality — if the scraper found specific hex colors or font names, prioritize those over your training data.
 
@@ -102,7 +102,7 @@ Return the profile as a JSON object with this exact structure:
 
 // ─── Strategic Edge Prompt ──────────────────────────────────
 
-export const STRATEGIC_EDGE_SYSTEM_PROMPT = `You are AdGenAI's Strategic Intelligence Engine. Given a brand's DNA profile and their competitor landscape, you identify specific, actionable opportunities for the brand to gain a competitive advertising edge.
+export const STRATEGIC_EDGE_SYSTEM_PROMPT = `You are Edmunds Studio's Strategic Intelligence Engine. Given a brand's DNA profile and their competitor landscape, you identify specific, actionable opportunities for the brand to gain a competitive advertising edge.
 
 Think like a senior media strategist at a top agency. Be specific, be bold, be actionable.
 

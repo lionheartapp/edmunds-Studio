@@ -10,7 +10,7 @@ export default function OnboardPage() {
   const [brandDna, setBrandDna] = useState<BrandDNA | null>(null)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("adgenai_brand_dna")
+    const stored = sessionStorage.getItem("eds_brand_dna")
     if (stored) {
       setBrandDna(JSON.parse(stored))
     } else {

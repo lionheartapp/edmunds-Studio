@@ -11,8 +11,8 @@ export default function StrategyPage() {
   const [edge, setEdge] = useState<StrategicEdgeType | null>(null)
 
   useEffect(() => {
-    const storedDna = sessionStorage.getItem("adgenai_brand_dna")
-    const storedEdge = sessionStorage.getItem("adgenai_strategic_edge")
+    const storedDna = sessionStorage.getItem("eds_brand_dna")
+    const storedEdge = sessionStorage.getItem("eds_strategic_edge")
 
     if (storedDna) {
       setBrandDna(JSON.parse(storedDna))

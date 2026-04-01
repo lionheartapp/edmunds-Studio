@@ -12,7 +12,7 @@ function getBaseUrl(request: NextRequest): string {
 }
 
 /**
- * Orchestrates the full AdGenAI pipeline:
+ * Orchestrates the full Edmunds Studio pipeline:
  * Brand DNA → Brief → Image → Figma → AE Script → Voiceover → Variants
  *
  * Uses Server-Sent Events (SSE) to stream progress to the client.

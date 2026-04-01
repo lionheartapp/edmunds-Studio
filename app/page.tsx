@@ -24,9 +24,9 @@ export default function Home() {
       const { brandDna } = await response.json()
 
       // Store brand DNA and user type for downstream pages
-      sessionStorage.setItem("adgenai_brand_dna", JSON.stringify(brandDna))
+      sessionStorage.setItem("eds_brand_dna", JSON.stringify(brandDna))
       if (userType) {
-        sessionStorage.setItem("adgenai_user_type", userType)
+        sessionStorage.setItem("eds_user_type", userType)
       }
       router.push("/onboard")
     } catch (error) {

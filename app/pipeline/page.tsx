@@ -13,8 +13,8 @@ export default function PipelinePage() {
   const [error, setError] = useState<string>()
 
   const runPipeline = useCallback(async () => {
-    const brandDnaStr = sessionStorage.getItem("adgenai_brand_dna")
-    const description = sessionStorage.getItem("adgenai_campaign_description")
+    const brandDnaStr = sessionStorage.getItem("eds_brand_dna")
+    const description = sessionStorage.getItem("eds_campaign_description")
 
     if (!brandDnaStr || !description) {
       router.push("/")
@@ -65,7 +65,7 @@ export default function PipelinePage() {
 
           if (data.stage === "complete" && data.status === "complete") {
             sessionStorage.setItem(
-              "adgenai_campaign_output",
+              "eds_campaign_output",
               JSON.stringify(data.output)
             )
             setTimeout(() => router.push("/review"), 1500)

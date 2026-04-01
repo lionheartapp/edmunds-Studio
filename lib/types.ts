@@ -1,4 +1,4 @@
-// lib/types.ts — AdGenAI Core Type Definitions
+// lib/types.ts — Edmunds Studio Core Type Definitions
 
 // ─── Brand DNA ───────────────────────────────────────────────
 

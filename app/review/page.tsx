@@ -35,7 +35,7 @@ export default function ReviewPage() {
   const [variants, setVariants] = useState<CampaignVariant[]>(DEMO_VARIANTS)
 
   useEffect(() => {
-    const output = sessionStorage.getItem("adgenai_campaign_output")
+    const output = sessionStorage.getItem("eds_campaign_output")
     if (output) {
       const parsed = JSON.parse(output)
       if (parsed.variants?.length) {

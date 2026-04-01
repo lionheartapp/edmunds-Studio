@@ -13,8 +13,8 @@ export default function PlacementPage() {
   const [placed, setPlaced] = useState(false)
 
   useEffect(() => {
-    const storedDna = sessionStorage.getItem("adgenai_brand_dna")
-    const storedCampaign = sessionStorage.getItem("adgenai_selected_campaign")
+    const storedDna = sessionStorage.getItem("eds_brand_dna")
+    const storedCampaign = sessionStorage.getItem("eds_selected_campaign")
 
     if (storedDna) {
       setBrandDna(JSON.parse(storedDna))

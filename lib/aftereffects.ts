@@ -15,14 +15,14 @@ export function generateAEScript(
   const fps = 30
   const duration = brief.durationSeconds || 15
 
-  return `// AdGenAI — Auto-generated After Effects ExtendScript
+  return `// Edmunds Studio — Auto-generated After Effects ExtendScript
 // Brand: ${brief.brand}
 // Platform: ${dims.label} (${dims.width}x${dims.height})
 // Duration: ${duration}s
 // Generated: ${new Date().toISOString()}
 
 (function() {
-  app.beginUndoGroup("AdGenAI Campaign");
+  app.beginUndoGroup("Edmunds Studio Campaign");
 
   // Create composition
   var comp = app.project.items.addComp(
@@ -140,7 +140,7 @@ export function generateAEScript(
   ` : "// No legal disclaimer for this brief"}
 
   app.endUndoGroup();
-  alert("AdGenAI composition created successfully!");
+  alert("Edmunds Studio composition created successfully!");
 
   // ─── Utility ──────────────────────────────────────────
   function hexToRGB(hex) {

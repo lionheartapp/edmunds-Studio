@@ -1,4 +1,4 @@
-// lib/claude.ts — Claude API Client for AdGenAI
+// lib/claude.ts — Claude API Client for Edmunds Studio
 
 import Anthropic from "@anthropic-ai/sdk"
 

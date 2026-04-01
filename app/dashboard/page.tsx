@@ -12,8 +12,8 @@ export default function DashboardPage() {
   const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    const storedDna = sessionStorage.getItem("adgenai_brand_dna")
-    const storedEdge = sessionStorage.getItem("adgenai_strategic_edge")
+    const storedDna = sessionStorage.getItem("eds_brand_dna")
+    const storedEdge = sessionStorage.getItem("eds_strategic_edge")
 
     if (storedDna) {
       setBrandDna(JSON.parse(storedDna))
@@ -31,7 +31,7 @@ export default function DashboardPage() {
 
   const handlePlaceOnEdmunds = (campaign: PreBuiltCampaign) => {
     // Store selected campaign and navigate to placement flow
-    sessionStorage.setItem("adgenai_selected_campaign", JSON.stringify(campaign))
+    sessionStorage.setItem("eds_selected_campaign", JSON.stringify(campaign))
     router.push("/placement")
   }
 

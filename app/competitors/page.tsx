@@ -11,7 +11,7 @@ export default function CompetitorsPage() {
   const [isLoadingEdge, setIsLoadingEdge] = useState(false)
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("adgenai_brand_dna")
+    const stored = sessionStorage.getItem("eds_brand_dna")
     if (stored) {
       setBrandDna(JSON.parse(stored))
     } else {
@@ -34,7 +34,7 @@ export default function CompetitorsPage() {
       if (!response.ok) throw new Error("Failed to generate strategic analysis")
 
       const { edge } = await response.json()
-      sessionStorage.setItem("adgenai_strategic_edge", JSON.stringify(edge))
+      sessionStorage.setItem("eds_strategic_edge", JSON.stringify(edge))
       router.push("/strategy")
     } catch (error) {
       console.error("Strategic edge analysis failed:", error)

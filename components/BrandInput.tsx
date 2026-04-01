@@ -216,7 +216,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                 </svg>
               </div>
               <span className="text-lg font-semibold tracking-tight">
-                AdGen<span className="accent-gradient-text">AI</span>
+                Edmunds<span className="accent-gradient-text">Studio</span>
               </span>
             </motion.div>
 
@@ -228,7 +228,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             >
               How are you
               <br />
-              <span className="accent-gradient-text">using AdGenAI?</span>
+              <span className="accent-gradient-text">using Edmunds Studio?</span>
             </motion.h1>
 
             <motion.p

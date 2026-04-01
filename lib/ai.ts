@@ -1,4 +1,4 @@
-// lib/ai.ts — AI Client for AdGenAI
+// lib/ai.ts — AI Client for Edmunds Studio
 // Supports Google Gemini (primary) with Anthropic Claude as fallback
 
 import { GoogleGenerativeAI } from "@google/generative-ai"

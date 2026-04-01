@@ -9,7 +9,7 @@ const sans = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "AdGenAI — Edmunds",
+  title: "Edmunds Studio",
   description:
     "Turn a brand name into a complete, scheduled ad campaign in under 60 seconds.",
 };
