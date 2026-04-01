@@ -3,15 +3,35 @@
 import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 
+export type UserType = "oem" | "dealer-group" | "single-dealer" | null
+
 interface BrandInputProps {
-  onSubmit: (brandName: string) => void
+  onSubmit: (brandName: string, userType?: UserType) => void
   isLoading?: boolean
 }
 
-const QUICK_BRANDS = [
-  { name: "Rivian", emoji: "🏔️" },
-  { name: "Subaru", emoji: "🌲" },
-  { name: "Toyota", emoji: "🚗" },
+const SCENARIOS = [
+  {
+    type: "oem" as UserType,
+    label: "OEM Campaign",
+    brand: "Rivian",
+    emoji: "🏢",
+    desc: "National brand campaign",
+  },
+  {
+    type: "dealer-group" as UserType,
+    label: "Dealer Group",
+    brand: "Valley Subaru",
+    emoji: "🏬",
+    desc: "Multi-store consistency",
+  },
+  {
+    type: "single-dealer" as UserType,
+    label: "Single Dealer",
+    brand: "AutoNation Toyota Tempe",
+    emoji: "🚗",
+    desc: "Quick local ads",
+  },
 ]
 
 const LOADING_SAYINGS = [
@@ -317,27 +337,28 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
               </motion.div>
             </form>
 
-            {/* Quick brand chips */}
+            {/* Scenario chips */}
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 0.7 }}
-              className="mt-8 flex flex-col items-center gap-3"
+              className="mt-10 flex flex-col items-center gap-4 w-full"
             >
-              <span className="text-xs text-zinc-600 uppercase tracking-wider">Try a demo</span>
-              <div className="flex gap-2">
-                {QUICK_BRANDS.map(({ name, emoji }) => (
+              <span className="text-xs text-zinc-600 uppercase tracking-wider">Try a demo scenario</span>
+              <div className="grid grid-cols-3 gap-3 w-full">
+                {SCENARIOS.map(({ type, label, brand: scenarioBrand, emoji, desc }) => (
                   <button
-                    key={name}
+                    key={type}
                     onClick={() => {
-                      setBrand(name)
-                      onSubmit(name)
+                      setBrand(scenarioBrand)
+                      onSubmit(scenarioBrand, type)
                     }}
-                    className="px-4 py-2 rounded-lg bg-zinc-900 border border-zinc-800
-                             hover:border-zinc-700 hover:bg-zinc-800 text-sm text-zinc-400
-                             hover:text-zinc-200 transition-all"
+                    className="flex flex-col items-center gap-1.5 px-4 py-4 rounded-xl bg-zinc-900 border border-zinc-800
+                             hover:border-indigo-500/30 hover:bg-zinc-800/80 text-sm transition-all group"
                   >
-                    {emoji} {name}
+                    <span className="text-xl mb-0.5">{emoji}</span>
+                    <span className="text-zinc-200 font-medium group-hover:text-white">{label}</span>
+                    <span className="text-[11px] text-zinc-600">{desc}</span>
                   </button>
                 ))}
               </div>

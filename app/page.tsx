@@ -3,12 +3,13 @@
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import BrandInput from "@/components/BrandInput"
+import type { UserType } from "@/components/BrandInput"
 
 export default function Home() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleBrandSubmit = async (brandName: string) => {
+  const handleBrandSubmit = async (brandName: string, userType?: UserType) => {
     setIsLoading(true)
 
     try {
@@ -22,8 +23,11 @@ export default function Home() {
 
       const { brandDna } = await response.json()
 
-      // Store in sessionStorage for the next page
+      // Store brand DNA and user type for downstream pages
       sessionStorage.setItem("adgenai_brand_dna", JSON.stringify(brandDna))
+      if (userType) {
+        sessionStorage.setItem("adgenai_user_type", userType)
+      }
       router.push("/onboard")
     } catch (error) {
       console.error("Brand analysis failed:", error)
