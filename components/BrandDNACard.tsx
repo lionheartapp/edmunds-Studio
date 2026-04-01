@@ -1,11 +1,13 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { BrandDNA, AdSample } from "@/lib/types"
-import { useMemo } from "react"
+import { BrandDNA, AdSample, EdmundsAdsData, SocialAdsData, SocialAdFormatted } from "@/lib/types"
+import { useMemo, useState } from "react"
 
 interface BrandDNACardProps {
   brandDna: BrandDNA
+  edmundsAds?: EdmundsAdsData | null
+  socialAds?: SocialAdsData | null
   onContinue: () => void
   onEdit?: (field: string) => void
 }
@@ -30,6 +32,8 @@ const cardVariant = {
 
 export default function BrandDNACard({
   brandDna,
+  edmundsAds,
+  socialAds,
   onContinue,
   onEdit,
 }: BrandDNACardProps) {
@@ -196,9 +200,79 @@ export default function BrandDNACard({
             </div>
           </GlassCard>
 
-          {/* Your Ads — full width with ad mockups */}
-          {brandDna.currentAds.length > 0 && (
-            <GlassCard className="col-span-12" label="Your Ads">
+          {/* ── Active on Edmunds — Real campaign data from Databricks ── */}
+          {edmundsAds && edmundsAds.models && edmundsAds.models.length > 0 && (
+            <GlassCard className="col-span-12" label="Active on Edmunds">
+              {/* Summary Stats Bar */}
+              <div className="flex flex-wrap gap-4 mb-5">
+                <EdmundsStat label="Impressions" value={formatNumber(edmundsAds.totalImpressions)} />
+                <EdmundsStat label="Active Campaigns" value={edmundsAds.activeCampaigns.toString()} />
+                <EdmundsStat label="Creatives" value={edmundsAds.totalCreatives.toString()} />
+                {edmundsAds.totalSpend > 0 && (
+                  <EdmundsStat label="Est. Spend (30d)" value={`$${formatNumber(edmundsAds.totalSpend)}`} />
+                )}
+                {edmundsAds.source === "databricks" && (
+                  <span className="ml-auto text-[9px] text-emerald-500/70 bg-emerald-500/10 px-2 py-1 rounded-full self-center border border-emerald-500/20">
+                    LIVE DATA
+                  </span>
+                )}
+              </div>
+
+              {/* Model Cards — with real vehicle images */}
+              <div className="overflow-x-auto md:overflow-x-visible -mx-5 md:mx-0 px-5 md:px-0 pb-4">
+                <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-3 min-w-min md:min-w-fit">
+                  {edmundsAds.models.slice(0, 3).map((model, i) => (
+                    <EdmundsModelCard
+                      key={model.targetedModel}
+                      model={model}
+                      brandName={brandDna.name}
+                      index={i}
+                    />
+                  ))}
+                </div>
+              </div>
+            </GlassCard>
+          )}
+
+          {/* ── Social Ad Intelligence — Real Meta ads or AI fallback ── */}
+          {(socialAds && socialAds.ads.length > 0) ? (
+            <GlassCard className="col-span-12" label="Social Ad Intelligence">
+              {/* Source badge + meta info */}
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-[10px] text-zinc-500">
+                  {socialAds.totalCount} active ad{socialAds.totalCount !== 1 ? "s" : ""} found
+                  {socialAds.pageName ? ` for ${socialAds.pageName}` : ""}
+                </span>
+                {socialAds.source === "meta_api" && (
+                  <span className="text-[9px] text-blue-400/70 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-400/20">
+                    META AD LIBRARY
+                  </span>
+                )}
+                <a
+                  href={`https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=${encodeURIComponent(brandDna.name)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-auto text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors"
+                >
+                  View in Ad Library →
+                </a>
+              </div>
+
+              <div className="overflow-x-auto md:overflow-x-visible -mx-5 md:mx-0 px-5 md:px-0 pb-4">
+                <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-3 min-w-min md:min-w-fit">
+                  {socialAds.ads.slice(0, 3).map((ad, i) => (
+                    <SocialAdCard
+                      key={ad.id}
+                      ad={ad}
+                      colors={brandDna.colors}
+                      index={i}
+                    />
+                  ))}
+                </div>
+              </div>
+            </GlassCard>
+          ) : brandDna.currentAds.length > 0 ? (
+            <GlassCard className="col-span-12" label="Social Ad Intelligence">
               <div className="overflow-x-auto md:overflow-x-visible -mx-5 md:mx-0 px-5 md:px-0 pb-4">
                 <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-3 min-w-min md:min-w-fit">
                   {brandDna.currentAds.slice(0, 3).map((ad, i) => (
@@ -212,7 +286,7 @@ export default function BrandDNACard({
                 </div>
               </div>
             </GlassCard>
-          )}
+          ) : null}
         </div>
 
         {/* Continue Button */}
@@ -234,6 +308,290 @@ export default function BrandDNACard({
         </motion.div>
       </motion.div>
     </div>
+  )
+}
+
+/* ── Edmunds Stat Pill ────────────────────────── */
+
+function EdmundsStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex flex-col gap-0.5 px-3 py-2 bg-zinc-800/60 rounded-lg border border-zinc-700/30">
+      <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{label}</span>
+      <span className="text-sm font-semibold text-zinc-200">{value}</span>
+    </div>
+  )
+}
+
+function formatNumber(n: number): string {
+  if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`
+  if (n >= 1000) return `${(n / 1000).toFixed(0)}K`
+  return n.toString()
+}
+
+/* ── Edmunds Model Card — Real vehicle image + stats ── */
+
+function EdmundsModelCard({
+  model,
+  brandName,
+  index,
+}: {
+  model: {
+    targetedModel: string
+    targetedModelYear: string
+    totalImpressions: number
+    totalClicks: number
+    totalRevenue: number
+    viewabilityPct: number
+    uniqueCreatives: number
+    topStates: string[]
+    vehicleImages: string[]
+  }
+  brandName: string
+  index: number
+}) {
+  const [imgError, setImgError] = useState(false)
+  const heroImage = model.vehicleImages?.[0]
+  const ctr = model.totalImpressions > 0
+    ? ((model.totalClicks / model.totalImpressions) * 100).toFixed(2)
+    : "0"
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+      whileHover={{ y: -6, scale: 1.01 }}
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
+                 overflow-hidden transition-all duration-300"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+      }}
+    >
+      {/* Vehicle Image or Gradient Fallback */}
+      <div className="relative w-full h-48 overflow-hidden border-b border-white/[0.04] bg-zinc-900">
+        {heroImage && !imgError ? (
+          <img
+            src={heroImage}
+            alt={`${brandName} ${model.targetedModel}`}
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center"
+            style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.1) 100%)" }}
+          >
+            <span className="text-3xl font-bold text-white/20">{model.targetedModel}</span>
+          </div>
+        )}
+
+        {/* Model Year + Model Badge */}
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          <span className="text-[10px] font-bold text-white/90 uppercase tracking-wider bg-black/50 backdrop-blur
+                         px-2.5 py-1 rounded-full border border-white/10">
+            {model.targetedModelYear} {model.targetedModel}
+          </span>
+        </div>
+
+        {/* Edmunds badge */}
+        <div className="absolute top-3 right-3">
+          <span className="text-[9px] font-bold text-blue-300 uppercase tracking-wider bg-blue-500/15 backdrop-blur
+                         px-2 py-1 rounded-full border border-blue-400/20">
+            Edmunds.com
+          </span>
+        </div>
+      </div>
+
+      {/* Stats */}
+      <div className="relative p-4 flex flex-col gap-3">
+        <div className="grid grid-cols-2 gap-2">
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Impressions</span>
+            <span className="text-sm font-semibold text-zinc-200">{formatNumber(model.totalImpressions)}</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Clicks</span>
+            <span className="text-sm font-semibold text-zinc-200">{formatNumber(model.totalClicks)}</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">CTR</span>
+            <span className="text-sm font-semibold text-emerald-400">{ctr}%</span>
+          </div>
+          <div className="flex flex-col gap-0.5">
+            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Viewability</span>
+            <span className="text-sm font-semibold text-zinc-200">{model.viewabilityPct}%</span>
+          </div>
+        </div>
+
+        {/* Revenue + Creatives */}
+        <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
+          {model.totalRevenue > 0 && (
+            <span className="text-[10px] text-amber-400/80">
+              ${formatNumber(model.totalRevenue)} revenue
+            </span>
+          )}
+          <span className="text-[10px] text-zinc-500">
+            {model.uniqueCreatives} creatives
+          </span>
+        </div>
+
+        {/* Top States */}
+        {model.topStates && model.topStates.length > 0 && (
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <span className="text-[9px] text-zinc-600">Top markets:</span>
+            {model.topStates.slice(0, 4).map(state => (
+              <span key={state} className="text-[9px] px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400 border border-zinc-700/40">
+                {state}
+              </span>
+            ))}
+          </div>
+        )}
+      </div>
+    </motion.div>
+  )
+}
+
+/* ── Social Ad Card — Real Meta Ad Library data ── */
+
+function SocialAdCard({
+  ad,
+  colors,
+  index,
+}: {
+  ad: SocialAdFormatted
+  colors: BrandDNA["colors"]
+  index: number
+}) {
+  const platformIcon = useMemo(() => {
+    if (ad.platform === "Instagram") return "IG"
+    if (ad.platform === "Facebook") return "FB"
+    return ad.platform.slice(0, 2).toUpperCase()
+  }, [ad.platform])
+
+  const platformColors = useMemo(() => {
+    if (ad.platform === "Instagram") return { bg: "bg-pink-500/10", text: "text-pink-300", border: "border-pink-500/20" }
+    return { bg: "bg-blue-500/10", text: "text-blue-300", border: "border-blue-500/20" }
+  }, [ad.platform])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
+      whileHover={{ y: -6, scale: 1.01 }}
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
+                 overflow-hidden transition-all duration-300"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+      }}
+    >
+      {/* Visual Header — platform-themed gradient */}
+      <div
+        className="relative w-full h-36 overflow-hidden border-b border-white/[0.04]"
+        style={{
+          background: ad.platform === "Instagram"
+            ? `linear-gradient(135deg, ${colors.primary}30, #E1306C20, ${colors.accent}15)`
+            : `linear-gradient(135deg, ${colors.primary}30, #1877F220, ${colors.secondary}15)`,
+        }}
+      >
+        {/* Platform badge */}
+        <div className="absolute top-3 left-3 flex items-center gap-2">
+          <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
+                         ${platformColors.bg} ${platformColors.text} border ${platformColors.border}`}>
+            {platformIcon} · {ad.format}
+          </span>
+          {ad.isActive && (
+            <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Active
+            </span>
+          )}
+        </div>
+
+        {/* Decorative elements */}
+        <div className="absolute inset-0 opacity-10">
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="absolute -top-16 -right-16 w-32 h-32 rounded-full border border-current"
+            style={{ color: colors.primary }}
+          />
+        </div>
+
+        {/* Centered brand mark */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <span className="text-5xl font-black text-white/[0.06] uppercase tracking-widest">
+            {ad.platform === "Instagram" ? "IG" : "fb"}
+          </span>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="relative p-4 flex flex-col gap-2.5">
+        {/* Headline */}
+        {ad.headline && (
+          <p className="text-sm font-semibold text-zinc-200 line-clamp-2 leading-snug">
+            {ad.headline}
+          </p>
+        )}
+
+        {/* Body text */}
+        {ad.bodyText && (
+          <p className="text-xs text-zinc-400 line-clamp-3 leading-relaxed">
+            {ad.bodyText}
+          </p>
+        )}
+
+        {/* CTA Button */}
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
+          className="relative w-full py-2.5 rounded-lg font-medium text-sm text-white overflow-hidden mt-1"
+          style={{
+            background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
+            boxShadow: `0 4px 12px ${colors.primary}30`,
+          }}
+        >
+          {ad.cta}
+        </motion.button>
+
+        {/* Stats footer */}
+        <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
+          {ad.impressionsRange && (
+            <span className="text-[10px] text-zinc-500">
+              <span className="text-emerald-400/80">{ad.impressionsRange}</span> impressions
+            </span>
+          )}
+          {ad.spendRange && (
+            <span className="text-[10px] text-amber-400/80">
+              {ad.spendRange}
+            </span>
+          )}
+        </div>
+
+        {/* Date + snapshot link */}
+        <div className="flex items-center justify-between">
+          {ad.dateSpotted && (
+            <span className="text-[9px] text-zinc-600">
+              Running since {ad.dateSpotted}
+            </span>
+          )}
+          {ad.snapshotUrl && ad.snapshotUrl !== "https://www.facebook.com/ads/library/?id=mock" && (
+            <a
+              href={ad.snapshotUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[9px] text-indigo-400 hover:text-indigo-300 transition-colors"
+            >
+              View Original →
+            </a>
+          )}
+        </div>
+      </div>
+    </motion.div>
   )
 }
 

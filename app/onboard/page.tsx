@@ -3,12 +3,16 @@
 import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import BrandDNACard from "@/components/BrandDNACard"
-import { BrandDNA } from "@/lib/types"
+import { BrandDNA, EdmundsAdsData, SocialAdsData } from "@/lib/types"
 
 export default function OnboardPage() {
   const router = useRouter()
   const [brandDna, setBrandDna] = useState<BrandDNA | null>(null)
+  const [edmundsAds, setEdmundsAds] = useState<EdmundsAdsData | null>(null)
+  const [socialAds, setSocialAds] = useState<SocialAdsData | null>(null)
   const prefetchStarted = useRef(false)
+  const edmundsFetchStarted = useRef(false)
+  const socialFetchStarted = useRef(false)
 
   useEffect(() => {
     const stored = sessionStorage.getItem("eds_brand_dna")
@@ -16,9 +20,64 @@ export default function OnboardPage() {
       const parsed = JSON.parse(stored) as BrandDNA
       setBrandDna(parsed)
 
+      // ── Check for cached Edmunds ads ──
+      const cachedEdmunds = sessionStorage.getItem("eds_edmunds_ads")
+      if (cachedEdmunds) {
+        setEdmundsAds(JSON.parse(cachedEdmunds))
+      }
+
+      // ── Prefetch Edmunds ad activity from Databricks ──
+      if (!edmundsFetchStarted.current && !cachedEdmunds) {
+        edmundsFetchStarted.current = true
+        console.log("[prefetch] Starting Edmunds ad activity fetch")
+
+        fetch("/api/edmunds-ads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ make: parsed.name }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.edmundsAds) {
+              sessionStorage.setItem("eds_edmunds_ads", JSON.stringify(data.edmundsAds))
+              setEdmundsAds(data.edmundsAds)
+              console.log(`[prefetch] Edmunds ads ready: ${data.edmundsAds.models?.length || 0} models, source=${data.edmundsAds.source}`)
+            }
+          })
+          .catch(err => {
+            console.warn("[prefetch] Edmunds ads fetch failed:", err)
+          })
+      }
+
+      // ── Prefetch social ads from Meta Ad Library ──
+      const cachedSocial = sessionStorage.getItem("eds_social_ads")
+      if (cachedSocial) {
+        setSocialAds(JSON.parse(cachedSocial))
+      }
+
+      if (!socialFetchStarted.current && !cachedSocial) {
+        socialFetchStarted.current = true
+        console.log("[prefetch] Starting Meta Ad Library fetch")
+
+        fetch("/api/social-ads", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ brandName: parsed.name, limit: 6 }),
+        })
+          .then(res => res.json())
+          .then(data => {
+            if (data.socialAds) {
+              sessionStorage.setItem("eds_social_ads", JSON.stringify(data.socialAds))
+              setSocialAds(data.socialAds)
+              console.log(`[prefetch] Social ads ready: ${data.socialAds.ads?.length || 0} ads, source=${data.socialAds.source}`)
+            }
+          })
+          .catch(err => {
+            console.warn("[prefetch] Social ads fetch failed:", err)
+          })
+      }
+
       // ── Prefetch competitor profiles in the background ──
-      // The competitors page checks sessionStorage first, so if this
-      // finishes before the user navigates, it's instant.
       if (
         !prefetchStarted.current &&
         parsed.competitors &&
@@ -26,7 +85,6 @@ export default function OnboardPage() {
         (!parsed.competitorProfiles || parsed.competitorProfiles.length === 0)
       ) {
         prefetchStarted.current = true
-        // Mark that a fetch is in-flight so the competitors page doesn't duplicate it
         sessionStorage.setItem("eds_competitors_fetching", "true")
         console.log("[prefetch] Starting competitor profiles fetch in background")
 
@@ -51,7 +109,6 @@ export default function OnboardPage() {
                 topPlatform: (cp.topPlatform as string) || "Unknown",
               }))
 
-              // Merge into stored brand DNA so competitors page finds it
               const updated = { ...parsed, competitorProfiles: profiles }
               sessionStorage.setItem("eds_brand_dna", JSON.stringify(updated))
               console.log(`[prefetch] Competitor profiles ready: ${profiles.length} profiles cached`)
@@ -82,7 +139,7 @@ export default function OnboardPage() {
 
   return (
     <div className="min-h-screen">
-      <BrandDNACard brandDna={brandDna} onContinue={handleContinue} onEdit={handleEdit} />
+      <BrandDNACard brandDna={brandDna} edmundsAds={edmundsAds} socialAds={socialAds} onContinue={handleContinue} onEdit={handleEdit} />
     </div>
   )
 }

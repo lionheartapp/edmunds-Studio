@@ -534,6 +534,165 @@ export async function queryShopperInterest(make: string, model?: string) {
 }
 
 // ═══════════════════════════════════════════════════════════════
+// EDMUNDS AD ACTIVITY — What this OEM is running on Edmunds NOW
+// ═══════════════════════════════════════════════════════════════
+
+export interface EdmundsAdActivity {
+  campaigns: {
+    campaignName: string
+    dealerName: string
+    strategy: string
+    impressions: number
+    clicks: number
+    ctr: number
+    spend: number
+    cpm: number
+    cpc: number
+    contacts: number
+  }[]
+  eventSummary: {
+    targetedModel: string
+    targetedModelYear: string
+    totalImpressions: number
+    totalClicks: number
+    totalRevenue: number
+    viewabilityPct: number
+    uniqueCreatives: number
+    topStates: string[]
+  }[]
+  totalImpressions: number
+  totalSpend: number
+  totalCreatives: number
+  activeCampaigns: number
+}
+
+/**
+ * Get the OEM's complete ad activity on Edmunds — campaigns + events.
+ * This is REAL data showing what's actually running.
+ */
+export async function queryEdmundsAdActivity(make: string): Promise<EdmundsAdActivity | null> {
+  if (!isDatabricksConfigured()) return null
+
+  try {
+    const [campaignResult, eventResult] = await Promise.allSettled([
+      // Active campaigns from adsolutions
+      executeQuery(`
+        SELECT
+          campaign_name,
+          dealer_name,
+          strategy,
+          SUM(total_facebook_impressions) as impressions,
+          SUM(total_facebook_clicks) as clicks,
+          ROUND(SUM(total_facebook_clicks) * 100.0 / NULLIF(SUM(total_facebook_impressions), 0), 2) as ctr,
+          ROUND(SUM(total_facebook_spend), 2) as spend,
+          ROUND(SUM(total_facebook_spend) * 1000.0 / NULLIF(SUM(total_facebook_impressions), 0), 2) as cpm,
+          ROUND(SUM(total_facebook_spend) / NULLIF(SUM(total_facebook_clicks), 0), 2) as cpc,
+          SUM(contacts) as contacts
+        FROM ad.gold_adsolutions_daily_campaign
+        WHERE f_date >= DATE_SUB(CURRENT_DATE(), 30)
+          AND LOWER(dealer_name) LIKE CONCAT('%', LOWER('${make}'), '%')
+        GROUP BY campaign_name, dealer_name, strategy
+        ORDER BY impressions DESC
+        LIMIT 10
+      `),
+      // Ad events by model
+      executeQuery(`
+        SELECT
+          targeted_model,
+          targeted_model_year,
+          SUM(ad_impressions) as total_impressions,
+          SUM(click_count) as total_clicks,
+          ROUND(SUM(total_estimated_revenue), 2) as total_revenue,
+          ROUND(SUM(viewable_impressions) * 100.0 / NULLIF(SUM(measurable_impressions), 0), 2) as viewability_pct,
+          COUNT(DISTINCT creative_id) as unique_creatives,
+          COLLECT_SET(geo_state) as top_states
+        FROM ad.gold_event_ad
+        WHERE LOWER(targeted_make) = LOWER('${make}')
+          AND record_date >= DATE_SUB(CURRENT_DATE(), 30)
+        GROUP BY targeted_model, targeted_model_year
+        ORDER BY total_impressions DESC
+        LIMIT 10
+      `),
+    ])
+
+    const campaigns = campaignResult.status === "fulfilled"
+      ? rowsToObjects<Record<string, unknown>>(campaignResult.value).map(r => ({
+          campaignName: (r.campaign_name as string) || "",
+          dealerName: (r.dealer_name as string) || "",
+          strategy: (r.strategy as string) || "",
+          impressions: (r.impressions as number) || 0,
+          clicks: (r.clicks as number) || 0,
+          ctr: (r.ctr as number) || 0,
+          spend: (r.spend as number) || 0,
+          cpm: (r.cpm as number) || 0,
+          cpc: (r.cpc as number) || 0,
+          contacts: (r.contacts as number) || 0,
+        }))
+      : []
+
+    const eventSummary = eventResult.status === "fulfilled"
+      ? rowsToObjects<Record<string, unknown>>(eventResult.value).map(r => ({
+          targetedModel: (r.targeted_model as string) || "",
+          targetedModelYear: (r.targeted_model_year as string) || "",
+          totalImpressions: (r.total_impressions as number) || 0,
+          totalClicks: (r.total_clicks as number) || 0,
+          totalRevenue: (r.total_revenue as number) || 0,
+          viewabilityPct: (r.viewability_pct as number) || 0,
+          uniqueCreatives: (r.unique_creatives as number) || 0,
+          topStates: Array.isArray(r.top_states) ? (r.top_states as string[]).slice(0, 5) : [],
+        }))
+      : []
+
+    const totalImpressions = eventSummary.reduce((s, e) => s + e.totalImpressions, 0)
+    const totalSpend = campaigns.reduce((s, c) => s + c.spend, 0)
+    const totalCreatives = eventSummary.reduce((s, e) => s + e.uniqueCreatives, 0)
+
+    return {
+      campaigns,
+      eventSummary,
+      totalImpressions,
+      totalSpend,
+      totalCreatives,
+      activeCampaigns: campaigns.length,
+    }
+  } catch (err) {
+    console.error("[databricks] queryEdmundsAdActivity failed:", err)
+    return null
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EDMUNDS MEDIA CDN — Real vehicle photos
+// ═══════════════════════════════════════════════════════════════
+
+/**
+ * Build Edmunds media CDN URLs for a vehicle.
+ * Pattern: https://media.ed.edmunds-media.com/{make}/{model}/{year}/oem/{year}_{make}_{model}_{suffix}.jpg
+ */
+export function getEdmundsVehicleImageUrl(
+  make: string,
+  model: string,
+  year: number | string,
+  angle: "fq" | "rq" | "s" | "f" | "r" = "fq", // front-quarter, rear-quarter, side, front, rear
+  size: 600 | 1600 = 600
+): string {
+  const m = make.toLowerCase().replace(/[^a-z0-9-]/g, "")
+  const mod = model.toLowerCase().replace(/[^a-z0-9-]/g, "-")
+  return `https://media.ed.edmunds-media.com/${m}/${mod}/${year}/oem/${year}_${m}_${mod}_${angle}_oem_1_${size}.jpg`
+}
+
+/**
+ * Get multiple angle photos for a vehicle
+ */
+export function getEdmundsVehicleImages(make: string, model: string, year: number | string): string[] {
+  return [
+    getEdmundsVehicleImageUrl(make, model, year, "fq", 600),
+    getEdmundsVehicleImageUrl(make, model, year, "f", 600),
+    getEdmundsVehicleImageUrl(make, model, year, "s", 600),
+  ]
+}
+
+// ═══════════════════════════════════════════════════════════════
 // UTILITY QUERIES
 // ═══════════════════════════════════════════════════════════════
 

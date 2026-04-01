@@ -104,6 +104,64 @@ export interface PreBuiltCampaign {
   estimatedImpact: string
 }
 
+// ─── Edmunds Real Ad Data ───────────────────────────────────
+
+export interface EdmundsAdsData {
+  campaigns: {
+    campaignName: string
+    dealerName: string
+    strategy: string
+    impressions: number
+    clicks: number
+    ctr: number
+    spend: number
+    cpm: number
+    cpc: number
+    contacts: number
+  }[]
+  models: {
+    targetedModel: string
+    targetedModelYear: string
+    totalImpressions: number
+    totalClicks: number
+    totalRevenue: number
+    viewabilityPct: number
+    uniqueCreatives: number
+    topStates: string[]
+    vehicleImages: string[]
+  }[]
+  totalImpressions: number
+  totalSpend: number
+  totalCreatives: number
+  activeCampaigns: number
+  source: "databricks" | "mock"
+}
+
+// ─── Social Ads (Meta Ad Library) ───────────────────────────
+
+export interface SocialAdsData {
+  ads: SocialAdFormatted[]
+  totalCount: number
+  pageId?: string
+  pageName?: string
+  source: "meta_api" | "mock"
+}
+
+export interface SocialAdFormatted {
+  id: string
+  headline: string
+  bodyText: string
+  cta: string
+  platform: string
+  format: string
+  imageUrl?: string
+  snapshotUrl?: string
+  dateSpotted: string
+  impressionsRange?: string
+  spendRange?: string
+  isActive: boolean
+}
+
 // ─── Creative Brief ──────────────────────────────────────────
 
 export interface CreativeBrief {
