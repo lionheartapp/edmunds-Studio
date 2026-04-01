@@ -21,10 +21,13 @@ export default function Home() {
 
       if (!response.ok) throw new Error("Failed to analyze brand")
 
-      const { brandDna } = await response.json()
+      const { brandDna, edmundsData } = await response.json()
 
-      // Store brand DNA and user type for downstream pages
+      // Store brand DNA, Edmunds market data, and user type for downstream pages
       sessionStorage.setItem("eds_brand_dna", JSON.stringify(brandDna))
+      if (edmundsData) {
+        sessionStorage.setItem("eds_edmunds_market", JSON.stringify(edmundsData))
+      }
       if (userType) {
         sessionStorage.setItem("eds_user_type", userType)
       }

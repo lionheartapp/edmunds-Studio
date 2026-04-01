@@ -10,6 +10,8 @@ export default function OnboardPage() {
   const [brandDna, setBrandDna] = useState<BrandDNA | null>(null)
   const [edmundsAds, setEdmundsAds] = useState<EdmundsAdsData | null>(null)
   const [socialAds, setSocialAds] = useState<SocialAdsData | null>(null)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [edmundsMarket, setEdmundsMarket] = useState<any>(null)
   const prefetchStarted = useRef(false)
   const edmundsFetchStarted = useRef(false)
   const socialFetchStarted = useRef(false)
@@ -18,6 +20,12 @@ export default function OnboardPage() {
     const stored = sessionStorage.getItem("eds_brand_dna")
     if (stored) {
       const parsed = JSON.parse(stored) as BrandDNA
+
+      // ── Load Edmunds market data (set during brand analysis) ──
+      const cachedMarket = sessionStorage.getItem("eds_edmunds_market")
+      if (cachedMarket) {
+        setEdmundsMarket(JSON.parse(cachedMarket))
+      }
       setBrandDna(parsed)
 
       // ── Check for cached Edmunds ads ──
@@ -139,7 +147,7 @@ export default function OnboardPage() {
 
   return (
     <div className="min-h-screen">
-      <BrandDNACard brandDna={brandDna} edmundsAds={edmundsAds} socialAds={socialAds} onContinue={handleContinue} onEdit={handleEdit} />
+      <BrandDNACard brandDna={brandDna} edmundsAds={edmundsAds} socialAds={socialAds} edmundsMarket={edmundsMarket} onContinue={handleContinue} onEdit={handleEdit} />
     </div>
   )
 }

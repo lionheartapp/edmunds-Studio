@@ -1,5 +1,6 @@
 // app/api/competitors/route.ts — Competitor Profiles (Stage 2)
 // Fetched separately from brand-dna to keep each call fast and reliable.
+// Now enriched with real Edmunds inventory + market data for each competitor.
 
 import { NextRequest, NextResponse } from "next/server"
 import { askAIJSON, isAIConfigured } from "@/lib/ai"
@@ -7,6 +8,11 @@ import {
   COMPETITOR_PROFILES_SYSTEM_PROMPT,
   COMPETITOR_PROFILES_USER_PROMPT,
 } from "@/prompts/brand-dna"
+import {
+  getInventorySummary,
+  getMarketData,
+  getDataSource,
+} from "@/lib/edmunds"
 
 export const maxDuration = 60
 
@@ -73,13 +79,54 @@ export async function POST(request: NextRequest) {
 
     console.log(`[competitors] Fetching profiles for ${competitors.join(", ")} (brand: ${brandName})`)
 
+    // ── Fetch real Edmunds data for each competitor in parallel ──
+    const competitorNames = competitors.slice(0, 3)
+    const edmundsResults = await Promise.allSettled(
+      competitorNames.map(async (name: string) => {
+        const [inv, mkt] = await Promise.allSettled([
+          getInventorySummary(name),
+          getMarketData(name),
+        ])
+        return {
+          name,
+          inventory: inv.status === "fulfilled" ? inv.value : null,
+          market: mkt.status === "fulfilled" ? mkt.value : null,
+        }
+      })
+    )
+
+    const competitorEdmundsData = edmundsResults
+      .filter(r => r.status === "fulfilled")
+      .map(r => (r as PromiseFulfilledResult<{ name: string; inventory: unknown; market: unknown }>).value)
+
+    const dataSource = getDataSource()
+    console.log(`[competitors] Edmunds data loaded for ${competitorEdmundsData.length} competitors (source: ${dataSource})`)
+
+    // Build context string for AI
+    const edmundsContext = competitorEdmundsData.map(cd => {
+      const lines: string[] = [`\n--- REAL EDMUNDS DATA for ${cd.name} (source: ${dataSource}) ---`]
+      const inv = cd.inventory as Record<string, unknown> | null
+      const mkt = cd.market as Record<string, unknown> | null
+      if (inv) {
+        lines.push(`  Inventory: ${(inv.totalInStock as number)?.toLocaleString() || "N/A"} units | Avg price: $${(inv.avgSellingPrice as number)?.toLocaleString() || "N/A"} | Days on lot: ${inv.avgDaysOnLot || "N/A"}`)
+      }
+      if (mkt) {
+        lines.push(`  Market share: ${mkt.marketShare || "N/A"}% | Days to turn: ${mkt.daysToTurn || "N/A"} | Incentive spend: $${(mkt.incentiveSpend as number)?.toLocaleString() || "N/A"}`)
+      }
+      return lines.join("\n")
+    }).join("\n")
+
+    const enrichedPrompt = COMPETITOR_PROFILES_USER_PROMPT(brandName, competitorNames)
+      + "\n\nIMPORTANT: Use this real Edmunds market data to ground your analysis. Reference specific inventory counts, pricing, and days-on-lot numbers in your strengths/weaknesses."
+      + edmundsContext
+
     const result = await withTimeout(
       askAIJSON<CompetitorResponse>(
         COMPETITOR_PROFILES_SYSTEM_PROMPT,
-        COMPETITOR_PROFILES_USER_PROMPT(brandName, competitors.slice(0, 3)),
+        enrichedPrompt,
         { temperature: 0.5 }
       ),
-      45000, // 45s — plenty of room in the 60s budget
+      45000,
       "AI"
     )
 
@@ -96,7 +143,10 @@ export async function POST(request: NextRequest) {
       }))
 
       console.log(`[competitors] Success: ${profiles.length} profiles in ${Date.now() - startTime}ms`)
-      return NextResponse.json({ competitorProfiles: profiles })
+      return NextResponse.json({
+        competitorProfiles: profiles,
+        edmundsData: { competitors: competitorEdmundsData, dataSource },
+      })
     }
 
     // AI failed — return empty but not a 500

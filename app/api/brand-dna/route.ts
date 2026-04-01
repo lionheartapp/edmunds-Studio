@@ -20,6 +20,12 @@ import {
   extractFonts,
   BrandfetchResult,
 } from "@/lib/brandfetch"
+import {
+  getInventorySummary,
+  getIncentives,
+  getMarketData,
+  getDataSource,
+} from "@/lib/edmunds"
 
 export const maxDuration = 60
 
@@ -161,7 +167,7 @@ export async function POST(request: NextRequest) {
 
     let scraperContext = ""
 
-    const [aiResult, bfResult, scraperResult] = await Promise.allSettled([
+    const [aiResult, bfResult, scraperResult, inventoryResult, marketResult, incentivesResult] = await Promise.allSettled([
       // 1. AI — fire immediately without scraper context (25s so retry fits in 60s budget)
       withTimeout(
         askAIJSON<BrandDNA>(
@@ -187,15 +193,36 @@ export async function POST(request: NextRequest) {
         10000,
         "Scraper"
       ),
+
+      // 4. Edmunds inventory data (Databricks or mock)
+      withTimeout(getInventorySummary(brandName), 10000, "Inventory"),
+
+      // 5. Edmunds market data
+      withTimeout(getMarketData(brandName), 10000, "Market"),
+
+      // 6. Edmunds incentives
+      withTimeout(getIncentives(brandName, "90210"), 10000, "Incentives"),
     ])
 
     // Extract results
     const aiProfile = aiResult.status === "fulfilled" ? aiResult.value : null
     const brandfetchData: BrandfetchResult | null =
       bfResult.status === "fulfilled" ? bfResult.value : null
+    const inventoryData = inventoryResult.status === "fulfilled" ? inventoryResult.value : null
+    const marketData = marketResult.status === "fulfilled" ? marketResult.value : null
+    const incentivesData = incentivesResult.status === "fulfilled" ? incentivesResult.value : null
+    const edmundsSource = getDataSource()
 
     const elapsed = Date.now() - startTime
-    console.log(`[brand-dna] Parallel phase done in ${elapsed}ms — AI: ${aiResult.status}, BF: ${bfResult.status}, Scraper: ${scraperResult.status}`)
+    console.log(`[brand-dna] Parallel phase done in ${elapsed}ms — AI: ${aiResult.status}, BF: ${bfResult.status}, Scraper: ${scraperResult.status}, Inventory: ${inventoryResult.status}, Market: ${marketResult.status} (source: ${edmundsSource})`)
+
+    // Bundle Edmunds data to return alongside brandDna
+    const edmundsData = {
+      inventory: inventoryData,
+      market: marketData,
+      incentives: incentivesData,
+      dataSource: edmundsSource,
+    }
 
     // ─── Success: AI worked on first try ────────────────────
     if (aiProfile) {
@@ -204,7 +231,7 @@ export async function POST(request: NextRequest) {
         : aiProfile
 
       console.log(`[brand-dna] Success for ${brandName} in ${Date.now() - startTime}ms`)
-      return NextResponse.json({ brandDna: profile })
+      return NextResponse.json({ brandDna: profile, edmundsData })
     }
 
     // ─── Retry: AI failed, try once more with scraper context ─
@@ -227,7 +254,7 @@ export async function POST(request: NextRequest) {
           : retryProfile
 
         console.log(`[brand-dna] Retry success for ${brandName} in ${Date.now() - startTime}ms`)
-        return NextResponse.json({ brandDna: profile })
+        return NextResponse.json({ brandDna: profile, edmundsData })
       }
     } catch (retryError) {
       console.error(`[brand-dna] Retry failed:`, retryError instanceof Error ? retryError.message : retryError)
@@ -238,14 +265,14 @@ export async function POST(request: NextRequest) {
     if (demo) {
       console.log(`[brand-dna] Falling back to demo brief for: ${brandName}`)
       const profile = brandfetchData ? applyBrandfetch(demo, brandfetchData) : demo
-      return NextResponse.json({ brandDna: profile })
+      return NextResponse.json({ brandDna: profile, edmundsData })
     }
 
     // Generic fallback — always returns something so the user isn't stuck
     console.log(`[brand-dna] AI failed, using generic fallback for: ${brandName}`)
     const generic = buildGenericFallback(brandName)
     const profile = brandfetchData ? applyBrandfetch(generic, brandfetchData) : generic
-    return NextResponse.json({ brandDna: profile, fallback: true })
+    return NextResponse.json({ brandDna: profile, edmundsData, fallback: true })
   } catch (error) {
     console.error("[brand-dna] Unhandled error:", error instanceof Error ? error.message : error)
 

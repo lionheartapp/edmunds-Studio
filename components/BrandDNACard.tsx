@@ -4,10 +4,31 @@ import { motion } from "framer-motion"
 import { BrandDNA, AdSample, EdmundsAdsData, SocialAdsData, SocialAdFormatted } from "@/lib/types"
 import { useMemo, useState } from "react"
 
+interface EdmundsMarketInfo {
+  inventory?: {
+    totalInStock: number
+    avgDaysOnLot: number
+    avgSellingPrice: number
+    avgMsrp: number
+    topTrims?: { trim: string; count: number; avgPrice: number }[]
+  } | null
+  market?: {
+    marketShare: number
+    salesTrend: string
+    avgTransactionPrice: number
+    incentiveSpend: number
+    daysToTurn: number
+    shopperInterest?: { searchVolume: number; trend: string }
+  } | null
+  incentives?: { name: string; description: string; type?: string }[] | null
+  dataSource: "databricks" | "api" | "mock"
+}
+
 interface BrandDNACardProps {
   brandDna: BrandDNA
   edmundsAds?: EdmundsAdsData | null
   socialAds?: SocialAdsData | null
+  edmundsMarket?: EdmundsMarketInfo | null
   onContinue: () => void
   onEdit?: (field: string) => void
 }
@@ -34,6 +55,7 @@ export default function BrandDNACard({
   brandDna,
   edmundsAds,
   socialAds,
+  edmundsMarket,
   onContinue,
   onEdit,
 }: BrandDNACardProps) {
@@ -100,24 +122,27 @@ export default function BrandDNACard({
 
           {/* Colors — spans 5 cols */}
           <GlassCard className="col-span-12 md:col-span-5" onEdit={() => onEdit?.("colors")} label="Colors">
-            <div className="flex gap-3 mt-1">
-              {Object.entries(brandDna.colors).map(([name, hex]) => (
-                <motion.div
-                  key={name}
-                  whileHover={{ scale: 1.08, y: -4 }}
-                  className="flex flex-col items-center gap-2 flex-1"
-                >
-                  <div
-                    className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
-                    style={{
-                      backgroundColor: hex,
-                      boxShadow: `0 8px 32px ${hex}30`,
-                    }}
-                  />
-                  <span className="text-[10px] text-zinc-500 capitalize">{name}</span>
-                  <span className="text-[10px] font-mono text-zinc-600">{hex}</span>
-                </motion.div>
-              ))}
+            <div className="flex gap-4 mt-1">
+              {(["primary", "secondary"] as const).map((name) => {
+                const hex = brandDna.colors[name]
+                return (
+                  <motion.div
+                    key={name}
+                    whileHover={{ scale: 1.08, y: -4 }}
+                    className="flex flex-col items-center gap-2 flex-1"
+                  >
+                    <div
+                      className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
+                      style={{
+                        backgroundColor: hex,
+                        boxShadow: `0 8px 32px ${hex}30`,
+                      }}
+                    />
+                    <span className="text-[10px] text-zinc-500 capitalize">{name}</span>
+                    <span className="text-[10px] font-mono text-zinc-600">{hex}</span>
+                  </motion.div>
+                )
+              })}
             </div>
           </GlassCard>
 
@@ -199,6 +224,86 @@ export default function BrandDNACard({
               ))}
             </div>
           </GlassCard>
+
+          {/* ── Edmunds Market Intelligence ── */}
+          {edmundsMarket && (edmundsMarket.inventory || edmundsMarket.market) && (
+            <GlassCard className="col-span-12" label="Edmunds Market Intelligence">
+              <div className="flex items-center gap-2 mb-4">
+                <span className={`text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                  edmundsMarket.dataSource === "databricks"
+                    ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
+                    : "text-amber-400 bg-amber-500/10 border-amber-500/20"
+                }`}>
+                  {edmundsMarket.dataSource === "databricks" ? "LIVE PRODUCTION DATA" : "EDMUNDS DATA"}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {edmundsMarket.inventory && (
+                  <>
+                    <MarketStat
+                      label="National Inventory"
+                      value={edmundsMarket.inventory.totalInStock?.toLocaleString() || "—"}
+                      sub="vehicles in stock"
+                    />
+                    <MarketStat
+                      label="Avg Days on Lot"
+                      value={edmundsMarket.inventory.avgDaysOnLot?.toString() || "—"}
+                      sub="days"
+                    />
+                    <MarketStat
+                      label="Avg Selling Price"
+                      value={`$${edmundsMarket.inventory.avgSellingPrice?.toLocaleString() || "—"}`}
+                      sub={`MSRP $${edmundsMarket.inventory.avgMsrp?.toLocaleString() || "—"}`}
+                    />
+                  </>
+                )}
+                {edmundsMarket.market && (
+                  <MarketStat
+                    label="Market Share"
+                    value={`${edmundsMarket.market.marketShare}%`}
+                    sub={`Trend: ${edmundsMarket.market.salesTrend}`}
+                  />
+                )}
+              </div>
+
+              {/* Incentives row */}
+              {edmundsMarket.incentives && edmundsMarket.incentives.length > 0 && (
+                <div className="border-t border-white/[0.04] pt-3 mt-1">
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 block">Active Incentives</span>
+                  <div className="flex flex-wrap gap-2">
+                    {edmundsMarket.incentives.slice(0, 3).map((inc, i) => (
+                      <div
+                        key={i}
+                        className="px-3 py-2 bg-emerald-500/5 border border-emerald-500/15 rounded-lg flex-1 min-w-[200px]"
+                      >
+                        <span className="text-xs font-medium text-emerald-300 block">{inc.name}</span>
+                        <span className="text-[10px] text-zinc-400 line-clamp-1">{inc.description}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Top trims */}
+              {edmundsMarket.inventory?.topTrims && edmundsMarket.inventory.topTrims.length > 0 && (
+                <div className="border-t border-white/[0.04] pt-3 mt-3">
+                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 block">Top Selling Trims</span>
+                  <div className="flex flex-wrap gap-2">
+                    {edmundsMarket.inventory.topTrims.map((trim, i) => (
+                      <div
+                        key={i}
+                        className="px-3 py-2 bg-zinc-800/60 border border-zinc-700/30 rounded-lg"
+                      >
+                        <span className="text-xs font-medium text-zinc-200">{trim.trim}</span>
+                        <span className="text-[10px] text-zinc-500 ml-2">{trim.count} units · ${trim.avgPrice.toLocaleString()}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </GlassCard>
+          )}
 
           {/* ── Active on Edmunds — Real campaign data from Databricks ── */}
           {edmundsAds && edmundsAds.models && edmundsAds.models.length > 0 && (
@@ -295,7 +400,7 @@ export default function BrandDNACard({
             whileHover={{ scale: 1.005 }}
             whileTap={{ scale: 0.995 }}
             onClick={onContinue}
-            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-gradient-to-r from-indigo-600 to-violet-600"
+            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-indigo-600 hover:bg-indigo-500"
             style={{
               boxShadow: "0 0 30px rgba(99, 102, 241, 0.25)",
             }}
@@ -307,6 +412,18 @@ export default function BrandDNACard({
           </p>
         </motion.div>
       </motion.div>
+    </div>
+  )
+}
+
+/* ── Market Stat Card ─────────────────────────── */
+
+function MarketStat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  return (
+    <div className="flex flex-col gap-1 px-4 py-3 bg-zinc-800/40 rounded-xl border border-zinc-700/20">
+      <span className="text-[9px] text-zinc-500 uppercase tracking-wider">{label}</span>
+      <span className="text-lg font-bold text-zinc-100">{value}</span>
+      {sub && <span className="text-[10px] text-zinc-500">{sub}</span>}
     </div>
   )
 }
@@ -545,14 +662,26 @@ function SocialAdCard({
           </p>
         )}
 
-        {/* CTA Button */}
+        {/* CTA Button — white outline, fills brand primary on hover */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative w-full py-2.5 rounded-lg font-medium text-sm text-white overflow-hidden mt-1"
+          className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
+                   transition-all duration-300 mt-1 border"
           style={{
-            background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-            boxShadow: `0 4px 12px ${colors.primary}30`,
+            borderColor: "rgba(255,255,255,0.25)",
+            color: "white",
+            background: "transparent",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = colors.primary
+            e.currentTarget.style.borderColor = colors.primary
+            e.currentTarget.style.boxShadow = `0 4px 16px ${colors.primary}40`
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"
+            e.currentTarget.style.boxShadow = "none"
           }}
         >
           {ad.cta}
@@ -704,28 +833,32 @@ function AdMockupCard({
           </p>
         )}
 
-        {/* CTA Button */}
+        {/* CTA Button — white outline, fills brand primary on hover */}
         <motion.button
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
-          className="relative w-full py-2.5 rounded-lg font-medium text-sm text-white overflow-hidden
-                   transition-all duration-200 mt-2 group/btn"
+          className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
+                   transition-all duration-300 mt-2 group/btn border"
           style={{
-            background: `linear-gradient(135deg, ${colors.primary}, ${colors.secondary})`,
-            boxShadow: `0 4px 12px ${colors.primary}30`,
+            borderColor: `rgba(255,255,255,0.25)`,
+            color: "white",
+            background: "transparent",
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.background = colors.primary
+            e.currentTarget.style.borderColor = colors.primary
+            e.currentTarget.style.boxShadow = `0 4px 16px ${colors.primary}40`
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.background = "transparent"
+            e.currentTarget.style.borderColor = "rgba(255,255,255,0.25)"
+            e.currentTarget.style.boxShadow = "none"
           }}
         >
           <span className="relative z-10 flex items-center justify-center gap-1.5">
             {ad.cta}
             <span className="group-hover/btn:translate-x-0.5 transition-transform">→</span>
           </span>
-          <motion.div
-            className="absolute inset-0 opacity-0 group-hover/btn:opacity-100"
-            style={{
-              background: `linear-gradient(135deg, ${colors.secondary}, ${colors.primary})`,
-            }}
-            transition={{ duration: 0.3 }}
-          />
         </motion.button>
 
         {/* Footer Stats */}
