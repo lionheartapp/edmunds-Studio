@@ -3,6 +3,7 @@
 import { motion } from "framer-motion"
 import { BrandDNA, AdSample, EdmundsAdsData, SocialAdsData, SocialAdFormatted } from "@/lib/types"
 import { useEffect, useMemo, useState } from "react"
+import SkeletonCard from "@/components/SkeletonCard"
 
 interface EdmundsMarketInfo {
   inventory?: {
@@ -32,7 +33,6 @@ interface BrandDNACardProps {
   edmundsAdsLoading?: boolean
   socialAdsLoading?: boolean
   onContinue: () => void
-  onEdit?: (field: string) => void
 }
 
 /* ── Section Loader — animated blob with playful messages ── */
@@ -48,7 +48,7 @@ const edmundsLoadingMessages = [
 
 const socialLoadingMessages = [
   "Scrolling through Meta's ad library at superhuman speed...",
-  "Stalking social ads... for science...",
+  "Scanning social ads...",
   "Finding out what the algorithm already knows...",
   "Judging ad creative so you don't have to...",
   "Intercepting social signals...",
@@ -74,6 +74,8 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
       className="col-span-12"
     >
       <div
+        role="status"
+        aria-live="polite"
         className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden"
         style={{
           background: "linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%)",
@@ -107,7 +109,7 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
           </div>
 
           <div className="flex flex-col gap-1.5 min-w-0">
-            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{label}</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
             <motion.span
               key={msgIndex}
               initial={{ opacity: 0, y: 6 }}
@@ -118,6 +120,7 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
             >
               {messages[msgIndex]}
             </motion.span>
+            <span className="text-xs text-zinc-600 mt-1">Usually takes about 5-10 seconds</span>
           </div>
         </div>
       </div>
@@ -151,7 +154,6 @@ export default function BrandDNACard({
   edmundsAdsLoading,
   socialAdsLoading,
   onContinue,
-  onEdit,
 }: BrandDNACardProps) {
   return (
     <div className="relative min-h-screen py-10 px-4 md:px-8">
@@ -215,7 +217,7 @@ export default function BrandDNACard({
         <div className="grid grid-cols-12 gap-3 auto-rows-auto">
 
           {/* Colors — spans 5 cols */}
-          <GlassCard className="col-span-12 md:col-span-5" onEdit={() => onEdit?.("colors")} label="Colors">
+          <GlassCard className="col-span-12 md:col-span-5" label="Colors" badge="AI-Inferred">
             <div className="flex gap-4 mt-1">
               {(["primary", "secondary"] as const).map((name) => {
                 const hex = brandDna.colors[name]
@@ -232,8 +234,8 @@ export default function BrandDNACard({
                         boxShadow: `0 8px 32px ${hex}30`,
                       }}
                     />
-                    <span className="text-[10px] text-zinc-500 capitalize">{name}</span>
-                    <span className="text-[10px] font-mono text-zinc-600">{hex}</span>
+                    <span className="text-xs text-zinc-500 capitalize">{name}</span>
+                    <span className="text-xs font-mono text-zinc-600">{hex}</span>
                   </motion.div>
                 )
               })}
@@ -241,7 +243,7 @@ export default function BrandDNACard({
           </GlassCard>
 
           {/* Typography — spans 4 cols */}
-          <GlassCard className="col-span-12 md:col-span-4" onEdit={() => onEdit?.("typography")} label="Typography">
+          <GlassCard className="col-span-12 md:col-span-4" label="Typography" badge="AI-Inferred">
             <div className="flex flex-col justify-center h-full">
               <p
                 className="text-3xl text-zinc-100 tracking-tight"
@@ -250,10 +252,10 @@ export default function BrandDNACard({
                 {brandDna.typography.primaryFont}
               </p>
               <div className="flex items-center gap-3 mt-3">
-                <span className="text-[11px] px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
+                <span className="text-xs px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
                   {brandDna.typography.fallback}
                 </span>
-                <span className="text-[11px] px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
+                <span className="text-xs px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
                   Weight {brandDna.typography.headingWeight}
                 </span>
               </div>
@@ -271,7 +273,7 @@ export default function BrandDNACard({
                   transition={{ delay: 0.4 + i * 0.1 }}
                   className="flex items-center gap-2.5 px-3 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700/30"
                 >
-                  <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-[10px] font-bold text-zinc-400">
+                  <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-400">
                     {i + 1}
                   </div>
                   <span className="text-sm text-zinc-300">{comp}</span>
@@ -281,7 +283,7 @@ export default function BrandDNACard({
           </GlassCard>
 
           {/* Voice — spans 6 cols */}
-          <GlassCard className="col-span-12 md:col-span-6" onEdit={() => onEdit?.("voice")} label="Voice">
+          <GlassCard className="col-span-12 md:col-span-6" label="Voice" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.voice.map((attr, i) => (
                 <motion.span
@@ -301,7 +303,7 @@ export default function BrandDNACard({
           </GlassCard>
 
           {/* Visual Style — spans 6 cols */}
-          <GlassCard className="col-span-12 md:col-span-6" onEdit={() => onEdit?.("visualStyle")} label="Visual Style">
+          <GlassCard className="col-span-12 md:col-span-6" label="Visual Style" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.visualStyle.map((style, i) => (
                 <motion.span
@@ -323,7 +325,7 @@ export default function BrandDNACard({
           {edmundsMarket && (edmundsMarket.inventory || edmundsMarket.market) && (
             <GlassCard className="col-span-12" label="Edmunds Market Intelligence">
               <div className="flex items-center gap-2 mb-4">
-                <span className={`text-[9px] uppercase tracking-wider px-2 py-0.5 rounded-full border ${
+                <span className={`text-xs uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                   edmundsMarket.dataSource === "databricks"
                     ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
                     : "text-amber-400 bg-amber-500/10 border-amber-500/20"
@@ -364,7 +366,7 @@ export default function BrandDNACard({
               {/* Incentives row */}
               {edmundsMarket.incentives && edmundsMarket.incentives.length > 0 && (
                 <div className="border-t border-white/[0.04] pt-3 mt-1">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 block">Active Incentives</span>
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider mb-2 block">Active Incentives</span>
                   <div className="flex flex-wrap gap-2">
                     {edmundsMarket.incentives.slice(0, 3).map((inc, i) => (
                       <div
@@ -372,7 +374,7 @@ export default function BrandDNACard({
                         className="px-3 py-2 bg-emerald-500/5 border border-emerald-500/15 rounded-lg flex-1 min-w-[200px]"
                       >
                         <span className="text-xs font-medium text-emerald-300 block">{inc.name}</span>
-                        <span className="text-[10px] text-zinc-400 line-clamp-1">{inc.description}</span>
+                        <span className="text-xs text-zinc-400 line-clamp-1">{inc.description}</span>
                       </div>
                     ))}
                   </div>
@@ -382,7 +384,7 @@ export default function BrandDNACard({
               {/* Top trims */}
               {edmundsMarket.inventory?.topTrims && edmundsMarket.inventory.topTrims.length > 0 && (
                 <div className="border-t border-white/[0.04] pt-3 mt-3">
-                  <span className="text-[10px] text-zinc-500 uppercase tracking-wider mb-2 block">Top Selling Trims</span>
+                  <span className="text-xs text-zinc-500 uppercase tracking-wider mb-2 block">Top Selling Trims</span>
                   <div className="flex flex-wrap gap-2">
                     {edmundsMarket.inventory.topTrims.map((trim, i) => (
                       <div
@@ -390,7 +392,7 @@ export default function BrandDNACard({
                         className="px-3 py-2 bg-zinc-800/60 border border-zinc-700/30 rounded-lg"
                       >
                         <span className="text-xs font-medium text-zinc-200">{trim.trim}</span>
-                        <span className="text-[10px] text-zinc-500 ml-2">{trim.count} units · ${trim.avgPrice.toLocaleString()}</span>
+                        <span className="text-xs text-zinc-500 ml-2">{trim.count} units · ${trim.avgPrice.toLocaleString()}</span>
                       </div>
                     ))}
                   </div>
@@ -401,7 +403,14 @@ export default function BrandDNACard({
 
           {/* ── Active on Edmunds — Real campaign data from Databricks ── */}
           {edmundsAdsLoading && (
-            <SectionLoader messages={edmundsLoadingMessages} label="Active on Edmunds" />
+            <>
+              <SectionLoader messages={edmundsLoadingMessages} label="Active on Edmunds" />
+              <div className="col-span-12 grid grid-cols-3 gap-3">
+                <SkeletonCard lines={4} />
+                <SkeletonCard lines={4} />
+                <SkeletonCard lines={4} />
+              </div>
+            </>
           )}
           {!edmundsAdsLoading && edmundsAds && edmundsAds.models && edmundsAds.models.length > 0 && (
             <GlassCard className="col-span-12" label="Active on Edmunds">
@@ -414,7 +423,7 @@ export default function BrandDNACard({
                   <EdmundsStat label="Est. Spend (30d)" value={`$${formatNumber(edmundsAds.totalSpend)}`} />
                 )}
                 {edmundsAds.source === "databricks" && (
-                  <span className="ml-auto text-[9px] text-emerald-500/70 bg-emerald-500/10 px-2 py-1 rounded-full self-center border border-emerald-500/20">
+                  <span className="ml-auto text-xs text-emerald-500/70 bg-emerald-500/10 px-2 py-1 rounded-full self-center border border-emerald-500/20">
                     LIVE DATA
                   </span>
                 )}
@@ -438,18 +447,25 @@ export default function BrandDNACard({
 
           {/* ── Social Ad Intelligence — Real Meta ads or AI fallback ── */}
           {socialAdsLoading && (
-            <SectionLoader messages={socialLoadingMessages} label="Social Ad Intelligence" />
+            <>
+              <SectionLoader messages={socialLoadingMessages} label="Social Ad Intelligence" />
+              <div className="col-span-12 grid grid-cols-3 gap-3">
+                <SkeletonCard lines={4} />
+                <SkeletonCard lines={4} />
+                <SkeletonCard lines={4} />
+              </div>
+            </>
           )}
           {!socialAdsLoading && socialAds && socialAds.ads.length > 0 && (
             <GlassCard className="col-span-12" label="Social Ad Intelligence">
               {/* Source badge + meta info */}
               <div className="flex items-center gap-3 mb-4">
-                <span className="text-[10px] text-zinc-500">
+                <span className="text-xs text-zinc-500">
                   {socialAds.totalCount} active ad{socialAds.totalCount !== 1 ? "s" : ""} found
                   {socialAds.pageName ? ` for ${socialAds.pageName}` : ""}
                 </span>
                 {socialAds.source === "meta_api" && (
-                  <span className="text-[9px] text-blue-400/70 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-400/20">
+                  <span className="text-xs text-blue-400/70 bg-blue-500/10 px-2 py-0.5 rounded-full border border-blue-400/20">
                     META AD LIBRARY
                   </span>
                 )}
@@ -457,7 +473,7 @@ export default function BrandDNACard({
                   href={`https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=${encodeURIComponent(brandDna.name)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-auto text-[10px] text-eds-60 hover:text-eds-70 transition-colors"
+                  className="ml-auto text-xs text-eds-60 hover:text-eds-70 transition-colors"
                 >
                   View in Ad Library →
                 </a>
@@ -509,7 +525,7 @@ export default function BrandDNACard({
             See What Your Competitors Are Doing →
           </motion.button>
           <p className="text-center text-xs text-zinc-600 mt-3">
-            You can edit any section above before continuing
+            Review your brand analysis above before continuing
           </p>
         </motion.div>
       </motion.div>
@@ -522,9 +538,9 @@ export default function BrandDNACard({
 function MarketStat({ label, value, sub }: { label: string; value: string; sub?: string }) {
   return (
     <div className="flex flex-col gap-1 px-4 py-3 bg-zinc-800/40 rounded-xl border border-zinc-700/20">
-      <span className="text-[9px] text-zinc-500 uppercase tracking-wider">{label}</span>
+      <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
       <span className="text-lg font-bold text-zinc-100">{value}</span>
-      {sub && <span className="text-[10px] text-zinc-500">{sub}</span>}
+      {sub && <span className="text-xs text-zinc-500">{sub}</span>}
     </div>
   )
 }
@@ -534,7 +550,7 @@ function MarketStat({ label, value, sub }: { label: string; value: string; sub?:
 function EdmundsStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5 px-3 py-2 bg-zinc-800/60 rounded-lg border border-zinc-700/30">
-      <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{label}</span>
+      <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
       <span className="text-sm font-semibold text-zinc-200">{value}</span>
     </div>
   )
@@ -622,7 +638,7 @@ function EdmundsModelCard({
 
         {/* Model Year + Model Badge */}
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white/90 uppercase tracking-wider bg-black/50 backdrop-blur
+          <span className="text-xs font-bold text-white/90 uppercase tracking-wider bg-black/50 backdrop-blur
                          px-2.5 py-1 rounded-full border border-white/10">
             {model.targetedModelYear} {displayName}
           </span>
@@ -630,7 +646,7 @@ function EdmundsModelCard({
 
         {/* Edmunds badge */}
         <div className="absolute top-3 right-3">
-          <span className="text-[9px] font-bold text-blue-300 uppercase tracking-wider bg-blue-500/15 backdrop-blur
+          <span className="text-xs font-bold text-blue-300 uppercase tracking-wider bg-blue-500/15 backdrop-blur
                          px-2 py-1 rounded-full border border-blue-400/20">
             Edmunds.com
           </span>
@@ -641,19 +657,19 @@ function EdmundsModelCard({
       <div className="relative p-4 flex flex-col gap-3">
         <div className="grid grid-cols-2 gap-2">
           <div className="flex flex-col gap-0.5">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Impressions</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wider">Impressions</span>
             <span className="text-sm font-semibold text-zinc-200">{formatNumber(model.totalImpressions)}</span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Clicks</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wider">Clicks</span>
             <span className="text-sm font-semibold text-zinc-200">{formatNumber(model.totalClicks)}</span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">CTR</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wider">CTR</span>
             <span className="text-sm font-semibold text-emerald-400">{ctr}%</span>
           </div>
           <div className="flex flex-col gap-0.5">
-            <span className="text-[9px] text-zinc-500 uppercase tracking-wider">Viewability</span>
+            <span className="text-xs text-zinc-500 uppercase tracking-wider">Viewability</span>
             <span className="text-sm font-semibold text-zinc-200">{model.viewabilityPct}%</span>
           </div>
         </div>
@@ -661,11 +677,11 @@ function EdmundsModelCard({
         {/* Revenue + Creatives */}
         <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
           {model.totalRevenue > 0 && (
-            <span className="text-[10px] text-amber-400/80">
+            <span className="text-xs text-amber-400/80">
               ${formatNumber(model.totalRevenue)} revenue
             </span>
           )}
-          <span className="text-[10px] text-zinc-500">
+          <span className="text-xs text-zinc-500">
             {model.uniqueCreatives} creatives
           </span>
         </div>
@@ -673,9 +689,9 @@ function EdmundsModelCard({
         {/* Top States */}
         {model.topStates && model.topStates.length > 0 && (
           <div className="flex items-center gap-1.5 flex-wrap">
-            <span className="text-[9px] text-zinc-600">Top markets:</span>
+            <span className="text-xs text-zinc-600">Top markets:</span>
             {model.topStates.slice(0, 4).map(state => (
-              <span key={state} className="text-[9px] px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400 border border-zinc-700/40">
+              <span key={state} className="text-xs px-1.5 py-0.5 bg-zinc-800 rounded text-zinc-400 border border-zinc-700/40">
                 {state}
               </span>
             ))}
@@ -697,6 +713,9 @@ function SocialAdCard({
   colors: BrandDNA["colors"]
   index: number
 }) {
+  const [iframeLoaded, setIframeLoaded] = useState(false)
+  const [iframeFailed, setIframeFailed] = useState(false)
+
   const platformIcon = useMemo(() => {
     if (ad.platform === "Instagram") return "IG"
     if (ad.platform === "Facebook") return "FB"
@@ -707,6 +726,17 @@ function SocialAdCard({
     if (ad.platform === "Instagram") return { bg: "bg-pink-500/10", text: "text-pink-300", border: "border-pink-500/20" }
     return { bg: "bg-blue-500/10", text: "text-blue-300", border: "border-blue-500/20" }
   }, [ad.platform])
+
+  const hasValidSnapshot = ad.snapshotUrl && ad.snapshotUrl !== "https://www.facebook.com/ads/library/?id=mock"
+
+  // Timeout: if iframe hasn't loaded in 5s, show fallback
+  useEffect(() => {
+    if (!hasValidSnapshot) return
+    const timer = setTimeout(() => {
+      if (!iframeLoaded) setIframeFailed(true)
+    }, 5000)
+    return () => clearTimeout(timer)
+  }, [hasValidSnapshot, iframeLoaded])
 
   return (
     <motion.div
@@ -722,44 +752,71 @@ function SocialAdCard({
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
-      {/* Visual Header — platform-themed gradient */}
+      {/* Visual Header — Embedded Ad or gradient fallback */}
       <div
-        className="relative w-full h-36 overflow-hidden border-b border-white/[0.04]"
-        style={{
-          background: ad.platform === "Instagram"
-            ? `linear-gradient(135deg, ${colors.primary}30, #E1306C20, ${colors.accent}15)`
-            : `linear-gradient(135deg, ${colors.primary}30, #1877F220, ${colors.secondary}15)`,
-        }}
+        className="relative w-full overflow-hidden border-b border-white/[0.04]"
+        style={{ minHeight: hasValidSnapshot && !iframeFailed ? "320px" : "144px" }}
       >
-        {/* Platform badge */}
-        <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
+        {/* Try iframe embed if we have a valid snapshot URL */}
+        {hasValidSnapshot && !iframeFailed && (
+          <>
+            <iframe
+              src={ad.snapshotUrl}
+              title={`${ad.headline || "Ad"} — ${ad.platform}`}
+              className="w-full border-0 bg-white"
+              style={{
+                height: "320px",
+                opacity: iframeLoaded ? 1 : 0,
+                transition: "opacity 0.3s ease",
+              }}
+              sandbox="allow-scripts allow-same-origin allow-popups"
+              loading="lazy"
+              onLoad={() => setIframeLoaded(true)}
+              onError={() => setIframeFailed(true)}
+            />
+            {/* Loading shimmer while iframe loads */}
+            {!iframeLoaded && (
+              <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center">
+                <div className="flex flex-col items-center gap-2">
+                  <div className="w-8 h-8 rounded-full border-2 border-eds-50/30 border-t-eds-50 animate-spin-slow" />
+                  <span className="text-xs text-zinc-500">Loading ad preview...</span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Gradient fallback — shown when no snapshot or iframe failed */}
+        {(!hasValidSnapshot || iframeFailed) && (
+          <div
+            className="w-full h-36"
+            style={{
+              background: ad.platform === "Instagram"
+                ? `linear-gradient(135deg, ${colors.primary}30, #E1306C20, ${colors.accent}15)`
+                : `linear-gradient(135deg, ${colors.primary}30, #1877F220, ${colors.secondary}15)`,
+            }}
+          >
+            {/* Centered brand mark */}
+            <div className="absolute inset-0 flex items-center justify-center">
+              <span className="text-5xl font-black text-white/[0.06] uppercase tracking-widest">
+                {ad.platform === "Instagram" ? "IG" : "FB"}
+              </span>
+            </div>
+          </div>
+        )}
+
+        {/* Platform badge — always visible, floated over the content */}
+        <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
+          <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm
                          ${platformColors.bg} ${platformColors.text} border ${platformColors.border}`}>
             {platformIcon} · {ad.format}
           </span>
           {ad.isActive && (
-            <span className="flex items-center gap-1 text-[9px] text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 backdrop-blur-sm px-2 py-0.5 rounded-full border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Active
             </span>
           )}
-        </div>
-
-        {/* Decorative elements */}
-        <div className="absolute inset-0 opacity-10">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-16 -right-16 w-32 h-32 rounded-full border border-current"
-            style={{ color: colors.primary }}
-          />
-        </div>
-
-        {/* Centered brand mark */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-5xl font-black text-white/[0.06] uppercase tracking-widest">
-            {ad.platform === "Instagram" ? "IG" : "fb"}
-          </span>
         </div>
       </div>
 
@@ -807,12 +864,12 @@ function SocialAdCard({
         {/* Stats footer */}
         <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
           {ad.impressionsRange && (
-            <span className="text-[10px] text-zinc-500">
+            <span className="text-xs text-zinc-500">
               <span className="text-emerald-400/80">{ad.impressionsRange}</span> impressions
             </span>
           )}
           {ad.spendRange && (
-            <span className="text-[10px] text-amber-400/80">
+            <span className="text-xs text-amber-400/80">
               {ad.spendRange}
             </span>
           )}
@@ -821,16 +878,16 @@ function SocialAdCard({
         {/* Date + snapshot link */}
         <div className="flex items-center justify-between">
           {ad.dateSpotted && (
-            <span className="text-[9px] text-zinc-600">
+            <span className="text-xs text-zinc-600">
               Running since {ad.dateSpotted}
             </span>
           )}
-          {ad.snapshotUrl && ad.snapshotUrl !== "https://www.facebook.com/ads/library/?id=mock" && (
+          {hasValidSnapshot && (
             <a
               href={ad.snapshotUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[9px] text-eds-60 hover:text-eds-70 transition-colors"
+              className="text-xs text-eds-60 hover:text-eds-70 transition-colors"
             >
               View Original →
             </a>
@@ -915,11 +972,11 @@ function AdMockupCard({
 
         {/* Platform + Format Badge */}
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="text-[10px] font-bold text-white/80 uppercase tracking-wider bg-black/40 backdrop-blur
+          <span className="text-xs font-bold text-white/80 uppercase tracking-wider bg-black/40 backdrop-blur
                          px-2.5 py-1 rounded-full border border-white/10">
             {ad.platform}
           </span>
-          <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-1 rounded-full
+          <span className={`text-xs font-bold uppercase tracking-wider px-2 py-1 rounded-full
                          ${formatBadgeColor.bg} ${formatBadgeColor.text}`}>
             {ad.format}
           </span>
@@ -980,14 +1037,14 @@ function AdMockupCard({
 
         {/* Footer Stats */}
         <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
-          <div className="text-[10px] text-zinc-500">
+          <div className="text-xs text-zinc-500">
             {ad.engagementRate && (
               <span className="text-green-400/80">
                 {ad.engagementRate.toFixed(1)}% engagement
               </span>
             )}
           </div>
-          <div className="text-[10px] text-zinc-500">
+          <div className="text-xs text-zinc-500">
             {ad.estimatedSpend && (
               <span className="text-amber-400/80">{ad.estimatedSpend}</span>
             )}
@@ -996,7 +1053,7 @@ function AdMockupCard({
 
         {/* Date Spotted */}
         {ad.dateSpotted && (
-          <div className="text-[9px] text-zinc-600 text-center">
+          <div className="text-xs text-zinc-600 text-center">
             Spotted {ad.dateSpotted}
           </div>
         )}
@@ -1021,12 +1078,12 @@ function GlassCard({
   children,
   className = "",
   label,
-  onEdit,
+  badge,
 }: {
   children: React.ReactNode
   className?: string
   label?: string
-  onEdit?: () => void
+  badge?: string
 }) {
   return (
     <motion.div
@@ -1049,17 +1106,13 @@ function GlassCard({
 
       {label && (
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[11px] font-semibold text-zinc-500 uppercase tracking-wider">
+          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
             {label}
           </span>
-          {onEdit && (
-            <button
-              onClick={onEdit}
-              className="text-[11px] text-zinc-600 hover:text-eds-60 transition-colors px-2 py-0.5 rounded-md
-                       hover:bg-white/[0.03]"
-            >
-              Edit
-            </button>
+          {badge && (
+            <span className="text-xs uppercase tracking-wider px-2 py-0.5 rounded-full text-zinc-400 bg-zinc-800/60 border border-zinc-700/30">
+              {badge}
+            </span>
           )}
         </div>
       )}
