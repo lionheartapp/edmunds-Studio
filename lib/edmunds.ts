@@ -270,7 +270,21 @@ function mockInventorySummary(make: string, model?: string): EdmundsInventorySum
   }
 
   const key = make.toLowerCase().split(" ")[0]
-  const data = configs[key] || configs.toyota
+  const data = configs[key] || {
+    make,
+    model: model || "All Models",
+    totalInStock: 8500,
+    avgDaysOnLot: 32,
+    avgSellingPrice: 38000,
+    avgMsrp: 40500,
+    priceRange: { min: 28000, max: 55000 },
+    ageDistribution: { under30Days: 3200, thirtyTo60Days: 2800, sixtyTo90Days: 1600, over90Days: 900 },
+    topTrims: [
+      { trim: "Base", count: 3000, avgPrice: 35000 },
+      { trim: "Premium", count: 2800, avgPrice: 40000 },
+      { trim: "Limited", count: 1500, avgPrice: 48000 },
+    ],
+  }
 
   return {
     make: data.make || make,
@@ -407,7 +421,25 @@ function mockIncentives(make: string, model?: string): EdmundsIncentive[] {
   }
 
   const key = make.toLowerCase().split(" ")[0]
-  return configs[key] || configs.toyota
+  return configs[key] || buildGenericIncentives(make)
+}
+
+function buildGenericIncentives(make: string): EdmundsIncentive[] {
+  const name = make.charAt(0).toUpperCase() + make.slice(1)
+  return [
+    {
+      id: `inc_${make.toLowerCase()}_001`, type: "cash_back", name: `${name} Spring Savings`,
+      description: `$2,500 customer cash on select ${name} models`, amount: 2500,
+      startDate: "2026-01-01", endDate: "2026-06-30",
+      make: name, models: [], region: "National",
+    },
+    {
+      id: `inc_${make.toLowerCase()}_002`, type: "low_apr", name: `${name} Finance Event`,
+      description: `2.9% APR for 60 months on select ${name} models`, apr: 2.9, term: 60,
+      startDate: "2026-01-01", endDate: "2026-06-30",
+      make: name, models: [], region: "National",
+    },
+  ]
 }
 
 function mockReview(make: string, model: string, year?: number): EdmundsReview {
@@ -442,7 +474,15 @@ function mockReview(make: string, model: string, year?: number): EdmundsReview {
   }
 
   const key = make.toLowerCase().split(" ")[0]
-  return configs[key] || configs.toyota
+  return configs[key] || {
+    vehicleId: `${make.toLowerCase()}_2025`, make, model: model || "All Models", year: year || 2025,
+    expertRating: 7.5, consumerRating: 4.2, reviewCount: 1200,
+    pros: ["Competitive pricing", "Good feature set", "Solid warranty"],
+    cons: ["Average fuel economy", "Infotainment could improve", "Limited color options"],
+    editorSummary: `The ${make} lineup offers solid value with competitive features in its segment.`,
+    categories: { driving: 7.5, comfort: 7.5, interior: 7.0, technology: 7.0, storage: 7.5, value: 8.0 },
+    sentiment: "positive" as const,
+  }
 }
 
 function mockMarketData(make: string, model?: string): EdmundsMarketData {
@@ -492,5 +532,14 @@ function mockMarketData(make: string, model?: string): EdmundsMarketData {
   }
 
   const key = make.toLowerCase().split(" ")[0]
-  return configs[key] || configs.toyota
+  return configs[key] || {
+    make, model: model || "All Models", region: "National",
+    marketShare: 3.5, salesTrend: "stable" as const, avgTransactionPrice: 38000,
+    incentiveSpend: 1800, daysToTurn: 35,
+    competitorComparison: [],
+    shopperInterest: {
+      searchVolume: 200000, trend: "flat" as const,
+      topSearchTerms: [`${make.toLowerCase()} review`, `${make.toLowerCase()} price`, `${make.toLowerCase()} 2026`],
+    },
+  }
 }
