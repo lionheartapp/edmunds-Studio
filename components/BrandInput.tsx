@@ -208,45 +208,47 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative z-10 flex flex-col items-center w-full max-w-2xl"
           >
-            {/* Logo — animated mini-blob with Edmunds car icon */}
+            {/* Logo — animated blob (matches SectionLoader style) with Edmunds car icon */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
               className="mb-8 flex items-center gap-3"
             >
-              <div className="relative w-10 h-10">
-                {/* Soft glow behind */}
-                <motion.div
-                  animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
-                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                  className="absolute inset-[-4px] rounded-full bg-eds-50/25 blur-md"
-                />
-                {/* Morphing blob shape */}
+              <div className="relative w-10 h-10 flex-shrink-0">
+                {/* Layer 1: morphing glow */}
                 <motion.div
                   animate={{
-                    borderRadius: [
-                      "30% 70% 70% 30% / 30% 30% 70% 70%",
-                      "50% 50% 50% 50%",
-                      "70% 30% 30% 70% / 70% 70% 30% 30%",
-                      "50% 50% 50% 50%",
-                      "30% 70% 70% 30% / 30% 30% 70% 70%",
-                    ],
+                    scale: [1, 1.2, 1],
+                    borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
                   }}
-                  transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
-                  className="absolute inset-0 flex items-center justify-center shadow-lg shadow-eds-50/25"
-                  style={{
-                    background: "linear-gradient(135deg, #4E91F5, #2070E8 50%, #1358BF 100%)",
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute inset-[-4px] bg-eds-50/20 blur-sm"
+                />
+                {/* Layer 2: solid morphing blob */}
+                <motion.div
+                  animate={{
+                    scale: [1, 1.08, 1],
+                    borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
                   }}
-                >
-                  {/* Edmunds car icon */}
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                  transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                  className="absolute inset-0 bg-eds-50/30"
+                />
+                {/* Layer 3: spinning ring */}
+                <motion.div
+                  animate={{ rotate: 360 }}
+                  transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+                  className="absolute inset-1 rounded-full border border-eds-60/30 border-t-eds-60/80"
+                />
+                {/* Car icon centered */}
+                <div className="absolute inset-0 flex items-center justify-center z-10">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
                     <path d="M5 17h2m10 0h2" />
                     <path d="M7 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
                     <path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13" />
                     <path d="M3 13h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2Z" />
                   </svg>
-                </motion.div>
+                </div>
               </div>
               <span className="text-lg font-semibold tracking-tight">
                 Edmunds<span className="accent-gradient-text">Studio</span>

@@ -23,6 +23,11 @@ export default function Home() {
 
       const { brandDna, edmundsData } = await response.json()
 
+      // Clear stale data from any previous brand search
+      sessionStorage.removeItem("eds_edmunds_ads")
+      sessionStorage.removeItem("eds_social_ads")
+      sessionStorage.removeItem("eds_competitors_fetching")
+
       // Store brand DNA, Edmunds market data, and user type for downstream pages
       sessionStorage.setItem("eds_brand_dna", JSON.stringify(brandDna))
       if (edmundsData) {
