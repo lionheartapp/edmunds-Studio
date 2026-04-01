@@ -127,27 +127,41 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             className="relative z-10 flex flex-col items-center"
             aria-live="polite"
           >
-            {/* Simplified Morphing Orb — 3 layers with CSS animations */}
+            {/* Morphing Orb — 3 layers with framer-motion */}
             <div className="relative w-48 h-48 mb-10">
               {/* Layer 1: Outer glow */}
-              <div
-                className="absolute inset-[-20px] rounded-full bg-eds-50/20 blur-3xl animate-blob-glow"
+              <motion.div
+                animate={{
+                  scale: [1, 1.15, 1],
+                  borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
+                }}
+                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                className="absolute inset-[-20px] bg-eds-50/20 blur-3xl"
               />
               {/* Layer 2: Morphing shape */}
-              <div
-                className="absolute inset-0 overflow-hidden animate-blob-morph"
+              <motion.div
+                animate={{
+                  scale: [1, 1.06, 1],
+                  borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
+                }}
+                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                className="absolute inset-0 overflow-hidden"
                 style={{
                   background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
                   boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
                 }}
               />
               {/* Layer 3: Orbiting dot */}
-              <div className="absolute inset-[-12px] animate-spin-slow">
+              <motion.div
+                animate={{ rotate: 360 }}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                className="absolute inset-[-12px]"
+              >
                 <div
                   className="absolute top-0 left-1/2 w-2.5 h-2.5 rounded-full bg-eds-60"
                   style={{ boxShadow: "0 0 10px rgba(78, 145, 245, 0.8)" }}
                 />
-              </div>
+              </motion.div>
             </div>
 
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-zinc-200 mb-3">
