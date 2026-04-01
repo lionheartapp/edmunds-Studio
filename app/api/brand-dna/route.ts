@@ -2,8 +2,11 @@
 
 import { NextRequest, NextResponse } from "next/server"
 import { askClaudeJSON } from "@/lib/claude"
-import { scrapeBrand } from "@/lib/scraper"
-import { BRAND_DNA_SYSTEM_PROMPT, BRAND_DNA_USER_PROMPT } from "@/prompts/brand-dna"
+import { scrapeBrand, buildScraperContext } from "@/lib/scraper"
+import {
+  BRAND_DNA_SYSTEM_PROMPT,
+  BRAND_DNA_USER_PROMPT,
+} from "@/prompts/brand-dna"
 import { BrandDNA } from "@/lib/types"
 import { readFile } from "fs/promises"
 import path from "path"
@@ -24,7 +27,12 @@ async function loadDemoBrief(brandName: string): Promise<BrandDNA | null> {
   if (!fileName) return null
 
   try {
-    const filePath = path.join(process.cwd(), "public", "demo-briefs", fileName)
+    const filePath = path.join(
+      process.cwd(),
+      "public",
+      "demo-briefs",
+      fileName
+    )
     const data = JSON.parse(await readFile(filePath, "utf-8"))
     return data.brandDna as BrandDNA
   } catch {
@@ -37,7 +45,10 @@ export async function POST(request: NextRequest) {
     const { brandName } = await request.json()
 
     if (!brandName) {
-      return NextResponse.json({ error: "Brand name is required" }, { status: 400 })
+      return NextResponse.json(
+        { error: "Brand name is required" },
+        { status: 400 }
+      )
     }
 
     // If no API key, fall back to demo briefs
@@ -47,26 +58,46 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ brandDna: demo })
       }
       return NextResponse.json(
-        { error: `No API key configured. Try a demo brand: Rivian, Subaru, or Toyota.` },
+        {
+          error:
+            "No API key configured. Try a demo brand: Rivian, Subaru, or Toyota.",
+        },
         { status: 503 }
       )
     }
 
-    // Run scraper in parallel with Claude analysis
-    const [scraperData, claudeProfile] = await Promise.allSettled([
-      scrapeBrand(brandName),
-      askClaudeJSON<BrandDNA>(
+    // Step 1: Run the scraper to get live web intelligence
+    let scraperContext = ""
+    try {
+      const scraperResult = await scrapeBrand(brandName)
+      scraperContext = buildScraperContext(scraperResult)
+
+      // If scraper got strong enough data on its own (colors + fonts),
+      // merge it as overrides later
+      if (scraperResult.raw.colors && scraperResult.raw.typography) {
+        console.log(
+          `[brand-dna] Scraper found colors + fonts for ${brandName}`
+        )
+      }
+    } catch (error) {
+      console.log(
+        `[brand-dna] Scraper failed, continuing with Claude only:`,
+        error
+      )
+    }
+
+    // Step 2: Ask Claude for full Brand DNA analysis, enriched with scraper context
+    try {
+      const profile = await askClaudeJSON<BrandDNA>(
         BRAND_DNA_SYSTEM_PROMPT,
-        BRAND_DNA_USER_PROMPT(brandName),
+        BRAND_DNA_USER_PROMPT(brandName, scraperContext),
         { temperature: 0.5 }
-      ),
-    ])
+      )
 
-    // Claude's analysis is the primary source
-    const profile =
-      claudeProfile.status === "fulfilled" ? claudeProfile.value : null
+      return NextResponse.json({ brandDna: profile })
+    } catch (claudeError) {
+      console.error("[brand-dna] Claude analysis failed:", claudeError)
 
-    if (!profile) {
       // Fall back to demo brief if Claude fails
       const demo = await loadDemoBrief(brandName)
       if (demo) {
@@ -77,23 +108,6 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       )
     }
-
-    // Merge scraper data where available (scraper overrides Claude for live data)
-    const scraped = scraperData.status === "fulfilled" ? scraperData.value : {}
-    const merged: BrandDNA = {
-      ...profile,
-      ...scraped,
-      colors: scraped.colors || profile.colors,
-      typography: scraped.typography || profile.typography,
-      voice: profile.voice,
-      visualStyle: profile.visualStyle,
-      currentAds: scraped.currentAds?.length
-        ? scraped.currentAds
-        : profile.currentAds,
-      competitors: profile.competitors,
-    }
-
-    return NextResponse.json({ brandDna: merged })
   } catch (error) {
     console.error("[brand-dna] Error:", error)
     return NextResponse.json(
