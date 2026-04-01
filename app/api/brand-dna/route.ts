@@ -78,25 +78,38 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1: Run scraper + Brandfetch in parallel
+    // Step 1: Run scraper + Brandfetch in parallel (with timeouts)
     let scraperContext = ""
 
+    // Helper: race a promise against a timeout
+    const withTimeout = <T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> =>
+      Promise.race([
+        promise,
+        new Promise<null>((resolve) => setTimeout(() => {
+          console.log(`[brand-dna] ${label} timed out after ${ms}ms`)
+          resolve(null)
+        }, ms)),
+      ])
+
     const [scraperSettled, bfSettled] = await Promise.allSettled([
-      scrapeBrand(brandName).then(result => {
-        scraperContext = buildScraperContext(result)
-        if (result.raw.colors && result.raw.typography) {
-          console.log(`[brand-dna] Scraper found colors + fonts for ${brandName}`)
-        }
-        return result
-      }),
-      isBrandfetchConfigured() ? fetchBrand(brandName) : Promise.resolve(null),
+      withTimeout(
+        scrapeBrand(brandName).then(result => {
+          scraperContext = buildScraperContext(result)
+          return result
+        }),
+        15000, // 15s max for scraper
+        "Scraper"
+      ),
+      isBrandfetchConfigured()
+        ? withTimeout(fetchBrand(brandName), 8000, "Brandfetch")
+        : Promise.resolve(null),
     ])
 
     if (scraperSettled.status === "rejected") {
-      console.log(`[brand-dna] Scraper failed, continuing:`, scraperSettled.reason)
+      console.log(`[brand-dna] Scraper failed:`, scraperSettled.reason)
     }
     if (bfSettled.status === "rejected") {
-      console.log(`[brand-dna] Brandfetch failed, continuing:`, bfSettled.reason)
+      console.log(`[brand-dna] Brandfetch failed:`, bfSettled.reason)
     }
 
     // Extract Brandfetch data if available
@@ -105,7 +118,11 @@ export async function POST(request: NextRequest) {
 
     if (brandfetchData) {
       console.log(`[brand-dna] Brandfetch: ${brandfetchData.logos?.length || 0} logos, ${brandfetchData.colors?.length || 0} colors, ${brandfetchData.fonts?.length || 0} fonts`)
+    } else {
+      console.log(`[brand-dna] Brandfetch: no data available`)
     }
+
+    console.log(`[brand-dna] Scraper context length: ${scraperContext.length} chars`)
 
     // Step 2: Ask AI for full Brand DNA analysis, enriched with scraper context
     // Retry up to 2 times on failure
@@ -187,9 +204,10 @@ export async function POST(request: NextRequest) {
       { status: 500 }
     )
   } catch (error) {
-    console.error("[brand-dna] Error:", error)
+    console.error("[brand-dna] Unhandled error:", error instanceof Error ? error.message : error)
+    console.error("[brand-dna] Stack:", error instanceof Error ? error.stack : "no stack")
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: `Internal server error: ${error instanceof Error ? error.message : "Unknown"}` },
       { status: 500 }
     )
   }
