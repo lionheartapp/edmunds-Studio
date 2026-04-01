@@ -100,7 +100,7 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
 
   return (
     <div className="relative min-h-screen py-12 px-6">
-      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-indigo-500/5 blur-3xl pointer-events-none" />
+      <div className="absolute top-0 right-0 w-[500px] h-[500px] rounded-full bg-eds-50/5 blur-3xl pointer-events-none" />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
@@ -110,7 +110,7 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
         {/* Header */}
         <div className="mb-8">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-2 h-2 rounded-full bg-indigo-500" />
+            <div className="w-2 h-2 rounded-full bg-eds-50" />
             <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
               Step 2 · {brandName}
             </span>
@@ -152,7 +152,7 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
               placeholder={config.talkPlaceholder}
               rows={7}
               className="w-full px-4 py-4 rounded-xl bg-zinc-900 border border-zinc-800
-                       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+                       focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20
                        placeholder:text-zinc-600 resize-none text-sm leading-relaxed"
             />
           </motion.div>
@@ -192,7 +192,7 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
               type="text"
               placeholder="Paste URL to existing brief..."
               className="w-full max-w-sm mx-auto px-4 py-3 rounded-lg bg-zinc-800 border border-zinc-700
-                       focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 text-center text-sm"
+                       focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20 text-center text-sm"
               onChange={(e) => setDescription(e.target.value)}
             />
           </motion.div>
@@ -204,7 +204,7 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
           whileTap={{ scale: 0.995 }}
           onClick={handleSubmit}
           disabled={isLoading || !hasContent}
-          className="w-full mt-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold
+          className="w-full mt-8 py-4 bg-eds-50 hover:bg-eds-50 text-white font-semibold
                    rounded-xl disabled:opacity-30 transition-all glow-sm"
         >
           {isLoading ? (
@@ -247,7 +247,7 @@ function FormField({
         onChange={(e) => onChange(e.target.value)}
         placeholder={placeholder}
         className="w-full px-4 py-3 rounded-xl bg-zinc-900 border border-zinc-800
-                 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+                 focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20
                  placeholder:text-zinc-600 text-sm"
       />
     </div>

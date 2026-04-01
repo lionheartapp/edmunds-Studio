@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import { BrandDNA, AdSample, EdmundsAdsData, SocialAdsData, SocialAdFormatted } from "@/lib/types"
-import { useMemo, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 interface EdmundsMarketInfo {
   inventory?: {
@@ -29,8 +29,100 @@ interface BrandDNACardProps {
   edmundsAds?: EdmundsAdsData | null
   socialAds?: SocialAdsData | null
   edmundsMarket?: EdmundsMarketInfo | null
+  edmundsAdsLoading?: boolean
+  socialAdsLoading?: boolean
   onContinue: () => void
   onEdit?: (field: string) => void
+}
+
+/* ── Section Loader — animated blob with playful messages ── */
+
+const edmundsLoadingMessages = [
+  "Digging through Edmunds ad vaults...",
+  "Counting impressions so you don't have to...",
+  "Asking Databricks very nicely for the data...",
+  "Pulling campaign numbers fresh off the lot...",
+  "Snooping on ad performance (legally)...",
+  "Crunching 30 days of ad activity...",
+]
+
+const socialLoadingMessages = [
+  "Scrolling through Meta's ad library at superhuman speed...",
+  "Stalking social ads... for science...",
+  "Finding out what the algorithm already knows...",
+  "Judging ad creative so you don't have to...",
+  "Intercepting social signals...",
+  "Analyzing every carousel, reel, and story...",
+]
+
+function SectionLoader({ messages, label }: { messages: string[]; label: string }) {
+  const [msgIndex, setMsgIndex] = useState(() => Math.floor(Math.random() * messages.length))
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setMsgIndex(prev => (prev + 1) % messages.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [messages.length])
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -12 }}
+      transition={{ duration: 0.4 }}
+      className="col-span-12"
+    >
+      <div
+        className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%)",
+          backdropFilter: "blur(12px)",
+        }}
+      >
+        <div className="flex items-center gap-5">
+          {/* Animated blob */}
+          <div className="relative w-12 h-12 flex-shrink-0">
+            <motion.div
+              animate={{
+                scale: [1, 1.2, 1],
+                borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
+              }}
+              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+              className="absolute inset-0 bg-eds-50/20 blur-sm"
+            />
+            <motion.div
+              animate={{
+                scale: [1, 1.15, 1],
+                borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
+              }}
+              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+              className="absolute inset-1 bg-eds-50/30"
+            />
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
+              className="absolute inset-2 rounded-full border border-eds-60/30 border-t-eds-60/80"
+            />
+          </div>
+
+          <div className="flex flex-col gap-1.5 min-w-0">
+            <span className="text-[10px] text-zinc-500 uppercase tracking-wider">{label}</span>
+            <motion.span
+              key={msgIndex}
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.3 }}
+              className="text-sm text-zinc-300 font-medium"
+            >
+              {messages[msgIndex]}
+            </motion.span>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  )
 }
 
 const stagger = {
@@ -56,6 +148,8 @@ export default function BrandDNACard({
   edmundsAds,
   socialAds,
   edmundsMarket,
+  edmundsAdsLoading,
+  socialAdsLoading,
   onContinue,
   onEdit,
 }: BrandDNACardProps) {
@@ -64,7 +158,7 @@ export default function BrandDNACard({
       {/* Background ambient glow — consistent UI color, not brand-dependent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-[0.07] pointer-events-none"
-        style={{ background: "radial-gradient(circle, #6366f1, #8b5cf6, transparent)" }}
+        style={{ background: "radial-gradient(circle, #2070E8, #4E91F5, transparent)" }}
       />
 
       <motion.div
@@ -94,8 +188,8 @@ export default function BrandDNACard({
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                className="w-3 h-3 rounded-full bg-indigo-500"
-                style={{ boxShadow: "0 0 12px rgba(99, 102, 241, 0.4)" }}
+                className="w-3 h-3 rounded-full bg-eds-50"
+                style={{ boxShadow: "0 0 12px rgba(32, 112, 232, 0.4)" }}
               />
             )}
             <div>
@@ -196,9 +290,9 @@ export default function BrandDNACard({
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + i * 0.08 }}
                   whileHover={{ scale: 1.05, y: -2 }}
-                  className="px-4 py-2 bg-indigo-500/10 text-indigo-400 rounded-xl text-sm font-medium
-                           border border-indigo-500/20 backdrop-blur-sm cursor-default"
-                  style={{ boxShadow: "0 0 20px rgba(99, 102, 241, 0.05)" }}
+                  className="px-4 py-2 bg-eds-50/10 text-eds-60 rounded-xl text-sm font-medium
+                           border border-eds-50/20 backdrop-blur-sm cursor-default"
+                  style={{ boxShadow: "0 0 20px rgba(32, 112, 232, 0.05)" }}
                 >
                   {attr}
                 </motion.span>
@@ -306,7 +400,10 @@ export default function BrandDNACard({
           )}
 
           {/* ── Active on Edmunds — Real campaign data from Databricks ── */}
-          {edmundsAds && edmundsAds.models && edmundsAds.models.length > 0 && (
+          {edmundsAdsLoading && (
+            <SectionLoader messages={edmundsLoadingMessages} label="Active on Edmunds" />
+          )}
+          {!edmundsAdsLoading && edmundsAds && edmundsAds.models && edmundsAds.models.length > 0 && (
             <GlassCard className="col-span-12" label="Active on Edmunds">
               {/* Summary Stats Bar */}
               <div className="flex flex-wrap gap-4 mb-5">
@@ -340,7 +437,10 @@ export default function BrandDNACard({
           )}
 
           {/* ── Social Ad Intelligence — Real Meta ads or AI fallback ── */}
-          {(socialAds && socialAds.ads.length > 0) ? (
+          {socialAdsLoading && (
+            <SectionLoader messages={socialLoadingMessages} label="Social Ad Intelligence" />
+          )}
+          {!socialAdsLoading && socialAds && socialAds.ads.length > 0 && (
             <GlassCard className="col-span-12" label="Social Ad Intelligence">
               {/* Source badge + meta info */}
               <div className="flex items-center gap-3 mb-4">
@@ -357,7 +457,7 @@ export default function BrandDNACard({
                   href={`https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=US&q=${encodeURIComponent(brandDna.name)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="ml-auto text-[10px] text-indigo-400 hover:text-indigo-300 transition-colors"
+                  className="ml-auto text-[10px] text-eds-60 hover:text-eds-70 transition-colors"
                 >
                   View in Ad Library →
                 </a>
@@ -376,7 +476,8 @@ export default function BrandDNACard({
                 </div>
               </div>
             </GlassCard>
-          ) : brandDna.currentAds.length > 0 ? (
+          )}
+          {!socialAdsLoading && !(socialAds && socialAds.ads.length > 0) && brandDna.currentAds.length > 0 && (
             <GlassCard className="col-span-12" label="Social Ad Intelligence">
               <div className="overflow-x-auto md:overflow-x-visible -mx-5 md:mx-0 px-5 md:px-0 pb-4">
                 <div className="flex md:grid md:grid-cols-3 gap-4 md:gap-3 min-w-min md:min-w-fit">
@@ -391,7 +492,7 @@ export default function BrandDNACard({
                 </div>
               </div>
             </GlassCard>
-          ) : null}
+          )}
         </div>
 
         {/* Continue Button */}
@@ -400,9 +501,9 @@ export default function BrandDNACard({
             whileHover={{ scale: 1.005 }}
             whileTap={{ scale: 0.995 }}
             onClick={onContinue}
-            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-indigo-600 hover:bg-indigo-500"
+            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-50"
             style={{
-              boxShadow: "0 0 30px rgba(99, 102, 241, 0.25)",
+              boxShadow: "0 0 30px rgba(32, 112, 232, 0.25)",
             }}
           >
             See What Your Competitors Are Doing →
@@ -462,12 +563,28 @@ function EdmundsModelCard({
     uniqueCreatives: number
     topStates: string[]
     vehicleImages: string[]
+    displayName?: string
   }
   brandName: string
   index: number
 }) {
-  const [imgError, setImgError] = useState(false)
-  const heroImage = model.vehicleImages?.[0]
+  // Cascade through image URLs on failure
+  const [imgIndex, setImgIndex] = useState(0)
+  const [allFailed, setAllFailed] = useState(false)
+  const images = model.vehicleImages || []
+  const currentImage = images[imgIndex]
+
+  const handleImageError = () => {
+    if (imgIndex < images.length - 1) {
+      setImgIndex(prev => prev + 1)
+    } else {
+      setAllFailed(true)
+    }
+  }
+
+  // Use display name if available, otherwise clean up the raw model name
+  const displayName = model.displayName || model.targetedModel
+
   const ctr = model.totalImpressions > 0
     ? ((model.totalClicks / model.totalImpressions) * 100).toFixed(2)
     : "0"
@@ -488,18 +605,18 @@ function EdmundsModelCard({
     >
       {/* Vehicle Image or Gradient Fallback */}
       <div className="relative w-full h-48 overflow-hidden border-b border-white/[0.04] bg-zinc-900">
-        {heroImage && !imgError ? (
+        {currentImage && !allFailed ? (
           <img
-            src={heroImage}
-            alt={`${brandName} ${model.targetedModel}`}
+            src={currentImage}
+            alt={`${brandName} ${displayName}`}
             className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-500"
-            onError={() => setImgError(true)}
+            onError={handleImageError}
           />
         ) : (
           <div className="w-full h-full flex items-center justify-center"
             style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(139,92,246,0.1) 100%)" }}
           >
-            <span className="text-3xl font-bold text-white/20">{model.targetedModel}</span>
+            <span className="text-3xl font-bold text-white/20">{displayName}</span>
           </div>
         )}
 
@@ -507,7 +624,7 @@ function EdmundsModelCard({
         <div className="absolute top-3 left-3 flex items-center gap-2">
           <span className="text-[10px] font-bold text-white/90 uppercase tracking-wider bg-black/50 backdrop-blur
                          px-2.5 py-1 rounded-full border border-white/10">
-            {model.targetedModelYear} {model.targetedModel}
+            {model.targetedModelYear} {displayName}
           </span>
         </div>
 
@@ -713,7 +830,7 @@ function SocialAdCard({
               href={ad.snapshotUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-[9px] text-indigo-400 hover:text-indigo-300 transition-colors"
+              className="text-[9px] text-eds-60 hover:text-eds-70 transition-colors"
             >
               View Original →
             </a>
@@ -747,7 +864,7 @@ function AdMockupCard({
   const formatBadgeColor = useMemo(() => {
     const badges = [
       { bg: "bg-blue-500/10", text: "text-blue-300" },
-      { bg: "bg-purple-500/10", text: "text-purple-300" },
+      { bg: "bg-eds-40/10", text: "text-eds-70" },
       { bg: "bg-pink-500/10", text: "text-pink-300" },
     ]
     return badges[index % badges.length]
@@ -938,7 +1055,7 @@ function GlassCard({
           {onEdit && (
             <button
               onClick={onEdit}
-              className="text-[11px] text-zinc-600 hover:text-indigo-400 transition-colors px-2 py-0.5 rounded-md
+              className="text-[11px] text-zinc-600 hover:text-eds-60 transition-colors px-2 py-0.5 rounded-md
                        hover:bg-white/[0.03]"
             >
               Edit

@@ -25,8 +25,8 @@ const categoryConfig: Record<
   },
   format_gap: {
     label: 'Format Gap',
-    color: 'from-purple-500 to-purple-600',
-    bgColor: 'bg-purple-500/10',
+    color: 'from-eds-40 to-eds-30',
+    bgColor: 'bg-eds-40/10',
   },
   platform_gap: {
     label: 'Platform Gap',
@@ -45,8 +45,8 @@ const categoryConfig: Record<
   },
   creative_gap: {
     label: 'Creative Gap',
-    color: 'from-indigo-500 to-indigo-600',
-    bgColor: 'bg-indigo-500/10',
+    color: 'from-eds-50 to-eds-50',
+    bgColor: 'bg-eds-50/10',
   },
 };
 
@@ -143,7 +143,7 @@ export default function StrategicEdgeComponent({
           transition={{ delay: 0.3 }}
         >
           <div
-            className="relative rounded-2xl border border-indigo-500/20 bg-white/5 backdrop-blur-md p-8 lg:p-10 overflow-hidden group"
+            className="relative rounded-2xl border border-eds-50/20 bg-white/5 backdrop-blur-md p-8 lg:p-10 overflow-hidden group"
           >
             <motion.div
               className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
@@ -182,7 +182,7 @@ export default function StrategicEdgeComponent({
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10 flex items-start gap-4">
                     <div
-                      className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500/25 to-violet-500/25"
+                      className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-gradient-to-br from-eds-50/25 to-eds-40/25"
                     >
                       <Zap className="w-6 h-6 text-yellow-300" />
                     </div>
@@ -241,7 +241,7 @@ export default function StrategicEdgeComponent({
             {/* Gradient border effect */}
             <div
               className="absolute inset-0 rounded-3xl opacity-50 pointer-events-none"
-              style={{ background: "conic-gradient(from 180deg, #6366f1, #8b5cf6, #6366f1)" }}
+              style={{ background: "conic-gradient(from 180deg, #2070E8, #4E91F5, #2070E8)" }}
             />
 
             <div className="relative z-10 px-8 lg:px-12 py-12 lg:py-16">
@@ -269,7 +269,7 @@ export default function StrategicEdgeComponent({
 
                 <motion.button
                   onClick={onLaunchCampaign}
-                  className="relative group mb-10 px-8 lg:px-10 py-4 lg:py-5 rounded-xl font-bold text-lg flex items-center gap-3 overflow-hidden transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600"
+                  className="relative group mb-10 px-8 lg:px-10 py-4 lg:py-5 rounded-xl font-bold text-lg flex items-center gap-3 overflow-hidden transition-all duration-300 bg-gradient-to-r from-eds-50 to-eds-30"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   variants={itemVariants}
@@ -305,8 +305,8 @@ export default function StrategicEdgeComponent({
                       key={campaign.id}
                       className={`flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-lg border border-white/20 overflow-hidden ${
                         index % 2 === 0
-                          ? "bg-gradient-to-br from-indigo-500/25 to-violet-500/15"
-                          : "bg-gradient-to-br from-violet-500/25 to-indigo-500/15"
+                          ? "bg-gradient-to-br from-eds-50/25 to-eds-40/15"
+                          : "bg-gradient-to-br from-eds-40/25 to-eds-50/15"
                       }`}
                       variants={itemVariants}
                       whileHover={{ scale: 1.1, zIndex: 10 }}
@@ -393,7 +393,7 @@ function OpportunityCard({
 
         {/* Suggested Angle Callout */}
         <div
-          className="rounded-lg border-l-4 border-indigo-500/50 pl-4 py-3 italic text-zinc-200 bg-white/[0.03]"
+          className="rounded-lg border-l-4 border-eds-50/50 pl-4 py-3 italic text-zinc-200 bg-white/[0.03]"
         >
           "{opportunity.suggestedAngle}"
         </div>
@@ -414,7 +414,7 @@ function OpportunityCard({
 
         {/* Estimated Edge Highlight */}
         <div
-          className={`rounded-lg px-4 py-3 font-bold text-white border-l-[3px] border-indigo-500 ${impact.glow}`}
+          className={`rounded-lg px-4 py-3 font-bold text-white border-l-[3px] border-eds-50 ${impact.glow}`}
           style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05))" }}
         >
           <span className="text-xs font-semibold text-zinc-400 block mb-1">

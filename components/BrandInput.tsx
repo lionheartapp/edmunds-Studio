@@ -23,7 +23,7 @@ const SCENARIOS = [
     ),
     desc: "Launch a national brand campaign",
     example: "e.g. Rivian, Ford, Toyota USA",
-    color: "#818cf8",
+    color: "#4E91F5",
     inputPrompt: "What OEM are you running for?",
     inputPlaceholder: "e.g. Rivian, Toyota, Ford",
     submitLabel: "Analyze Brand →",
@@ -40,7 +40,7 @@ const SCENARIOS = [
     ),
     desc: "Consistent ads across all your stores",
     example: "e.g. Valley Subaru, AutoNation Honda",
-    color: "#a78bfa",
+    color: "#7AAFFF",
     inputPrompt: "What's your dealer group name?",
     inputPlaceholder: "e.g. Valley Subaru, AutoNation Honda",
     submitLabel: "Analyze Dealer Group →",
@@ -110,9 +110,9 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
     <div className="relative min-h-screen flex flex-col items-center justify-center px-6 overflow-hidden">
       {/* Background gradient orbs */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl" />
-        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-purple-500/8 blur-3xl" />
-        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-indigo-500/5 blur-3xl" />
+        <div className="absolute -top-40 -right-40 w-96 h-96 rounded-full bg-eds-50/10 blur-3xl" />
+        <div className="absolute -bottom-40 -left-40 w-96 h-96 rounded-full bg-eds-40/8 blur-3xl" />
+        <div className="absolute top-1/3 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-eds-50/5 blur-3xl" />
       </div>
 
       <AnimatePresence mode="wait">
@@ -131,7 +131,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
               <motion.div
                 animate={{ scale: [1, 1.3, 1.1, 1.25, 1], opacity: [0.2, 0.5, 0.3, 0.45, 0.2] }}
                 transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
-                className="absolute inset-[-20px] rounded-full bg-indigo-500/20 blur-3xl"
+                className="absolute inset-[-20px] rounded-full bg-eds-50/20 blur-3xl"
               />
               <motion.div
                 animate={{ y: [0, -14, -4, -18, 0], x: [0, 6, -4, 8, 0], rotate: [0, 3, -2, 4, 0] }}
@@ -152,8 +152,8 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                   transition={{ repeat: Infinity, duration: 8, ease: "easeInOut" }}
                   className="absolute inset-0 overflow-hidden"
                   style={{
-                    background: "radial-gradient(circle at 35% 30%, #a5b4fc, #818cf8 25%, #6366f1 45%, #4338ca 70%, #312e81 100%)",
-                    boxShadow: "0 0 80px rgba(99, 102, 241, 0.5), 0 0 160px rgba(99, 102, 241, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
+                    background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
+                    boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
                   }}
                 >
                   <motion.div
@@ -166,22 +166,22 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                     animate={{ x: [0, -15, 10, -8, 0], y: [0, 12, -8, 15, 0], opacity: [0.15, 0.3, 0.1, 0.25, 0.15] }}
                     transition={{ repeat: Infinity, duration: 9, ease: "easeInOut" }}
                     className="absolute bottom-4 right-4 w-20 h-20 rounded-full"
-                    style={{ background: "radial-gradient(circle, rgba(167, 139, 250, 0.5), transparent 70%)" }}
+                    style={{ background: "radial-gradient(circle, rgba(122, 175, 255, 0.5), transparent 70%)" }}
                   />
                 </motion.div>
               </motion.div>
               <motion.div
                 animate={{ scaleX: [1, 0.8, 0.9, 0.75, 1], opacity: [0.25, 0.12, 0.2, 0.1, 0.25], x: [0, 6, -4, 8, 0] }}
                 transition={{ repeat: Infinity, duration: 7, ease: "easeInOut" }}
-                className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-indigo-500/30 blur-lg"
+                className="absolute -bottom-6 left-1/2 -translate-x-1/2 w-28 h-5 rounded-full bg-eds-50/30 blur-lg"
               />
               <motion.div animate={{ rotate: 360 }} transition={{ repeat: Infinity, duration: 5, ease: "linear" }} className="absolute inset-[-12px]">
                 <motion.div animate={{ scale: [1, 1.5, 1], opacity: [0.6, 1, 0.6] }} transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="absolute top-0 left-1/2 w-2 h-2 rounded-full bg-indigo-400" style={{ boxShadow: "0 0 8px rgba(129, 140, 248, 0.8)" }} />
+                  className="absolute top-0 left-1/2 w-2 h-2 rounded-full bg-eds-60" style={{ boxShadow: "0 0 8px rgba(78, 145, 245, 0.8)" }} />
               </motion.div>
               <motion.div animate={{ rotate: -360 }} transition={{ repeat: Infinity, duration: 8, ease: "linear" }} className="absolute inset-[-20px]">
                 <motion.div animate={{ scale: [1, 1.3, 1], opacity: [0.4, 0.8, 0.4] }} transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                  className="absolute bottom-0 right-1/4 w-1.5 h-1.5 rounded-full bg-purple-400" style={{ boxShadow: "0 0 6px rgba(167, 139, 250, 0.7)" }} />
+                  className="absolute bottom-0 right-1/4 w-1.5 h-1.5 rounded-full bg-eds-60" style={{ boxShadow: "0 0 6px rgba(122, 175, 255, 0.7)" }} />
               </motion.div>
             </div>
 
@@ -208,17 +208,45 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             transition={{ duration: 0.6, ease: "easeOut" }}
             className="relative z-10 flex flex-col items-center w-full max-w-2xl"
           >
-            {/* Logo */}
+            {/* Logo — animated mini-blob with Edmunds car icon */}
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ delay: 0.1, type: "spring", stiffness: 200 }}
               className="mb-8 flex items-center gap-3"
             >
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                  <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />
-                </svg>
+              <div className="relative w-10 h-10">
+                {/* Soft glow behind */}
+                <motion.div
+                  animate={{ scale: [1, 1.3, 1], opacity: [0.3, 0.5, 0.3] }}
+                  transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
+                  className="absolute inset-[-4px] rounded-full bg-eds-50/25 blur-md"
+                />
+                {/* Morphing blob shape */}
+                <motion.div
+                  animate={{
+                    borderRadius: [
+                      "30% 70% 70% 30% / 30% 30% 70% 70%",
+                      "50% 50% 50% 50%",
+                      "70% 30% 30% 70% / 70% 70% 30% 30%",
+                      "50% 50% 50% 50%",
+                      "30% 70% 70% 30% / 30% 30% 70% 70%",
+                    ],
+                  }}
+                  transition={{ repeat: Infinity, duration: 6, ease: "easeInOut" }}
+                  className="absolute inset-0 flex items-center justify-center shadow-lg shadow-eds-50/25"
+                  style={{
+                    background: "linear-gradient(135deg, #4E91F5, #2070E8 50%, #1358BF 100%)",
+                  }}
+                >
+                  {/* Edmunds car icon */}
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M5 17h2m10 0h2" />
+                    <path d="M7 17a2 2 0 1 0 0-4 2 2 0 0 0 0 4Zm10 0a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                    <path d="M5 13l1.5-4.5A2 2 0 0 1 8.4 7h7.2a2 2 0 0 1 1.9 1.5L19 13" />
+                    <path d="M3 13h18v2a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-2Z" />
+                  </svg>
+                </motion.div>
               </div>
               <span className="text-lg font-semibold tracking-tight">
                 Edmunds<span className="accent-gradient-text">Studio</span>
@@ -308,14 +336,14 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                   onChange={(e) => setBrand(e.target.value)}
                   placeholder="Type a brand name..."
                   className="w-full px-5 py-3.5 pr-28 text-sm rounded-xl bg-zinc-900/50 border border-zinc-800
-                           focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+                           focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20
                            placeholder:text-zinc-600 transition-all"
                 />
                 <div className="absolute right-2 top-1/2 -translate-y-1/2">
                   <button
                     type="submit"
                     disabled={!brand.trim()}
-                    className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium
+                    className="px-4 py-2 bg-eds-50 hover:bg-eds-50 text-white text-sm font-medium
                              rounded-lg transition-all disabled:opacity-0 disabled:pointer-events-none"
                   >
                     Analyze →
@@ -363,14 +391,14 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                 onChange={(e) => setBrand(e.target.value)}
                 placeholder={selectedScenario.inputPlaceholder}
                 className="w-full px-5 py-4 text-base rounded-xl bg-zinc-900 border border-zinc-800
-                         focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20
+                         focus:border-eds-50 focus:ring-2 focus:ring-eds-50/20
                          placeholder:text-zinc-600 transition-all"
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={!brand.trim()}
-                className="w-full mt-4 py-3.5 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold rounded-xl
+                className="w-full mt-4 py-3.5 bg-eds-50 hover:bg-eds-50 text-white font-semibold rounded-xl
                          disabled:opacity-30 disabled:cursor-not-allowed transition-all glow-sm"
               >
                 {selectedScenario.submitLabel}

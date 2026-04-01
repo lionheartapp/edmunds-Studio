@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  /* EDS Neutrals */
   --background: #09090b;
   --foreground: #fafafa;
   --card: #18181b;
@@ -8,9 +9,29 @@
   --border: #27272a;
   --border-light: #3f3f46;
   --muted: #a1a1aa;
-  --accent: #6366f1;
-  --accent-hover: #818cf8;
-  --accent-glow: rgba(99, 102, 241, 0.15);
+
+  /* EDS Blue Scale — primary accent */
+  --eds-blue-05: #091A33;
+  --eds-blue-10: #033E96;
+  --eds-blue-20: #0A4AAB;
+  --eds-blue-30: #1358BF;
+  --eds-blue-40: #1561D4;
+  --eds-blue-50: #2070E8;
+  --eds-blue-60: #4E91F5;
+  --eds-blue-70: #7AAFFF;
+  --eds-blue-80: #A3C8FF;
+  --eds-blue-90: #CCE0FF;
+  --eds-blue-100: #F0F6FF;
+
+  /* EDS Brand */
+  --eds-brand-blue: #007EE5;
+
+  /* Accent = Blue/50 */
+  --accent: #2070E8;
+  --accent-hover: #4E91F5;
+  --accent-glow: rgba(32, 112, 232, 0.15);
+
+  /* Status */
   --success: #22c55e;
   --warning: #f59e0b;
   --danger: #ef4444;
@@ -21,6 +42,19 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+
+  /* EDS Blue Scale — available as bg-eds-50, text-eds-50, border-eds-50, etc. */
+  --color-eds-05: #091A33;
+  --color-eds-10: #033E96;
+  --color-eds-20: #0A4AAB;
+  --color-eds-30: #1358BF;
+  --color-eds-40: #1561D4;
+  --color-eds-50: #2070E8;
+  --color-eds-60: #4E91F5;
+  --color-eds-70: #7AAFFF;
+  --color-eds-80: #A3C8FF;
+  --color-eds-90: #CCE0FF;
+  --color-eds-100: #F0F6FF;
 }
 
 * {
@@ -63,9 +97,9 @@ body {
   background-clip: text;
 }
 
-/* Accent gradient text */
+/* Accent gradient text — EDS Blue scale */
 .accent-gradient-text {
-  background: linear-gradient(135deg, #818cf8 0%, #6366f1 50%, #a78bfa 100%);
+  background: linear-gradient(135deg, #4E91F5 0%, #2070E8 50%, #7AAFFF 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;

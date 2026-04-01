@@ -666,30 +666,183 @@ export async function queryEdmundsAdActivity(make: string): Promise<EdmundsAdAct
 // ═══════════════════════════════════════════════════════════════
 
 /**
+ * Normalize raw model names (from Databricks targeted_model, campaign names, etc.)
+ * into the hyphenated slug format the Edmunds media CDN expects.
+ *
+ * Examples:
+ *   "f150" → "f-150"
+ *   "F250SuperDuty" → "f-250-super-duty"
+ *   "grandcherokee" → "grand-cherokee"
+ *   "CX-5" → "cx-5"
+ *   "Bronco" → "bronco"
+ */
+const MODEL_SLUG_MAP: Record<string, string> = {
+  // Ford
+  f150: "f-150", f250: "f-250", f350: "f-350", f450: "f-450",
+  f250superduty: "f-250-super-duty", f350superduty: "f-350-super-duty",
+  f150lightning: "f-150-lightning",
+  mustangmache: "mustang-mach-e", mustangmachegtp: "mustang-mach-e",
+  bronco: "bronco", broncosport: "bronco-sport",
+  explorer: "explorer", expedition: "expedition", edge: "edge",
+  escape: "escape", maverick: "maverick", ranger: "ranger",
+  mustang: "mustang", transit: "transit",
+  // Toyota
+  camry: "camry", corolla: "corolla", rav4: "rav4",
+  highlander: "highlander", tacoma: "tacoma", tundra: "tundra",
+  "4runner": "4runner", sienna: "sienna", prius: "prius",
+  venza: "venza", supra: "supra", sequoia: "sequoia",
+  grandhighlander: "grand-highlander", landcruiser: "land-cruiser",
+  crownsiglsdn: "crown-signia", bz4x: "bz4x",
+  // Honda
+  civic: "civic", accord: "accord", crv: "cr-v", "cr-v": "cr-v",
+  hrv: "hr-v", "hr-v": "hr-v", pilot: "pilot", ridgeline: "ridgeline",
+  odyssey: "odyssey", passport: "passport", prologue: "prologue",
+  // Chevrolet
+  silverado: "silverado", equinox: "equinox", tahoe: "tahoe",
+  suburban: "suburban", traverse: "traverse", blazer: "blazer",
+  trax: "trax", colorado: "colorado", camaro: "camaro",
+  corvette: "corvette", bolt: "bolt-euv", malibu: "malibu",
+  silveradoev: "silverado-ev",
+  // Jeep
+  grandcherokee: "grand-cherokee", wrangler: "wrangler",
+  compass: "compass", cherokee: "cherokee", gladiator: "gladiator",
+  renegade: "renegade", wagoneer: "wagoneer",
+  grandwagoneer: "grand-wagoneer",
+  // Hyundai
+  tucson: "tucson", palisade: "palisade", santafe: "santa-fe",
+  ioniq5: "ioniq-5", ioniq6: "ioniq-6", kona: "kona",
+  sonata: "sonata", elantra: "elantra",
+  // Kia
+  telluride: "telluride", sportage: "sportage", ev6: "ev6",
+  ev9: "ev9", sorento: "sorento", forte: "forte", seltos: "seltos",
+  // Nissan
+  rogue: "rogue", altima: "altima", pathfinder: "pathfinder",
+  frontier: "frontier", sentra: "sentra", murano: "murano",
+  kicks: "kicks", ariya: "ariya",
+  // Subaru
+  outback: "outback", forester: "forester", crosstrek: "crosstrek",
+  wrx: "wrx", impreza: "impreza", ascent: "ascent", solterra: "solterra",
+  // BMW
+  "3series": "3-series", "5series": "5-series", "7series": "7-series",
+  x3: "x3", x5: "x5", x7: "x7", x1: "x1", i4: "i4", ix: "ix",
+  // Mercedes
+  "cclass": "c-class", "eclass": "e-class", "sclass": "s-class",
+  gle: "gle", glc: "glc", gls: "gls", glb: "glb", gla: "gla",
+  // Audi
+  q5: "q5", q7: "q7", q3: "q3", a4: "a4", a6: "a6", q8: "q8",
+  etron: "e-tron", etrongt: "e-tron-gt",
+  // VW
+  tiguan: "tiguan", atlas: "atlas", jetta: "jetta",
+  taos: "taos", id4: "id.4", arteon: "arteon",
+  atlascrosssport: "atlas-cross-sport",
+  // Mazda
+  cx5: "cx-5", "cx-5": "cx-5", cx50: "cx-50", "cx-50": "cx-50",
+  cx90: "cx-90", "cx-90": "cx-90", mazda3: "mazda3", mx5miata: "mx-5-miata",
+  // Lexus
+  rx: "rx", nx: "nx", es: "es", is: "is", gx: "gx", lx: "lx", ux: "ux",
+  rz: "rz",
+  // GMC
+  sierra: "sierra", yukon: "yukon", terrain: "terrain",
+  acadia: "acadia", canyon: "canyon", hummer: "hummer-ev",
+  // Ram
+  "1500": "1500", "2500": "2500", "3500": "3500",
+  // Dodge
+  durango: "durango", charger: "charger", hornet: "hornet",
+  // Rivian
+  r1t: "r1t", r1s: "r1s", r2: "r2",
+  // Tesla
+  modely: "model-y", model3: "model-3", modelx: "model-x", models: "model-s",
+  "model y": "model-y", "model 3": "model-3", "model x": "model-x", "model s": "model-s",
+}
+
+/**
+ * Human-readable display names for raw model codes
+ */
+const MODEL_DISPLAY_MAP: Record<string, string> = {
+  f150: "F-150", f250: "F-250", f350: "F-350",
+  f250superduty: "F-250 Super Duty", f350superduty: "F-350 Super Duty",
+  f150lightning: "F-150 Lightning",
+  grandcherokee: "Grand Cherokee", grandwagoneer: "Grand Wagoneer",
+  grandhighlander: "Grand Highlander", landcruiser: "Land Cruiser",
+  santafe: "Santa Fe", ioniq5: "Ioniq 5", ioniq6: "Ioniq 6",
+  crv: "CR-V", hrv: "HR-V",
+  broncosport: "Bronco Sport",
+  cx5: "CX-5", cx50: "CX-50", cx90: "CX-90",
+  atlascrosssport: "Atlas Cross Sport",
+  mustangmache: "Mustang Mach-E",
+  silveradoev: "Silverado EV",
+  modely: "Model Y", model3: "Model 3", modelx: "Model X", models: "Model S",
+  "3series": "3 Series", "5series": "5 Series", "7series": "7 Series",
+  cclass: "C-Class", eclass: "E-Class", sclass: "S-Class",
+  etron: "e-tron", etrongt: "e-tron GT",
+  mx5miata: "MX-5 Miata",
+}
+
+export function normalizeModelSlug(rawModel: string): string {
+  const key = rawModel.toLowerCase().replace(/[\s_-]+/g, "").replace(/[^a-z0-9]/g, "")
+  if (MODEL_SLUG_MAP[key]) return MODEL_SLUG_MAP[key]
+
+  // Also check the raw lowercase with hyphens preserved
+  const withHyphens = rawModel.toLowerCase().trim()
+  if (MODEL_SLUG_MAP[withHyphens]) return MODEL_SLUG_MAP[withHyphens]
+
+  // Fallback: insert hyphens before digit-letter and letter-digit boundaries
+  // "f150" → "f-150", "cx5" → "cx-5"
+  const slug = key
+    .replace(/([a-z])(\d)/g, "$1-$2")
+    .replace(/(\d)([a-z])/g, "$1-$2")
+  return slug
+}
+
+export function getDisplayModelName(rawModel: string): string {
+  const key = rawModel.toLowerCase().replace(/[\s_-]+/g, "").replace(/[^a-z0-9]/g, "")
+  if (MODEL_DISPLAY_MAP[key]) return MODEL_DISPLAY_MAP[key]
+
+  // Fallback: title case the raw model
+  return rawModel
+    .replace(/([a-z])([A-Z])/g, "$1 $2")
+    .replace(/(\d)([a-z])/gi, "$1 $2")
+    .replace(/([a-z])(\d)/gi, "$1-$2")
+    .split(/[\s_-]+/)
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(" ")
+}
+
+/**
  * Build Edmunds media CDN URLs for a vehicle.
- * Pattern: https://media.ed.edmunds-media.com/{make}/{model}/{year}/oem/{year}_{make}_{model}_{suffix}.jpg
+ * Pattern: https://media.ed.edmunds-media.com/{make}/{model}/{year}/oem/{year}_{make}_{model}_{angle}_oem_{seq}_{size}.jpg
+ *
+ * Angle codes: f34 (front 3/4), r34 (rear 3/4), sd (side), ft (front), bk (back)
  */
 export function getEdmundsVehicleImageUrl(
   make: string,
   model: string,
   year: number | string,
-  angle: "fq" | "rq" | "s" | "f" | "r" = "fq", // front-quarter, rear-quarter, side, front, rear
+  angle: "f34" | "r34" | "sd" | "ft" | "bk" = "f34",
   size: 600 | 1600 = 600
 ): string {
   const m = make.toLowerCase().replace(/[^a-z0-9-]/g, "")
-  const mod = model.toLowerCase().replace(/[^a-z0-9-]/g, "-")
+  const mod = normalizeModelSlug(model)
   return `https://media.ed.edmunds-media.com/${m}/${mod}/${year}/oem/${year}_${m}_${mod}_${angle}_oem_1_${size}.jpg`
 }
 
 /**
- * Get multiple angle photos for a vehicle
+ * Get multiple candidate image URLs for a vehicle — tries multiple years and angles
+ * so the frontend can cascade through them on error.
  */
 export function getEdmundsVehicleImages(make: string, model: string, year: number | string): string[] {
-  return [
-    getEdmundsVehicleImageUrl(make, model, year, "fq", 600),
-    getEdmundsVehicleImageUrl(make, model, year, "f", 600),
-    getEdmundsVehicleImageUrl(make, model, year, "s", 600),
-  ]
+  const numYear = typeof year === "string" ? parseInt(year, 10) : year
+  const currentYear = new Date().getFullYear()
+  // Try the given year, then current year, then previous year
+  const years = [...new Set([numYear, currentYear, currentYear + 1, currentYear - 1].filter(y => y > 2018))]
+
+  const urls: string[] = []
+  for (const y of years) {
+    urls.push(getEdmundsVehicleImageUrl(make, model, y, "f34", 600))
+  }
+  // Also add a side view for the primary year
+  urls.push(getEdmundsVehicleImageUrl(make, model, years[0], "sd", 600))
+  return urls
 }
 
 // ═══════════════════════════════════════════════════════════════

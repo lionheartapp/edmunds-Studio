@@ -58,7 +58,7 @@ export default function PipelineStatusView({
                 transition={{ delay: i * 0.1 }}
                 className={`flex items-center gap-4 p-4 rounded-xl transition-all border ${
                   isCurrent
-                    ? "bg-zinc-900 border-indigo-500 border-2 glow-sm shadow-lg shadow-indigo-500/20"
+                    ? "bg-zinc-900 border-eds-50 border-2 glow-sm shadow-lg shadow-eds-50/20"
                     : isComplete
                     ? "bg-zinc-900 border-zinc-800"
                     : "bg-zinc-900/40 border-zinc-800 opacity-50"
@@ -81,7 +81,7 @@ export default function PipelineStatusView({
                     <motion.div
                       animate={{ rotate: 360 }}
                       transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                      className="w-8 h-8 border-3 border-indigo-500 border-t-transparent rounded-full"
+                      className="w-8 h-8 border-3 border-eds-50 border-t-transparent rounded-full"
                     />
                   ) : (
                     <div className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-sm">
@@ -117,7 +117,7 @@ export default function PipelineStatusView({
                   <motion.div
                     initial={{ opacity: 0, scale: 0.9 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="text-xs text-indigo-400 font-mono bg-indigo-500/10 px-3 py-1 rounded-lg border border-indigo-500/20"
+                    className="text-xs text-eds-60 font-mono bg-eds-50/10 px-3 py-1 rounded-lg border border-eds-50/20"
                   >
                     Live Preview
                   </motion.div>

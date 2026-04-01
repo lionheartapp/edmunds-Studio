@@ -6,6 +6,7 @@ import {
   isDatabricksConfigured,
   queryEdmundsAdActivity,
   getEdmundsVehicleImages,
+  getDisplayModelName,
 } from "@/lib/databricks"
 
 export const maxDuration = 45
@@ -31,9 +32,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ edmundsAds: buildMockData(make) })
     }
 
-    // Enrich event summary with vehicle images
+    // Enrich event summary with vehicle images + display names
     const enrichedEvents = activity.eventSummary.map((event) => ({
       ...event,
+      displayName: event.targetedModel ? getDisplayModelName(event.targetedModel) : event.targetedModel,
       vehicleImages: event.targetedModel
         ? getEdmundsVehicleImages(
             make,
@@ -100,6 +102,7 @@ function buildMockData(make: string) {
     models: models.map((model) => ({
       targetedModel: model,
       targetedModelYear: currentYear.toString(),
+      displayName: getDisplayModelName(model),
       totalImpressions: Math.floor(Math.random() * 500000) + 200000,
       totalClicks: Math.floor(Math.random() * 8000) + 2000,
       totalRevenue: Math.floor(Math.random() * 50000) + 15000,

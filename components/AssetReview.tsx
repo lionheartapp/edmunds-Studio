@@ -26,13 +26,13 @@ export default function AssetReview({
   const getAccentColor = (angle: string) => {
     switch (angle) {
       case "emotional":
-        return { border: "border-purple-500/30", top: "bg-gradient-to-r from-purple-500 to-purple-600" }
+        return { border: "border-eds-40/30", top: "bg-gradient-to-r from-eds-40 to-eds-30" }
       case "rational":
         return { border: "border-blue-500/30", top: "bg-gradient-to-r from-blue-500 to-cyan-600" }
       case "urgency":
         return { border: "border-amber-500/30", top: "bg-gradient-to-r from-amber-500 to-orange-600" }
       default:
-        return { border: "border-indigo-500/30", top: "bg-gradient-to-r from-indigo-500 to-indigo-600" }
+        return { border: "border-eds-50/30", top: "bg-gradient-to-r from-eds-50 to-eds-50" }
     }
   }
 
@@ -55,7 +55,7 @@ export default function AssetReview({
             onClick={() => setSelectedPlatform(platform)}
             className={`px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all ${
               selectedPlatform === platform
-                ? "bg-indigo-600 text-zinc-100 glow-sm shadow-lg shadow-indigo-500/20"
+                ? "bg-eds-50 text-zinc-100 glow-sm shadow-lg shadow-eds-50/20"
                 : "bg-zinc-800 text-zinc-400 border border-zinc-700 hover:bg-zinc-700"
             }`}
           >
@@ -98,8 +98,8 @@ export default function AssetReview({
                 </button>
                 <button
                   onClick={() => setTweakTarget(variant.id)}
-                  className="flex-1 py-2 bg-indigo-500/10 text-indigo-400 border border-indigo-500/30 rounded-lg text-sm font-medium
-                           hover:bg-indigo-500/20 transition-colors"
+                  className="flex-1 py-2 bg-eds-50/10 text-eds-60 border border-eds-50/30 rounded-lg text-sm font-medium
+                           hover:bg-eds-50/20 transition-colors"
                 >
                   Tweak
                 </button>
@@ -135,7 +135,7 @@ export default function AssetReview({
                     onChange={(e) => setTweakInstruction(e.target.value)}
                     placeholder="Make the headline punchier..."
                     className="flex-1 px-4 py-3 rounded-lg border border-zinc-700 bg-zinc-800 text-zinc-100 placeholder-zinc-500
-                             focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30"
+                             focus:border-eds-50 focus:outline-none focus:ring-1 focus:ring-eds-50/30"
                     autoFocus
                   />
                   <button
@@ -144,7 +144,7 @@ export default function AssetReview({
                       setTweakTarget(null)
                       setTweakInstruction("")
                     }}
-                    className="px-6 py-3 bg-indigo-600 text-zinc-100 rounded-lg font-medium glow-sm hover:bg-indigo-500 transition-colors"
+                    className="px-6 py-3 bg-eds-50 text-zinc-100 rounded-lg font-medium glow-sm hover:bg-eds-50 transition-colors"
                   >
                     Apply
                   </button>
@@ -166,8 +166,8 @@ export default function AssetReview({
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={onApproveAll}
-        className="w-full py-4 bg-indigo-600 text-zinc-100 font-semibold rounded-xl
-                 hover:bg-indigo-500 transition-colors text-lg glow-sm shadow-lg shadow-indigo-500/20"
+        className="w-full py-4 bg-eds-50 text-zinc-100 font-semibold rounded-xl
+                 hover:bg-eds-50 transition-colors text-lg glow-sm shadow-lg shadow-eds-50/20"
       >
         Approve All & Schedule →
       </motion.button>

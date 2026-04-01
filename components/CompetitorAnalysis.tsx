@@ -74,7 +74,7 @@ export default function CompetitorAnalysis({
       {/* Background elements */}
       <div className="fixed inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-eds-40/5 rounded-full blur-3xl" />
       </div>
 
       <div className="relative z-10">
@@ -124,7 +124,7 @@ export default function CompetitorAnalysis({
                 animate={{ opacity: 1 }}
                 className="text-center py-20"
               >
-                <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mx-auto mb-6" />
+                <div className="w-12 h-12 rounded-full border-2 border-eds-50 border-t-transparent animate-spin mx-auto mb-6" />
                 <p className="text-zinc-300 text-lg font-medium mb-2">Analyzing competitors...</p>
                 <p className="text-zinc-500 text-sm">Pulling ad strategies, audience overlap, and performance data</p>
               </motion.div>
@@ -186,7 +186,7 @@ export default function CompetitorAnalysis({
 
                       {/* Top Platform Badge */}
                       <motion.div
-                        className="px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/30 text-sm font-medium text-purple-200 whitespace-nowrap"
+                        className="px-4 py-2 rounded-full bg-eds-40/10 border border-eds-40/30 text-sm font-medium text-eds-80 whitespace-nowrap"
                         whileHover={{ scale: 1.05 }}
                       >
                         {competitor.topPlatform}

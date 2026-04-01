@@ -50,7 +50,7 @@ export default function ScheduleCalendar({
                 onUpdateSlot(i, { scheduledAt: new Date(e.target.value).toISOString() })
               }
               className="flex-1 px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg text-zinc-100 placeholder-zinc-500
-                       focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500/30 text-sm"
+                       focus:border-eds-50 focus:outline-none focus:ring-1 focus:ring-eds-50/30 text-sm"
             />
 
             {/* Status Badge */}
@@ -58,7 +58,7 @@ export default function ScheduleCalendar({
               slot.status === "scheduled"
                 ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/30"
                 : slot.status === "published"
-                ? "bg-indigo-500/10 text-indigo-400 border border-indigo-500/30"
+                ? "bg-eds-50/10 text-eds-60 border border-eds-50/30"
                 : "bg-zinc-800 text-zinc-400 border border-zinc-700"
             }`}>
               {slot.status}
@@ -71,8 +71,8 @@ export default function ScheduleCalendar({
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
         onClick={onScheduleAll}
-        className="w-full py-4 bg-indigo-600 text-zinc-100 font-semibold rounded-xl
-                 hover:bg-indigo-500 transition-colors text-lg glow-sm shadow-lg shadow-indigo-500/20"
+        className="w-full py-4 bg-eds-50 text-zinc-100 font-semibold rounded-xl
+                 hover:bg-eds-50 transition-colors text-lg glow-sm shadow-lg shadow-eds-50/20"
       >
         Schedule All
       </motion.button>

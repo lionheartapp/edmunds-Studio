@@ -44,7 +44,7 @@ export default function PlacementPage() {
   if (!brandDna || !campaign) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin" />
+        <div className="w-12 h-12 rounded-full border-2 border-eds-50 border-t-transparent animate-spin" />
       </div>
     )
   }
@@ -64,7 +64,7 @@ export default function PlacementPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.2 }}
-              className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br from-indigo-600 to-violet-600"
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br from-eds-50 to-eds-30"
               style={{ boxShadow: "0 0 60px rgba(99,102,241,0.25)" }}
             >
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">

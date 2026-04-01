@@ -227,7 +227,7 @@ export default function CompetitorsPage() {
       {isLoadingEdge && (
         <div className="fixed inset-0 bg-zinc-950/80 backdrop-blur-sm z-50 flex items-center justify-center">
           <div className="text-center">
-            <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mx-auto mb-4" />
+            <div className="w-12 h-12 rounded-full border-2 border-eds-50 border-t-transparent animate-spin mx-auto mb-4" />
             <p className="text-zinc-300 text-sm">Analyzing your strategic opportunities...</p>
           </div>
         </div>

@@ -51,7 +51,7 @@ export default function CampaignDashboard({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <motion.div
-                className="w-4 h-4 rounded-full bg-indigo-500"
+                className="w-4 h-4 rounded-full bg-eds-50"
                 animate={{ boxShadow: "0 0 20px rgba(99,102,241,0.5)" }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
@@ -61,7 +61,7 @@ export default function CampaignDashboard({
 
           {/* Center Title */}
           <div className="absolute left-1/2 -translate-x-1/2">
-            <h2 className="text-xl font-semibold bg-gradient-to-r from-white via-blue-200 to-purple-200 bg-clip-text text-transparent">
+            <h2 className="text-xl font-semibold bg-gradient-to-r from-white via-blue-200 to-eds-80 bg-clip-text text-transparent">
               Campaign Dashboard
             </h2>
           </div>
@@ -71,7 +71,7 @@ export default function CampaignDashboard({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-indigo-600"
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-eds-50"
             style={{ boxShadow: "0 0 20px rgba(99,102,241,0.25)" }}
           >
             <Plus className="w-4 h-4" />
@@ -92,7 +92,7 @@ export default function CampaignDashboard({
             label: 'Pre-built Campaigns',
             value: campaigns.length,
             icon: Zap,
-            color: '#6366f1',
+            color: '#2070E8',
           },
           {
             label: 'Opportunities Found',
@@ -289,7 +289,7 @@ export default function CampaignDashboard({
                         key={campaign.id}
                         campaign={campaign}
                         index={idx}
-                        brandColor="#6366f1"
+                        brandColor="#2070E8"
                         gradient={getGradientForCampaign(idx)}
                         isSelected={selectedCampaign === campaign.id}
                         onSelect={() => setSelectedCampaign(campaign.id)}

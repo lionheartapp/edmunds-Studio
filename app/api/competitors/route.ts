@@ -171,7 +171,7 @@ function buildGenericCompetitors(names: string[]): CompetitorProfile[] {
   return names.slice(0, 3).map((name, i) => ({
     name,
     domain: `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
-    logoColor: colors[i] || "#6366f1",
+    logoColor: colors[i] || "#2070E8",
     adSpend: "$50k-100k/mo",
     topPlatform: "Facebook",
     audienceOverlap: 60 + i * 10,
