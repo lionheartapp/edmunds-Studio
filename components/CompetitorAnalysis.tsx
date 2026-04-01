@@ -16,11 +16,13 @@ import {
 interface CompetitorAnalysisProps {
   brandDna: BrandDNA;
   onContinue: () => void;
+  isLoadingCompetitors?: boolean;
 }
 
 export default function CompetitorAnalysis({
   brandDna,
   onContinue,
+  isLoadingCompetitors = false,
 }: CompetitorAnalysisProps) {
   const competitors = brandDna.competitorProfiles || [];
 
@@ -115,6 +117,30 @@ export default function CompetitorAnalysis({
           animate="visible"
         >
           <div className="max-w-6xl mx-auto space-y-16">
+            {/* Loading state while competitor profiles are fetched */}
+            {isLoadingCompetitors && competitors.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <div className="w-12 h-12 rounded-full border-2 border-indigo-500 border-t-transparent animate-spin mx-auto mb-6" />
+                <p className="text-zinc-300 text-lg font-medium mb-2">Analyzing competitors...</p>
+                <p className="text-zinc-500 text-sm">Pulling ad strategies, audience overlap, and performance data</p>
+              </motion.div>
+            )}
+
+            {!isLoadingCompetitors && competitors.length === 0 && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="text-center py-20"
+              >
+                <p className="text-zinc-400 text-lg">No competitor data available yet.</p>
+                <p className="text-zinc-500 text-sm mt-2">You can still continue to the strategy phase.</p>
+              </motion.div>
+            )}
+
             {competitors.map((competitor, compIndex) => (
               <motion.div
                 key={competitor.domain}

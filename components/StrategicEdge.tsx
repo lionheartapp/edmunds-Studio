@@ -96,21 +96,17 @@ export default function StrategicEdgeComponent({
 }: StrategicEdgeProps) {
   return (
     <div className="relative w-full bg-gradient-to-b from-zinc-950 to-zinc-900 text-white overflow-hidden">
-      {/* Animated background elements */}
+      {/* Animated background elements — consistent UI accent */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <motion.div
           className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-20"
-          style={{
-            background: `radial-gradient(circle, ${brandColors.primary}33, transparent)`,
-          }}
+          style={{ background: "radial-gradient(circle, rgba(99,102,241,0.2), transparent)" }}
           animate={{ y: [0, 30, 0] }}
           transition={{ duration: 8, repeat: Infinity }}
         />
         <motion.div
           className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-15"
-          style={{
-            background: `radial-gradient(circle, ${brandColors.accent}33, transparent)`,
-          }}
+          style={{ background: "radial-gradient(circle, rgba(139,92,246,0.2), transparent)" }}
           animate={{ y: [0, -30, 0] }}
           transition={{ duration: 10, repeat: Infinity }}
         />
@@ -147,17 +143,11 @@ export default function StrategicEdgeComponent({
           transition={{ delay: 0.3 }}
         >
           <div
-            className="relative rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md p-8 lg:p-10 overflow-hidden group"
-            style={{
-              borderColor: `${brandColors.primary}40`,
-              background: `linear-gradient(135deg, rgba(255,255,255,0.05) 0%, rgba(${brandColors.primary},0.03) 100%)`,
-            }}
+            className="relative rounded-2xl border border-indigo-500/20 bg-white/5 backdrop-blur-md p-8 lg:p-10 overflow-hidden group"
           >
             <motion.div
               className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-              style={{
-                background: `radial-gradient(circle at center, ${brandColors.primary}15, transparent)`,
-              }}
+              style={{ background: "radial-gradient(circle at center, rgba(99,102,241,0.08), transparent)" }}
             />
             <div className="relative z-10">
               <h2 className="text-base font-semibold uppercase tracking-wider text-zinc-400 mb-3">
@@ -192,10 +182,7 @@ export default function StrategicEdgeComponent({
                   <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                   <div className="relative z-10 flex items-start gap-4">
                     <div
-                      className="flex-shrink-0 w-12 h-12 rounded-lg bg-gradient-to-br flex items-center justify-center"
-                      style={{
-                        background: `linear-gradient(135deg, ${brandColors.primary}40, ${brandColors.accent}40)`,
-                      }}
+                      className="flex-shrink-0 w-12 h-12 rounded-lg flex items-center justify-center bg-gradient-to-br from-indigo-500/25 to-violet-500/25"
                     >
                       <Zap className="w-6 h-6 text-yellow-300" />
                     </div>
@@ -247,18 +234,14 @@ export default function StrategicEdgeComponent({
           >
             <div
               className="absolute inset-0"
-              style={{
-                background: `linear-gradient(135deg, ${brandColors.primary}15, ${brandColors.accent}10)`,
-              }}
+              style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05))" }}
             />
             <div className="absolute inset-0 backdrop-blur-md" />
 
             {/* Gradient border effect */}
             <div
               className="absolute inset-0 rounded-3xl opacity-50 pointer-events-none"
-              style={{
-                background: `conic-gradient(from 180deg, ${brandColors.primary}, ${brandColors.accent}, ${brandColors.primary})`,
-              }}
+              style={{ background: "conic-gradient(from 180deg, #6366f1, #8b5cf6, #6366f1)" }}
             />
 
             <div className="relative z-10 px-8 lg:px-12 py-12 lg:py-16">
@@ -286,10 +269,7 @@ export default function StrategicEdgeComponent({
 
                 <motion.button
                   onClick={onLaunchCampaign}
-                  className="relative group mb-10 px-8 lg:px-10 py-4 lg:py-5 rounded-xl font-bold text-lg flex items-center gap-3 overflow-hidden transition-all duration-300"
-                  style={{
-                    background: `linear-gradient(135deg, ${brandColors.primary}, ${brandColors.accent})`,
-                  }}
+                  className="relative group mb-10 px-8 lg:px-10 py-4 lg:py-5 rounded-xl font-bold text-lg flex items-center gap-3 overflow-hidden transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   variants={itemVariants}
@@ -297,16 +277,9 @@ export default function StrategicEdgeComponent({
                   {/* Pulsing glow effect */}
                   <motion.div
                     className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
-                    style={{
-                      background: `radial-gradient(circle, ${brandColors.primary}80, transparent)`,
-                    }}
-                    animate={{
-                      scale: [1, 1.1, 1],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                    }}
+                    style={{ background: "radial-gradient(circle, rgba(99,102,241,0.5), transparent)" }}
+                    animate={{ scale: [1, 1.1, 1] }}
+                    transition={{ duration: 2, repeat: Infinity }}
                   />
                   <span className="relative z-10 flex items-center gap-2">
                     Launch Your Campaign Dashboard
@@ -330,19 +303,13 @@ export default function StrategicEdgeComponent({
                   {edge.preBuiltCampaigns.slice(0, 4).map((campaign, index) => (
                     <motion.div
                       key={campaign.id}
-                      className="flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-lg border border-white/20 overflow-hidden"
+                      className={`flex-shrink-0 w-20 h-20 lg:w-24 lg:h-24 rounded-lg border border-white/20 overflow-hidden ${
+                        index % 2 === 0
+                          ? "bg-gradient-to-br from-indigo-500/25 to-violet-500/15"
+                          : "bg-gradient-to-br from-violet-500/25 to-indigo-500/15"
+                      }`}
                       variants={itemVariants}
-                      whileHover={{
-                        scale: 1.1,
-                        zIndex: 10,
-                      }}
-                      style={{
-                        background: `linear-gradient(135deg, ${
-                          index % 2 === 0 ? brandColors.primary : brandColors.accent
-                        }40, ${
-                          index % 2 === 0 ? brandColors.accent : brandColors.primary
-                        }20)`,
-                      }}
+                      whileHover={{ scale: 1.1, zIndex: 10 }}
                     >
                       <div className="w-full h-full flex items-center justify-center">
                         <Sparkles className="w-8 h-8 lg:w-10 lg:h-10 text-white/60" />
@@ -393,19 +360,7 @@ function OpportunityCard({
       {/* Hover glow effect */}
       <div
         className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-50 transition-opacity duration-500"
-        style={{
-          background: `radial-gradient(circle at top-right, ${brandColors.primary}20, transparent)`,
-        }}
-      />
-
-      {/* Border brightening on hover */}
-      <motion.div
-        className="absolute inset-0 rounded-2xl pointer-events-none"
-        initial={{ borderColor: 'rgba(255, 255, 255, 0.1)' }}
-        whileHover={{
-          borderColor: `${brandColors.primary}60`,
-        }}
-        transition={{ duration: 0.3 }}
+        style={{ background: "radial-gradient(circle at top-right, rgba(99,102,241,0.12), transparent)" }}
       />
 
       <div className="relative z-10 space-y-4">
@@ -438,10 +393,7 @@ function OpportunityCard({
 
         {/* Suggested Angle Callout */}
         <div
-          className="rounded-lg border-l-4 pl-4 py-3 italic text-zinc-200 bg-white/[0.03]"
-          style={{
-            borderLeftColor: `${brandColors.primary}80`,
-          }}
+          className="rounded-lg border-l-4 border-indigo-500/50 pl-4 py-3 italic text-zinc-200 bg-white/[0.03]"
         >
           "{opportunity.suggestedAngle}"
         </div>
@@ -462,11 +414,8 @@ function OpportunityCard({
 
         {/* Estimated Edge Highlight */}
         <div
-          className={`rounded-lg px-4 py-3 font-bold text-white ${impact.glow}`}
-          style={{
-            background: `linear-gradient(135deg, ${brandColors.primary}15, ${brandColors.accent}10)`,
-            borderLeft: `3px solid ${brandColors.primary}`,
-          }}
+          className={`rounded-lg px-4 py-3 font-bold text-white border-l-[3px] border-indigo-500 ${impact.glow}`}
+          style={{ background: "linear-gradient(135deg, rgba(99,102,241,0.08), rgba(139,92,246,0.05))" }}
         >
           <span className="text-xs font-semibold text-zinc-400 block mb-1">
             ESTIMATED EDGE

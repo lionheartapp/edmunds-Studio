@@ -470,16 +470,11 @@ export default function AdPlacement({
               onClick={() => setSection(sec)}
               className={`px-6 py-4 font-semibold text-sm transition-all ${
                 section === sec
-                  ? 'text-white border-b-2'
+                  ? 'text-white border-b-2 border-indigo-500'
                   : 'text-slate-400 hover:text-slate-300'
               }`}
-              style={
-                section === sec
-                  ? { borderBottomColor: brandColors.primary }
-                  : {}
-              }
             >
-              <span className="text-xs font-bold mr-2" style={{ color: brandColors.primary }}>
+              <span className="text-xs font-bold mr-2 text-indigo-400">
                 {idx + 1}
               </span>
               {sec === 'format' && 'Format'}
@@ -517,7 +512,7 @@ export default function AdPlacement({
                         }`}
                         style={
                           selectedFormat === format.id
-                            ? { boxShadow: `0 0 20px ${brandColors.primary}30` }
+                            ? { boxShadow: "0 0 20px rgba(99,102,241,0.18)" }
                             : {}
                         }
                       >
@@ -530,8 +525,7 @@ export default function AdPlacement({
                           </div>
                           {selectedFormat === format.id && (
                             <div
-                              className="w-5 h-5 rounded-full flex items-center justify-center text-white flex-shrink-0"
-                              style={{ backgroundColor: brandColors.primary }}
+                              className="w-5 h-5 rounded-full flex items-center justify-center text-white flex-shrink-0 bg-indigo-500"
                             >
                               <CheckIcon />
                             </div>
@@ -645,15 +639,12 @@ export default function AdPlacement({
                         whileTap={{ scale: 0.95 }}
                         className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                           selectedMakes.includes(make)
-                            ? 'text-white'
+                            ? 'text-white bg-indigo-600'
                             : 'text-slate-400 bg-slate-800 hover:bg-slate-700'
                         }`}
                         style={
                           selectedMakes.includes(make)
-                            ? {
-                                backgroundColor: brandColors.primary,
-                                boxShadow: `0 0 12px ${brandColors.primary}50`,
-                              }
+                            ? { boxShadow: "0 0 12px rgba(99,102,241,0.3)" }
                             : {}
                         }
                       >
@@ -675,15 +666,12 @@ export default function AdPlacement({
                         whileTap={{ scale: 0.95 }}
                         className={`px-4 py-2 rounded-full text-sm font-semibold transition-all ${
                           selectedFunnelStages.includes(stage.id)
-                            ? 'text-white'
+                            ? 'text-white bg-indigo-600'
                             : 'text-slate-400 bg-slate-800 hover:bg-slate-700'
                         }`}
                         style={
                           selectedFunnelStages.includes(stage.id)
-                            ? {
-                                backgroundColor: brandColors.primary,
-                                boxShadow: `0 0 12px ${brandColors.primary}50`,
-                              }
+                            ? { boxShadow: "0 0 12px rgba(99,102,241,0.3)" }
                             : {}
                         }
                       >
@@ -744,10 +732,7 @@ export default function AdPlacement({
                         <label className="text-sm font-semibold text-slate-300">
                           Search Radius
                         </label>
-                        <span
-                          className="text-sm font-bold"
-                          style={{ color: brandColors.primary }}
-                        >
+                        <span className="text-sm font-bold text-indigo-400">
                           {radius} miles
                         </span>
                       </div>
@@ -760,7 +745,7 @@ export default function AdPlacement({
                         onChange={(e) => setRadius(Number(e.target.value))}
                         className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                         style={{
-                          background: `linear-gradient(to right, ${brandColors.primary}, ${brandColors.primary}) 0% ${(radius / 100) * 100}%, #1e293b ${(radius / 100) * 100}% 100%`,
+                          background: `linear-gradient(to right, #6366f1, #6366f1) 0% ${(radius / 100) * 100}%, #1e293b ${(radius / 100) * 100}% 100%`,
                         }}
                       />
                     </div>
@@ -782,9 +767,7 @@ export default function AdPlacement({
                             checked={selectedPages.includes(page)}
                             onChange={() => togglePage(page)}
                             className="w-4 h-4 rounded"
-                            style={{
-                              accentColor: brandColors.primary,
-                            }}
+                            style={{ accentColor: "#6366f1" }}
                           />
                           <span className="text-white text-sm font-medium">{page}</span>
                         </label>
@@ -797,8 +780,7 @@ export default function AdPlacement({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-6 rounded-lg border border-slate-700 bg-gradient-to-r from-slate-800/50 to-slate-700/50"
-                  style={{ borderColor: brandColors.primary + '40' }}
+                  className="p-6 rounded-lg border border-indigo-500/25 bg-gradient-to-r from-slate-800/50 to-slate-700/50"
                 >
                   <div className="flex items-center justify-between">
                     <div>
@@ -808,17 +790,14 @@ export default function AdPlacement({
                       </p>
                     </div>
                     <div
-                      className="w-16 h-16 rounded-full flex items-center justify-center"
-                      style={{
-                        backgroundColor: brandColors.accent + '30',
-                      }}
+                      className="w-16 h-16 rounded-full flex items-center justify-center bg-indigo-500/20"
                     >
                       <svg
                         width="32"
                         height="32"
                         viewBox="0 0 32 32"
                         fill="none"
-                        stroke={brandColors.primary}
+                        stroke="#6366f1"
                         strokeWidth="2"
                       >
                         <circle cx="16" cy="16" r="14"></circle>
@@ -847,10 +826,7 @@ export default function AdPlacement({
                 <div>
                   <div className="flex items-center justify-between mb-4">
                     <h3 className="text-lg font-bold text-white">Daily Budget</h3>
-                    <div
-                      className="text-2xl font-bold"
-                      style={{ color: brandColors.primary }}
-                    >
+                    <div className="text-2xl font-bold text-indigo-400">
                       ${dailyBudget.toLocaleString()}
                     </div>
                   </div>
@@ -863,7 +839,7 @@ export default function AdPlacement({
                     onChange={(e) => setDailyBudget(Number(e.target.value))}
                     className="w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer"
                     style={{
-                      background: `linear-gradient(to right, ${brandColors.primary}, ${brandColors.primary}) 0% ${((dailyBudget - 50) / (5000 - 50)) * 100}%, #1e293b ${((dailyBudget - 50) / (5000 - 50)) * 100}% 100%`,
+                      background: `linear-gradient(to right, #6366f1, #6366f1) 0% ${((dailyBudget - 50) / (5000 - 50)) * 100}%, #1e293b ${((dailyBudget - 50) / (5000 - 50)) * 100}% 100%`,
                     }}
                   />
                   <div className="flex justify-between text-xs text-slate-400 mt-2">
@@ -910,11 +886,8 @@ export default function AdPlacement({
                 <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="p-6 rounded-lg border-2 bg-gradient-to-br from-slate-800/50 to-slate-700/50"
-                  style={{
-                    borderColor: brandColors.primary + '50',
-                    boxShadow: `0 0 20px ${brandColors.primary}20`,
-                  }}
+                  className="p-6 rounded-lg border-2 border-indigo-500/30 bg-gradient-to-br from-slate-800/50 to-slate-700/50"
+                  style={{ boxShadow: "0 0 20px rgba(99,102,241,0.12)" }}
                 >
                   <h3 className="text-lg font-bold text-white mb-6">Estimated Campaign Metrics</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -969,11 +942,8 @@ export default function AdPlacement({
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={handlePlaceOnEdmunds}
-              className="px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2 transition"
-              style={{
-                backgroundColor: brandColors.primary,
-                boxShadow: `0 0 20px ${brandColors.primary}50`,
-              }}
+              className="px-6 py-3 rounded-lg font-semibold text-white flex items-center gap-2 transition bg-indigo-600"
+              style={{ boxShadow: "0 0 20px rgba(99,102,241,0.3)" }}
             >
               Place on Edmunds
               <ChevronRightIcon />

@@ -48,6 +48,52 @@ async function loadDemoBrief(brandName: string): Promise<BrandDNA | null> {
   }
 }
 
+/**
+ * Build a minimal generic BrandDNA for any brand when AI is unavailable.
+ * This ensures the user ALWAYS gets a result they can continue with.
+ */
+function buildGenericFallback(brandName: string): BrandDNA {
+  const name = brandName.trim()
+  const domain = `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`
+
+  return {
+    name,
+    domain,
+    colors: {
+      primary: "#3B82F6",
+      secondary: "#1E40AF",
+      accent: "#F59E0B",
+      background: "#FFFFFF",
+    },
+    typography: {
+      primaryFont: "Inter",
+      fallback: "system-ui, sans-serif",
+      headingWeight: "700",
+    },
+    voice: ["Professional", "Confident", "Approachable"],
+    visualStyle: ["Clean", "Modern", "Lifestyle photography"],
+    currentAds: [
+      {
+        platform: "Facebook",
+        headline: `Discover ${name}`,
+        cta: "Learn More",
+        format: "Image",
+        dateSpotted: "2026-Q1",
+      },
+      {
+        platform: "Instagram",
+        headline: `${name} — Built for You`,
+        cta: "Shop Now",
+        format: "Carousel",
+        dateSpotted: "2026-Q1",
+      },
+    ],
+    competitors: ["Competitor 1", "Competitor 2", "Competitor 3"],
+    competitorProfiles: [],
+    guidelinesUrl: undefined,
+  } as unknown as BrandDNA
+}
+
 // ─── Helpers ────────────────────────────────────────────────
 
 /** Race a promise against a timeout — returns null on timeout */
@@ -116,14 +162,14 @@ export async function POST(request: NextRequest) {
     let scraperContext = ""
 
     const [aiResult, bfResult, scraperResult] = await Promise.allSettled([
-      // 1. AI — fire immediately without scraper context
+      // 1. AI — fire immediately without scraper context (25s so retry fits in 60s budget)
       withTimeout(
         askAIJSON<BrandDNA>(
           BRAND_DNA_SYSTEM_PROMPT,
           BRAND_DNA_USER_PROMPT(brandName, ""),
           { temperature: 0.5 }
         ),
-        40000, // 40s max for AI
+        25000,
         "AI"
       ),
 
@@ -138,7 +184,7 @@ export async function POST(request: NextRequest) {
           scraperContext = buildScraperContext(result)
           return result
         }),
-        10000, // 10s max
+        10000,
         "Scraper"
       ),
     ])
@@ -171,7 +217,7 @@ export async function POST(request: NextRequest) {
           BRAND_DNA_USER_PROMPT(brandName, scraperContext),
           { temperature: 0.5 }
         ),
-        30000,
+        20000, // 20s retry — keeps total under 60s Vercel limit
         "AI retry"
       )
 
@@ -187,7 +233,7 @@ export async function POST(request: NextRequest) {
       console.error(`[brand-dna] Retry failed:`, retryError instanceof Error ? retryError.message : retryError)
     }
 
-    // ─── Fallback: demo brief ───────────────────────────────
+    // ─── Fallback: demo brief or generic ────────────────────
     const demo = await loadDemoBrief(brandName)
     if (demo) {
       console.log(`[brand-dna] Falling back to demo brief for: ${brandName}`)
@@ -195,16 +241,23 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ brandDna: profile })
     }
 
-    const firstError = aiResult.status === "rejected"
-      ? (aiResult.reason instanceof Error ? aiResult.reason.message : String(aiResult.reason))
-      : "AI returned null (timeout)"
-
-    return NextResponse.json(
-      { error: `Failed to analyze brand: ${firstError}` },
-      { status: 500 }
-    )
+    // Generic fallback — always returns something so the user isn't stuck
+    console.log(`[brand-dna] AI failed, using generic fallback for: ${brandName}`)
+    const generic = buildGenericFallback(brandName)
+    const profile = brandfetchData ? applyBrandfetch(generic, brandfetchData) : generic
+    return NextResponse.json({ brandDna: profile, fallback: true })
   } catch (error) {
     console.error("[brand-dna] Unhandled error:", error instanceof Error ? error.message : error)
+
+    // Even on crash, try to return something usable
+    try {
+      const { brandName } = await request.clone().json()
+      if (brandName) {
+        const generic = buildGenericFallback(brandName)
+        return NextResponse.json({ brandDna: generic, fallback: true })
+      }
+    } catch { /* ignore */ }
+
     return NextResponse.json(
       { error: `Internal server error: ${error instanceof Error ? error.message : "Unknown"}` },
       { status: 500 }

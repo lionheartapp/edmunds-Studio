@@ -35,10 +35,10 @@ export default function BrandDNACard({
 }: BrandDNACardProps) {
   return (
     <div className="relative min-h-screen py-10 px-4 md:px-8">
-      {/* Background ambient glow based on brand color */}
+      {/* Background ambient glow — consistent UI color, not brand-dependent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-[0.07] pointer-events-none"
-        style={{ background: `radial-gradient(circle, ${brandDna.colors.primary}, ${brandDna.colors.accent}, transparent)` }}
+        style={{ background: "radial-gradient(circle, #6366f1, #8b5cf6, transparent)" }}
       />
 
       <motion.div
@@ -68,8 +68,8 @@ export default function BrandDNACard({
               <motion.div
                 animate={{ scale: [1, 1.2, 1] }}
                 transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                className="w-3 h-3 rounded-full"
-                style={{ backgroundColor: brandDna.colors.primary, boxShadow: `0 0 12px ${brandDna.colors.primary}60` }}
+                className="w-3 h-3 rounded-full bg-indigo-500"
+                style={{ boxShadow: "0 0 12px rgba(99, 102, 241, 0.4)" }}
               />
             )}
             <div>
@@ -221,10 +221,9 @@ export default function BrandDNACard({
             whileHover={{ scale: 1.005 }}
             whileTap={{ scale: 0.995 }}
             onClick={onContinue}
-            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white"
+            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-gradient-to-r from-indigo-600 to-violet-600"
             style={{
-              background: `linear-gradient(135deg, ${brandDna.colors.primary}, ${brandDna.colors.secondary})`,
-              boxShadow: `0 0 30px ${brandDna.colors.primary}40`,
+              boxShadow: "0 0 30px rgba(99, 102, 241, 0.25)",
             }}
           >
             See What Your Competitors Are Doing →

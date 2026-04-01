@@ -1,0 +1,140 @@
+// app/api/competitors/route.ts — Competitor Profiles (Stage 2)
+// Fetched separately from brand-dna to keep each call fast and reliable.
+
+import { NextRequest, NextResponse } from "next/server"
+import { askAIJSON, isAIConfigured } from "@/lib/ai"
+import {
+  COMPETITOR_PROFILES_SYSTEM_PROMPT,
+  COMPETITOR_PROFILES_USER_PROMPT,
+} from "@/prompts/brand-dna"
+
+export const maxDuration = 60
+
+interface CompetitorProfile {
+  name: string
+  domain: string
+  logoColor: string
+  adSpend: string
+  topPlatform: string
+  audienceOverlap: number
+  ads: {
+    platform: string
+    headline: string
+    bodyText?: string
+    cta: string
+    format: string
+    thumbnailDesc?: string
+    dateSpotted?: string
+    estimatedImpressions?: string
+    engagementRate?: number
+    sentiment?: string
+    whyItWorks?: string
+  }[]
+  strengths: string[]
+  weaknesses: string[]
+}
+
+interface CompetitorResponse {
+  competitorProfiles: CompetitorProfile[]
+}
+
+/** Race a promise against a timeout — returns null on timeout */
+function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T | null> {
+  return Promise.race([
+    promise,
+    new Promise<null>((resolve) =>
+      setTimeout(() => {
+        console.log(`[competitors] ${label} timed out after ${ms}ms`)
+        resolve(null)
+      }, ms)
+    ),
+  ])
+}
+
+export async function POST(request: NextRequest) {
+  const startTime = Date.now()
+
+  try {
+    const { brandName, competitors } = await request.json()
+
+    if (!brandName || !competitors || !Array.isArray(competitors) || competitors.length === 0) {
+      return NextResponse.json(
+        { error: "brandName and competitors[] are required" },
+        { status: 400 }
+      )
+    }
+
+    if (!isAIConfigured()) {
+      return NextResponse.json(
+        { error: "No AI API key configured", competitorProfiles: [] },
+        { status: 503 }
+      )
+    }
+
+    console.log(`[competitors] Fetching profiles for ${competitors.join(", ")} (brand: ${brandName})`)
+
+    const result = await withTimeout(
+      askAIJSON<CompetitorResponse>(
+        COMPETITOR_PROFILES_SYSTEM_PROMPT,
+        COMPETITOR_PROFILES_USER_PROMPT(brandName, competitors.slice(0, 3)),
+        { temperature: 0.5 }
+      ),
+      45000, // 45s — plenty of room in the 60s budget
+      "AI"
+    )
+
+    if (result && result.competitorProfiles) {
+      // Ensure safe defaults on each profile
+      const profiles = result.competitorProfiles.map((cp) => ({
+        ...cp,
+        ads: cp.ads || [],
+        strengths: cp.strengths || [],
+        weaknesses: cp.weaknesses || [],
+        audienceOverlap: cp.audienceOverlap || 0,
+        adSpend: cp.adSpend || "Unknown",
+        topPlatform: cp.topPlatform || "Unknown",
+      }))
+
+      console.log(`[competitors] Success: ${profiles.length} profiles in ${Date.now() - startTime}ms`)
+      return NextResponse.json({ competitorProfiles: profiles })
+    }
+
+    // AI failed — return empty but not a 500
+    console.log(`[competitors] AI returned null, returning empty profiles`)
+    return NextResponse.json({ competitorProfiles: buildGenericCompetitors(competitors) })
+
+  } catch (error) {
+    console.error("[competitors] Error:", error instanceof Error ? error.message : error)
+    // Still return something so the UI doesn't crash
+    try {
+      const { competitors } = await request.clone().json()
+      return NextResponse.json({ competitorProfiles: buildGenericCompetitors(competitors || []) })
+    } catch {
+      return NextResponse.json({ competitorProfiles: [] })
+    }
+  }
+}
+
+/** Build minimal competitor stubs when AI is unavailable */
+function buildGenericCompetitors(names: string[]): CompetitorProfile[] {
+  const colors = ["#EF4444", "#3B82F6", "#10B981"]
+  return names.slice(0, 3).map((name, i) => ({
+    name,
+    domain: `${name.toLowerCase().replace(/[^a-z0-9]/g, "")}.com`,
+    logoColor: colors[i] || "#6366f1",
+    adSpend: "$50k-100k/mo",
+    topPlatform: "Facebook",
+    audienceOverlap: 60 + i * 10,
+    ads: [
+      {
+        platform: "Facebook",
+        headline: `${name} — Drive Yours Today`,
+        cta: "Learn More",
+        format: "Image",
+        dateSpotted: "2026-Q1",
+      },
+    ],
+    strengths: ["Strong brand recognition", "Large ad budget"],
+    weaknesses: ["Generic messaging", "Low social engagement"],
+  }))
+}

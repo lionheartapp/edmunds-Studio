@@ -39,6 +39,7 @@ export async function askAI(
 
 /**
  * Send a message to the AI and parse the response as JSON.
+ * Uses Gemini's native JSON mode for reliable structured output.
  */
 export async function askAIJSON<T>(
   systemPrompt: string,
@@ -48,24 +49,43 @@ export async function askAIJSON<T>(
     temperature?: number
   }
 ): Promise<T> {
-  // Ask Gemini to respond in JSON by adding to system prompt
-  const jsonSystemPrompt = systemPrompt + "\n\nIMPORTANT: Respond with ONLY valid JSON. No markdown code fences, no explanation text — just the raw JSON object."
+  const genAI = getGemini()
 
-  const text = await askAI(jsonSystemPrompt, userMessage, options)
+  // Use Gemini's native JSON response mode for reliable structured output
+  const model = genAI.getGenerativeModel({
+    model: GEMINI_MODEL,
+    systemInstruction: systemPrompt + "\n\nRespond with ONLY valid JSON. No markdown, no explanation.",
+    generationConfig: {
+      maxOutputTokens: options?.maxTokens ?? 8192,
+      temperature: options?.temperature ?? 0.7,
+      responseMimeType: "application/json",
+    },
+  })
 
-  // Extract JSON from response — AI may wrap it in ```json blocks
-  const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || text.match(/(\{[\s\S]*\})/)
-  if (!jsonMatch) {
-    console.error("[ai] No JSON found in response. First 300 chars:", text.substring(0, 300))
-    throw new Error("Could not parse JSON from AI response")
-  }
+  const result = await model.generateContent(userMessage)
+  const text = result.response.text()
 
-  const jsonStr = jsonMatch[1] || jsonMatch[0]
+  // With JSON mode, the response should be clean JSON
+  // But add fallback extraction just in case
   try {
-    return JSON.parse(jsonStr) as T
-  } catch (parseError) {
-    console.error("[ai] JSON parse failed. First 300 chars of extracted:", jsonStr.substring(0, 300))
-    throw new Error(`JSON parse error: ${parseError instanceof Error ? parseError.message : String(parseError)}`)
+    return JSON.parse(text) as T
+  } catch {
+    console.warn("[ai] Direct JSON parse failed, trying extraction. First 200 chars:", text.substring(0, 200))
+
+    // Try extracting from markdown blocks or finding the JSON object
+    const jsonMatch = text.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || text.match(/(\{[\s\S]*\})/)
+    if (!jsonMatch) {
+      console.error("[ai] No JSON found in response. First 300 chars:", text.substring(0, 300))
+      throw new Error("Could not parse JSON from AI response")
+    }
+
+    const jsonStr = jsonMatch[1] || jsonMatch[0]
+    try {
+      return JSON.parse(jsonStr) as T
+    } catch (parseError) {
+      console.error("[ai] JSON parse failed. First 300 chars of extracted:", jsonStr.substring(0, 300))
+      throw new Error(`JSON parse error: ${parseError instanceof Error ? parseError.message : String(parseError)}`)
+    }
   }
 }
 

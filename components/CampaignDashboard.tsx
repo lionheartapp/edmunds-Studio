@@ -26,18 +26,14 @@ export default function CampaignDashboard({
   const estimatedReach = campaigns.length * 50000; // Placeholder calculation
   const competitorGaps = Math.max(0, 5 - opportunitiesCount);
 
-  // Generate gradient for each campaign based on index and brand colors
+  // Generate gradient for each campaign — consistent UI palette
   const getGradientForCampaign = (index: number) => {
-    const brandColor = brandDna.colors.primary || '#3B82F6';
-    const secondaryColor = brandDna.colors.secondary || '#8B5CF6';
-
     const gradients = [
-      `linear-gradient(135deg, ${brandColor}20 0%, ${secondaryColor}30 100%)`,
-      `linear-gradient(135deg, ${secondaryColor}20 0%, ${brandColor}30 100%)`,
-      `linear-gradient(135deg, ${brandColor}30 0%, #EC4899 20%)`,
-      `linear-gradient(135deg, #06B6D4 20%, ${brandColor}30 100%)`,
+      "linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(139,92,246,0.18) 100%)",
+      "linear-gradient(135deg, rgba(139,92,246,0.12) 0%, rgba(99,102,241,0.18) 100%)",
+      "linear-gradient(135deg, rgba(99,102,241,0.18) 0%, rgba(236,72,153,0.12) 100%)",
+      "linear-gradient(135deg, rgba(6,182,212,0.12) 0%, rgba(99,102,241,0.18) 100%)",
     ];
-
     return gradients[index % gradients.length];
   };
 
@@ -55,9 +51,8 @@ export default function CampaignDashboard({
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <motion.div
-                className="w-4 h-4 rounded-full"
-                style={{ backgroundColor: brandDna.colors.primary || '#3B82F6' }}
-                animate={{ boxShadow: `0 0 20px ${brandDna.colors.primary || '#3B82F6'}80` }}
+                className="w-4 h-4 rounded-full bg-indigo-500"
+                animate={{ boxShadow: "0 0 20px rgba(99,102,241,0.5)" }}
                 transition={{ duration: 2, repeat: Infinity }}
               />
               <h1 className="font-bold text-lg">{brandDna.name}</h1>
@@ -76,11 +71,8 @@ export default function CampaignDashboard({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={() => setDrawerOpen(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all"
-            style={{
-              backgroundColor: brandDna.colors.primary || '#3B82F6',
-              boxShadow: `0 0 20px ${brandDna.colors.primary || '#3B82F6'}40`,
-            }}
+            className="flex items-center gap-2 px-4 py-2 rounded-lg font-semibold transition-all bg-indigo-600"
+            style={{ boxShadow: "0 0 20px rgba(99,102,241,0.25)" }}
           >
             <Plus className="w-4 h-4" />
             New Campaign
@@ -100,7 +92,7 @@ export default function CampaignDashboard({
             label: 'Pre-built Campaigns',
             value: campaigns.length,
             icon: Zap,
-            color: brandDna.colors.primary,
+            color: '#6366f1',
           },
           {
             label: 'Opportunities Found',
@@ -297,7 +289,7 @@ export default function CampaignDashboard({
                         key={campaign.id}
                         campaign={campaign}
                         index={idx}
-                        brandColor={brandDna.colors.primary}
+                        brandColor="#6366f1"
                         gradient={getGradientForCampaign(idx)}
                         isSelected={selectedCampaign === campaign.id}
                         onSelect={() => setSelectedCampaign(campaign.id)}

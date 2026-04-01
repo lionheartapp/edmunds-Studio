@@ -64,11 +64,8 @@ export default function PlacementPage() {
               initial={{ scale: 0 }}
               animate={{ scale: 1 }}
               transition={{ type: "spring", damping: 15, stiffness: 200, delay: 0.2 }}
-              className="w-24 h-24 rounded-full flex items-center justify-center mb-6"
-              style={{
-                background: `linear-gradient(135deg, ${brandDna.colors.primary}, ${brandDna.colors.accent})`,
-                boxShadow: `0 0 60px ${brandDna.colors.primary}40`,
-              }}
+              className="w-24 h-24 rounded-full flex items-center justify-center mb-6 bg-gradient-to-br from-indigo-600 to-violet-600"
+              style={{ boxShadow: "0 0 60px rgba(99,102,241,0.25)" }}
             >
               <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12" />
