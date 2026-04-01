@@ -13,7 +13,7 @@ const stagger = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.08 },
+    transition: { staggerChildren: 0.06 },
   },
 }
 
@@ -39,10 +39,10 @@ export default function BrandDNACard({
         variants={stagger}
         initial="hidden"
         animate="show"
-        className="relative z-10 max-w-2xl mx-auto"
+        className="relative z-10 max-w-5xl mx-auto"
       >
-        {/* Header */}
-        <motion.div variants={fadeUp} className="mb-10">
+        {/* Header — full width */}
+        <motion.div variants={fadeUp} className="mb-8">
           <div className="flex items-center gap-3 mb-1">
             <div
               className="w-3 h-3 rounded-full"
@@ -56,112 +56,135 @@ export default function BrandDNACard({
           <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
         </motion.div>
 
-        {/* Color Palette */}
-        <Section title="Colors" onEdit={() => onEdit?.("colors")}>
-          <div className="flex gap-4">
-            {Object.entries(brandDna.colors).map(([name, hex]) => (
-              <div key={name} className="flex flex-col items-center gap-2">
-                <div
-                  className="w-16 h-16 rounded-2xl border border-zinc-800 shadow-lg transition-transform hover:scale-105"
-                  style={{ backgroundColor: hex }}
-                />
-                <span className="text-[11px] text-zinc-500 capitalize">{name}</span>
-                <span className="text-[11px] font-mono text-zinc-600">{hex}</span>
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* Typography */}
-        <Section title="Typography" onEdit={() => onEdit?.("typography")}>
-          <p
-            className="text-2xl text-zinc-100"
-            style={{ fontWeight: parseInt(brandDna.typography.headingWeight) || 700 }}
-          >
-            {brandDna.typography.primaryFont}
-          </p>
-          <p className="text-sm text-zinc-500 mt-1">
-            Fallback: {brandDna.typography.fallback} · Weight: {brandDna.typography.headingWeight}
-          </p>
-        </Section>
-
-        {/* Voice */}
-        <Section title="Voice" onEdit={() => onEdit?.("voice")}>
-          <div className="flex flex-wrap gap-2">
-            {brandDna.voice.map((attr) => (
-              <span
-                key={attr}
-                className="px-3 py-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg text-sm font-medium
-                         border border-indigo-500/20"
-              >
-                {attr}
-              </span>
-            ))}
-          </div>
-        </Section>
-
-        {/* Visual Style */}
-        <Section title="Visual Style" onEdit={() => onEdit?.("visualStyle")}>
-          <div className="flex flex-wrap gap-2">
-            {brandDna.visualStyle.map((style) => (
-              <span
-                key={style}
-                className="px-3 py-1.5 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium
-                         border border-zinc-700"
-              >
-                {style}
-              </span>
-            ))}
-          </div>
-        </Section>
-
-        {/* Competitors */}
-        <Section title="Competitors">
-          <div className="flex gap-3">
-            {brandDna.competitors.map((comp) => (
-              <div
-                key={comp}
-                className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-400"
-              >
-                {comp}
-              </div>
-            ))}
-          </div>
-        </Section>
-
-        {/* Current Ads */}
-        {brandDna.currentAds.length > 0 && (
-          <Section title="Ad Intelligence">
-            <div className="grid gap-3">
-              {brandDna.currentAds.map((ad, i) => (
-                <motion.div
-                  key={i}
-                  variants={fadeUp}
-                  className="p-4 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
-                >
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">
-                      {ad.platform}
-                    </span>
-                    <span className="text-[11px] text-zinc-600">·</span>
-                    <span className="text-[11px] text-zinc-600">{ad.format}</span>
-                    {ad.dateSpotted && (
-                      <>
-                        <span className="text-[11px] text-zinc-600">·</span>
-                        <span className="text-[11px] text-zinc-600">{ad.dateSpotted}</span>
-                      </>
-                    )}
+        {/* Two-column grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-10 gap-y-0">
+          {/* ── Left Column ──────────────────────── */}
+          <div>
+            {/* Color Palette */}
+            <Section title="Colors" onEdit={() => onEdit?.("colors")}>
+              <div className="flex gap-4">
+                {Object.entries(brandDna.colors).map(([name, hex]) => (
+                  <div key={name} className="flex flex-col items-center gap-2">
+                    <div
+                      className="w-14 h-14 rounded-2xl border border-zinc-800 shadow-lg transition-transform hover:scale-105"
+                      style={{ backgroundColor: hex }}
+                    />
+                    <span className="text-[11px] text-zinc-500 capitalize">{name}</span>
+                    <span className="text-[11px] font-mono text-zinc-600">{hex}</span>
                   </div>
-                  <p className="text-sm font-medium text-zinc-200">&ldquo;{ad.headline}&rdquo;</p>
-                  <p className="text-xs text-indigo-400 mt-1.5 font-medium">{ad.cta} →</p>
-                </motion.div>
-              ))}
-            </div>
-          </Section>
-        )}
+                ))}
+              </div>
+            </Section>
 
-        {/* Confirm Button */}
-        <motion.div variants={fadeUp} className="mt-10">
+            {/* Typography */}
+            <Section title="Typography" onEdit={() => onEdit?.("typography")}>
+              <p
+                className="text-2xl text-zinc-100"
+                style={{ fontWeight: parseInt(brandDna.typography.headingWeight) || 700 }}
+              >
+                {brandDna.typography.primaryFont}
+              </p>
+              <p className="text-sm text-zinc-500 mt-1">
+                Fallback: {brandDna.typography.fallback} · Weight: {brandDna.typography.headingWeight}
+              </p>
+            </Section>
+
+            {/* Voice */}
+            <Section title="Voice" onEdit={() => onEdit?.("voice")}>
+              <div className="flex flex-wrap gap-2">
+                {brandDna.voice.map((attr) => (
+                  <span
+                    key={attr}
+                    className="px-3 py-1.5 bg-indigo-500/10 text-indigo-400 rounded-lg text-sm font-medium
+                             border border-indigo-500/20"
+                  >
+                    {attr}
+                  </span>
+                ))}
+              </div>
+            </Section>
+
+            {/* Visual Style */}
+            <Section title="Visual Style" onEdit={() => onEdit?.("visualStyle")}>
+              <div className="flex flex-wrap gap-2">
+                {brandDna.visualStyle.map((style) => (
+                  <span
+                    key={style}
+                    className="px-3 py-1.5 bg-zinc-800 text-zinc-300 rounded-lg text-sm font-medium
+                             border border-zinc-700"
+                  >
+                    {style}
+                  </span>
+                ))}
+              </div>
+            </Section>
+          </div>
+
+          {/* ── Right Column ─────────────────────── */}
+          <div>
+            {/* Competitors */}
+            <Section title="Competitors">
+              <div className="flex flex-wrap gap-2">
+                {brandDna.competitors.map((comp) => (
+                  <div
+                    key={comp}
+                    className="px-3 py-2 bg-zinc-900 border border-zinc-800 rounded-lg text-sm text-zinc-400"
+                  >
+                    {comp}
+                  </div>
+                ))}
+              </div>
+            </Section>
+
+            {/* Current Ads */}
+            {brandDna.currentAds.length > 0 && (
+              <Section title="Ad Intelligence">
+                <div className="grid gap-3">
+                  {brandDna.currentAds.map((ad, i) => (
+                    <motion.div
+                      key={i}
+                      variants={fadeUp}
+                      className="p-4 bg-zinc-900 rounded-xl border border-zinc-800 hover:border-zinc-700 transition-colors"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider">
+                          {ad.platform}
+                        </span>
+                        <span className="text-[11px] text-zinc-600">·</span>
+                        <span className="text-[11px] text-zinc-600">{ad.format}</span>
+                        {ad.dateSpotted && (
+                          <>
+                            <span className="text-[11px] text-zinc-600">·</span>
+                            <span className="text-[11px] text-zinc-600">{ad.dateSpotted}</span>
+                          </>
+                        )}
+                      </div>
+                      <p className="text-sm font-medium text-zinc-200">&ldquo;{ad.headline}&rdquo;</p>
+                      <p className="text-xs text-indigo-400 mt-1.5 font-medium">{ad.cta} →</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </Section>
+            )}
+
+            {/* Guidelines URL if available */}
+            {brandDna.guidelinesUrl && (
+              <Section title="Brand Guidelines">
+                <a
+                  href={brandDna.guidelinesUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-sm text-indigo-400 hover:text-indigo-300 transition-colors underline underline-offset-2"
+                >
+                  {brandDna.guidelinesUrl} ↗
+                </a>
+              </Section>
+            )}
+          </div>
+        </div>
+
+        {/* Confirm Button — full width */}
+        <motion.div variants={fadeUp} className="mt-6">
           <button
             onClick={onConfirm}
             className="w-full py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-semibold
@@ -188,8 +211,8 @@ function Section({
   onEdit?: () => void
 }) {
   return (
-    <motion.div variants={fadeUp} className="mb-8 pb-8 border-b border-zinc-800/50">
-      <div className="flex items-center justify-between mb-4">
+    <motion.div variants={fadeUp} className="mb-6 pb-6 border-b border-zinc-800/50">
+      <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
           {title}
         </h3>
