@@ -52,9 +52,13 @@ Return JSON with this exact structure:
 
 // ─── Competitor Profiles Prompt (fetched separately) ──────
 
-export const COMPETITOR_PROFILES_SYSTEM_PROMPT = `You are Edmunds Studio's Competitive Intelligence Engine. Given a brand and its top competitors, build detailed advertising profiles for each competitor.
+export const COMPETITOR_PROFILES_SYSTEM_PROMPT = `You are Edmunds Studio's Competitive Intelligence Engine — focused exclusively on AUTOMOTIVE brands.
 
-Think like a senior media strategist doing a competitive audit. Be specific and insightful.
+CRITICAL RULES:
+- You are analyzing AUTOMOTIVE competitors only. All brands mentioned must be car/truck/vehicle manufacturers or dealers.
+- NEVER mention non-automotive brands (Nike, Apple, etc.).
+- If real Edmunds market data is provided for competitors (inventory, pricing, days on lot), USE IT and reference specific numbers.
+- Think like a senior automotive media strategist doing a competitive audit. Be specific and insightful.
 
 Return ONLY valid JSON. No markdown, no explanation.`
 
@@ -164,4 +168,7 @@ Return a JSON object with this exact structure:
       "estimatedImpact": "Brief impact prediction"
     }
   ]
-}`
+}
+
+REMEMBER: Every single item must be specific to ${brandName}. Do NOT reference Nike, Apple, or any non-automotive brand.`
+}
