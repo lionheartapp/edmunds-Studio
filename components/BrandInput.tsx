@@ -305,9 +305,9 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
               transition={{ delay: 0.2 }}
               className="text-4xl md:text-5xl font-bold text-center mb-3 tracking-tight leading-tight"
             >
-              How are you
+              Tell us who you are,
               <br />
-              <span className="accent-gradient-text">using Edmunds Studio?</span>
+              <span className="accent-gradient-text">and we'll handle the rest.</span>
             </motion.h1>
 
             <motion.p
