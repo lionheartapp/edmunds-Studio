@@ -76,11 +76,7 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
       <div
         role="status"
         aria-live="polite"
-        className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0.005) 100%)",
-          backdropFilter: "blur(12px)",
-        }}
+        className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden bg-zinc-900/80"
       >
         <div className="flex items-center gap-5">
           {/* Animated blob */}
@@ -174,11 +170,11 @@ export default function BrandDNACard({
 
           {/* Row 1: Brand Color + Voice + Visual Style */}
 
-          {/* Brand Color — single swatch, spans 2 cols */}
+          {/* Brand Color — compact swatch, spans 2 cols */}
           <GlassCard className="col-span-12 md:col-span-2" label="Brand Color" badge="AI-Inferred">
-            <div className="flex flex-col items-center gap-2 mt-1">
+            <div className="flex flex-col gap-2">
               <div
-                className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
+                className="w-full h-[100px] rounded-xl border border-white/5 shadow-lg"
                 style={{
                   backgroundColor: brandDna.colors.primary,
                   boxShadow: `0 8px 32px ${brandDna.colors.primary}30`,
@@ -188,8 +184,8 @@ export default function BrandDNACard({
             </div>
           </GlassCard>
 
-          {/* Voice — spans 5 cols */}
-          <GlassCard className="col-span-12 md:col-span-5" label="Voice" badge="AI-Inferred">
+          {/* Voice — spans 5 cols, compact */}
+          <GlassCard className="col-span-12 md:col-span-5 self-start" label="Voice" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.voice.map((attr, i) => (
                 <motion.span
@@ -197,9 +193,8 @@ export default function BrandDNACard({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + i * 0.08 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  className="px-4 py-2 bg-eds-50/10 text-eds-60 rounded-xl text-sm font-medium
-                           border border-eds-50/20 backdrop-blur-sm cursor-default"
+                  className="px-3 py-1.5 bg-eds-50/10 text-eds-60 rounded-lg text-sm font-medium
+                           border border-eds-50/20 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform"
                   style={{ boxShadow: "0 0 20px rgba(32, 112, 232, 0.05)" }}
                 >
                   {attr}
@@ -208,8 +203,8 @@ export default function BrandDNACard({
             </div>
           </GlassCard>
 
-          {/* Visual Style — spans 5 cols */}
-          <GlassCard className="col-span-12 md:col-span-5" label="Visual Style" badge="AI-Inferred">
+          {/* Visual Style — spans 5 cols, compact */}
+          <GlassCard className="col-span-12 md:col-span-5 self-start" label="Visual Style" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.visualStyle.map((style, i) => (
                 <motion.span
@@ -217,9 +212,8 @@ export default function BrandDNACard({
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.3 + i * 0.08 }}
-                  whileHover={{ scale: 1.05, y: -2 }}
-                  className="px-4 py-2 bg-zinc-800/80 text-zinc-300 rounded-xl text-sm font-medium
-                           border border-zinc-700/50 backdrop-blur-sm cursor-default"
+                  className="px-3 py-1.5 bg-zinc-800/80 text-zinc-300 rounded-lg text-sm font-medium
+                           border border-zinc-700/50 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform"
                 >
                   {style}
                 </motion.span>
@@ -229,8 +223,16 @@ export default function BrandDNACard({
 
           {/* ── Edmunds Market Intelligence ── */}
           {edmundsMarket && (edmundsMarket.inventory || edmundsMarket.market) && (
-            <GlassCard className="col-span-12" label="Edmunds Market Intelligence">
-              <div className="flex items-center gap-2 mb-4">
+            <GlassCard className="col-span-12" label={undefined}>
+              {/* Custom header with Edmunds logo + right-aligned badge */}
+              <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center gap-2.5">
+                  {/* Edmunds car icon */}
+                  <svg width="20" height="14" viewBox="0 0 260 175" fill="none" className="text-eds-60 flex-shrink-0">
+                    <path fillRule="evenodd" clipRule="evenodd" d="M252.241 43.348C255.974 43.247 259.154 46.136 259.254 49.861H259.264L259.455 57.12C259.556 60.855 256.668 64.036 252.945 64.137L237.37 65.939C237.423 66.053 237.476 66.179 237.525 66.294L237.571 66.402C241.747 71.788 249.605 86.718 249.605 107.88C249.605 117.153 247.885 128.718 246.5 138.031C245.845 142.438 245.264 146.34 244.977 149.257V162.788C244.977 169.533 239.513 175 232.772 175H216.21C209.469 175 204.005 169.533 204.005 162.788V152.731C186.648 151.14 158.345 150.596 129.9 150.546C101.455 150.596 73.152 151.14 55.795 152.731V162.788C55.795 169.533 50.332 175 43.59 175H27.029C20.287 175 14.824 169.533 14.824 162.788V149.257C14.536 146.34 13.956 142.438 13.3 138.031C11.915 128.718 10.195 117.153 10.195 107.88C10.195 98.346 11.151 90.906 12.862 85.057C13.797 79.429 16.977 72.402 22.219 66.402L22.541 65.647L22.35 65.969L6.513 64.137C2.79 64.026 -0.098 60.845 0.003 57.12L0.184 49.861C0.294 46.136 3.474 43.247 7.197 43.348L22.098 43.76C25.459 43.851 28.135 46.438 28.558 49.67C28.679 50.546 28.89 51.412 29.131 52.267L31.013 48.553C37.09 37.307 45.391 23.797 53.732 15.29C53.732 15.29 61.057 6.299 75.748 3.329L75.828 3.309C88.627 0.581 109.465 -0.124 129.89 0.017C150.315 -0.124 171.153 0.571 183.932 3.299L183.95 3.305C183.971 3.313 183.988 3.319 184.012 3.319C198.702 6.289 206.027 15.28 206.027 15.28C214.369 23.787 222.67 37.307 228.747 48.542L230.427 51.855C230.618 51.14 230.779 50.405 230.88 49.67C231.313 46.438 233.989 43.851 237.34 43.76L252.241 43.348ZM34.585 107.236C35.329 114.726 41.387 120.787 48.873 121.532C58.985 122.538 67.427 114.102 66.42 103.974C65.676 96.484 59.619 90.423 52.133 89.678C42.021 88.671 33.579 97.108 34.585 107.236ZM193.309 107.236C194.054 114.726 200.111 120.787 207.597 121.532C217.709 122.538 226.151 114.102 225.145 103.974C224.4 96.484 218.343 90.423 210.857 89.678C200.745 88.671 192.303 97.108 193.309 107.236ZM62.547 51.975V39.19C62.547 34.861 66.873 31.357 72.226 31.357H95.71C101.063 31.357 105.39 34.861 105.39 39.19V51.965C105.39 52.72 105.249 53.455 104.997 54.15H108.016C111.678 54.14 115.381 54.14 119.124 54.15H140.686C144.429 54.14 148.132 54.14 151.794 54.15H156.604C160.742 54.209 165.145 54.302 167.636 54.355L168.889 54.382C186.628 54.835 203.109 56.053 217.588 59.123C213.946 49.801 206.269 34.851 197.153 25.428C195.543 23.847 189.264 18.229 179.867 16.578C175.289 15.873 158.888 13.427 133.391 13.427H126.409C100.912 13.427 84.511 15.873 79.933 16.578C70.526 18.229 64.257 23.847 62.647 25.428C53.531 34.851 45.854 49.801 42.212 59.123C49.024 57.684 56.288 56.657 63.905 55.922C63.06 54.764 62.547 53.425 62.547 51.975ZM129.729 134.388C132.476 134.297 135.243 133.995 138.02 133.472C157.962 129.716 173.427 115.662 180.259 97.631C170.61 108.625 151.352 114.323 129.729 114.565C108.106 114.313 88.858 108.625 79.199 97.631C86.031 115.662 101.496 129.716 121.438 133.472C124.215 133.985 126.982 134.287 129.729 134.388ZM164.201 28.236H187.675L187.685 28.246C193.038 28.246 197.365 31.749 197.365 36.078V48.854C197.365 49.679 197.164 50.505 196.952 51.119C192.012 45.139 182.101 41.434 175.943 41.434C167.502 41.434 159.875 45.34 154.934 51.32C154.522 50.495 154.522 49.669 154.522 48.844V36.068C154.522 31.739 158.848 28.236 164.201 28.236Z" fill="currentColor" />
+                  </svg>
+                  <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Market Intelligence</span>
+                </div>
                 <span className={`text-xs uppercase tracking-wider px-2 py-0.5 rounded-full border ${
                   edmundsMarket.dataSource === "databricks"
                     ? "text-emerald-400 bg-emerald-500/10 border-emerald-500/20"
@@ -351,6 +353,52 @@ export default function BrandDNACard({
             </GlassCard>
           )}
 
+          {/* ── No Edmunds Ads — opportunity / sales CTA ── */}
+          {!edmundsAdsLoading && (!edmundsAds || !edmundsAds.models || edmundsAds.models.length === 0) && (
+            <GlassCard className="col-span-12" label={undefined}>
+              {/* Custom header with Edmunds logo */}
+              <div className="flex items-center gap-2.5 mb-5">
+                <svg width="18" height="13" viewBox="0 0 260 175" fill="none" className="text-eds-60 flex-shrink-0">
+                  <path fillRule="evenodd" clipRule="evenodd" d="M252.241 43.348C255.974 43.247 259.154 46.136 259.254 49.861H259.264L259.455 57.12C259.556 60.855 256.668 64.036 252.945 64.137L237.37 65.939C237.423 66.053 237.476 66.179 237.525 66.294L237.571 66.402C241.747 71.788 249.605 86.718 249.605 107.88C249.605 117.153 247.885 128.718 246.5 138.031C245.845 142.438 245.264 146.34 244.977 149.257V162.788C244.977 169.533 239.513 175 232.772 175H216.21C209.469 175 204.005 169.533 204.005 162.788V152.731C186.648 151.14 158.345 150.596 129.9 150.546C101.455 150.596 73.152 151.14 55.795 152.731V162.788C55.795 169.533 50.332 175 43.59 175H27.029C20.287 175 14.824 169.533 14.824 162.788V149.257C14.536 146.34 13.956 142.438 13.3 138.031C11.915 128.718 10.195 117.153 10.195 107.88C10.195 98.346 11.151 90.906 12.862 85.057C13.797 79.429 16.977 72.402 22.219 66.402L22.541 65.647L22.35 65.969L6.513 64.137C2.79 64.026 -0.098 60.845 0.003 57.12L0.184 49.861C0.294 46.136 3.474 43.247 7.197 43.348L22.098 43.76C25.459 43.851 28.135 46.438 28.558 49.67C28.679 50.546 28.89 51.412 29.131 52.267L31.013 48.553C37.09 37.307 45.391 23.797 53.732 15.29C53.732 15.29 61.057 6.299 75.748 3.329L75.828 3.309C88.627 0.581 109.465 -0.124 129.89 0.017C150.315 -0.124 171.153 0.571 183.932 3.299L183.95 3.305C183.971 3.313 183.988 3.319 184.012 3.319C198.702 6.289 206.027 15.28 206.027 15.28C214.369 23.787 222.67 37.307 228.747 48.542L230.427 51.855C230.618 51.14 230.779 50.405 230.88 49.67C231.313 46.438 233.989 43.851 237.34 43.76L252.241 43.348ZM34.585 107.236C35.329 114.726 41.387 120.787 48.873 121.532C58.985 122.538 67.427 114.102 66.42 103.974C65.676 96.484 59.619 90.423 52.133 89.678C42.021 88.671 33.579 97.108 34.585 107.236ZM193.309 107.236C194.054 114.726 200.111 120.787 207.597 121.532C217.709 122.538 226.151 114.102 225.145 103.974C224.4 96.484 218.343 90.423 210.857 89.678C200.745 88.671 192.303 97.108 193.309 107.236ZM62.547 51.975V39.19C62.547 34.861 66.873 31.357 72.226 31.357H95.71C101.063 31.357 105.39 34.861 105.39 39.19V51.965C105.39 52.72 105.249 53.455 104.997 54.15H108.016C111.678 54.14 115.381 54.14 119.124 54.15H140.686C144.429 54.14 148.132 54.14 151.794 54.15H156.604C160.742 54.209 165.145 54.302 167.636 54.355L168.889 54.382C186.628 54.835 203.109 56.053 217.588 59.123C213.946 49.801 206.269 34.851 197.153 25.428C195.543 23.847 189.264 18.229 179.867 16.578C175.289 15.873 158.888 13.427 133.391 13.427H126.409C100.912 13.427 84.511 15.873 79.933 16.578C70.526 18.229 64.257 23.847 62.647 25.428C53.531 34.851 45.854 49.801 42.212 59.123C49.024 57.684 56.288 56.657 63.905 55.922C63.06 54.764 62.547 53.425 62.547 51.975ZM129.729 134.388C132.476 134.297 135.243 133.995 138.02 133.472C157.962 129.716 173.427 115.662 180.259 97.631C170.61 108.625 151.352 114.323 129.729 114.565C108.106 114.313 88.858 108.625 79.199 97.631C86.031 115.662 101.496 129.716 121.438 133.472C124.215 133.985 126.982 134.287 129.729 134.388ZM164.201 28.236H187.675L187.685 28.246C193.038 28.246 197.365 31.749 197.365 36.078V48.854C197.365 49.679 197.164 50.505 196.952 51.119C192.012 45.139 182.101 41.434 175.943 41.434C167.502 41.434 159.875 45.34 154.934 51.32C154.522 50.495 154.522 49.669 154.522 48.844V36.068C154.522 31.739 158.848 28.236 164.201 28.236Z" fill="currentColor" />
+                </svg>
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">Advertising Opportunity</span>
+              </div>
+
+              <div className="mb-5">
+                <p className="text-base font-semibold text-zinc-200 mb-1">
+                  {brandDna.name} isn&apos;t advertising on Edmunds yet
+                </p>
+                <p className="text-sm text-zinc-500">
+                  That means shoppers actively researching {brandDna.name} vehicles aren&apos;t seeing your message at the moment of decision.
+                </p>
+              </div>
+
+              {/* Edmunds platform stats — the pitch */}
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-5">
+                <div className="px-4 py-3 bg-eds-50/5 rounded-xl border border-eds-50/10">
+                  <span className="text-lg font-bold text-eds-60">20M+</span>
+                  <p className="text-xs text-zinc-500 mt-0.5">Monthly shoppers</p>
+                </div>
+                <div className="px-4 py-3 bg-eds-50/5 rounded-xl border border-eds-50/10">
+                  <span className="text-lg font-bold text-eds-60">3.2x</span>
+                  <p className="text-xs text-zinc-500 mt-0.5">Higher purchase intent</p>
+                </div>
+                <div className="px-4 py-3 bg-eds-50/5 rounded-xl border border-eds-50/10">
+                  <span className="text-lg font-bold text-eds-60">84%</span>
+                  <p className="text-xs text-zinc-500 mt-0.5">Visit a dealer within 30 days</p>
+                </div>
+                <div className="px-4 py-3 bg-eds-50/5 rounded-xl border border-eds-50/10">
+                  <span className="text-lg font-bold text-eds-60">$0.12</span>
+                  <p className="text-xs text-zinc-500 mt-0.5">Avg cost per engaged shopper</p>
+                </div>
+              </div>
+
+              <p className="text-xs text-zinc-600 italic">
+                Edmunds Studio can generate ready-to-launch campaigns tailored for the Edmunds platform — keep going to see what we build for you.
+              </p>
+            </GlassCard>
+          )}
+
           {/* ── Social Ad Intelligence — Real Meta ads or AI fallback ── */}
           {socialAdsLoading && (
             <>
@@ -420,10 +468,9 @@ export default function BrandDNACard({
         {/* Continue Button */}
         <motion.div variants={cardVariant} className="mt-6">
           <motion.button
-            whileHover={{ scale: 1.005 }}
             whileTap={{ scale: 0.995 }}
             onClick={onContinue}
-            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 active:scale-[0.98]"
+            className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 hover:scale-[1.005] active:scale-[0.98]"
             style={{
               boxShadow: "0 0 30px rgba(32, 112, 232, 0.25)",
             }}
@@ -520,12 +567,9 @@ function EdmundsModelCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -6, scale: 1.01 }}
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
-                 overflow-hidden transition-all duration-300"
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl"
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
@@ -548,7 +592,7 @@ function EdmundsModelCard({
 
         {/* Model Year + Model Badge */}
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="text-xs font-bold text-white/90 uppercase tracking-wider bg-black/50 backdrop-blur
+          <span className="text-xs font-bold text-white/90 uppercase tracking-wider bg-black/60
                          px-2.5 py-1 rounded-full border border-white/10">
             {model.targetedModelYear} {displayName}
           </span>
@@ -556,7 +600,7 @@ function EdmundsModelCard({
 
         {/* Edmunds badge */}
         <div className="absolute top-3 right-3">
-          <span className="text-xs font-bold text-blue-300 uppercase tracking-wider bg-blue-500/15 backdrop-blur
+          <span className="text-xs font-bold text-blue-300 uppercase tracking-wider bg-blue-500/20
                          px-2 py-1 rounded-full border border-blue-400/20">
             Edmunds.com
           </span>
@@ -645,12 +689,9 @@ function SocialAdCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -6, scale: 1.01 }}
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
-                 overflow-hidden transition-all duration-300"
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl"
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
@@ -709,12 +750,12 @@ function SocialAdCard({
 
         {/* Platform badge — always visible, floated over the content */}
         <div className="absolute top-3 left-3 z-10 flex items-center gap-2">
-          <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full backdrop-blur-sm
+          <span className={`text-xs font-bold uppercase tracking-wider px-2.5 py-1 rounded-full
                          ${platformColors.bg} ${platformColors.text} border ${platformColors.border}`}>
             {platformIcon} · {ad.format}
           </span>
           {ad.isActive && (
-            <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/10 backdrop-blur-sm px-2 py-0.5 rounded-full border border-emerald-500/20">
+            <span className="flex items-center gap-1 text-xs text-emerald-400 bg-emerald-500/20 px-2 py-0.5 rounded-full border border-emerald-500/20">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
               Active
             </span>
@@ -740,8 +781,6 @@ function SocialAdCard({
 
         {/* CTA Button — white outline, fills brand primary on hover */}
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
           className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
                    transition-all duration-300 mt-1 border"
           style={{
@@ -834,12 +873,10 @@ function AdMockupCard({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-      whileHover={{ y: -8, scale: 1.02 }}
       className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
-                 overflow-hidden transition-all duration-300"
+                 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
@@ -870,7 +907,7 @@ function AdMockupCard({
 
         {/* Platform + Format Badge */}
         <div className="absolute top-3 left-3 flex items-center gap-2">
-          <span className="text-xs font-bold text-white/80 uppercase tracking-wider bg-black/40 backdrop-blur
+          <span className="text-xs font-bold text-white/80 uppercase tracking-wider bg-black/60
                          px-2.5 py-1 rounded-full border border-white/10">
             {ad.platform}
           </span>
@@ -908,8 +945,6 @@ function AdMockupCard({
 
         {/* CTA Button — white outline, fills brand primary on hover */}
         <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
           className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
                    transition-all duration-300 mt-2 group/btn border"
           style={{
@@ -959,14 +994,12 @@ function AdMockupCard({
       </div>
 
       {/* View Details Overlay (appears on hover) */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        whileHover={{ opacity: 1 }}
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center
-                 opacity-0 transition-opacity duration-200 pointer-events-none"
+      <div
+        className="absolute inset-0 bg-black/60 flex items-center justify-center
+                 opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none"
       >
         <span className="text-sm font-medium text-white">View Full Details</span>
-      </motion.div>
+      </div>
     </motion.div>
   )
 }
@@ -987,11 +1020,9 @@ function GlassCard({
   return (
     <motion.div
       variants={cardVariant}
-      whileHover={{ borderColor: "rgba(255,255,255,0.08)" }}
-      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors ${className}`}
+      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors hover:border-white/[0.08] ${className}`}
       style={{
-        background: "linear-gradient(135deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.01) 100%)",
-        backdropFilter: "blur(12px)",
+        background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
@@ -1004,12 +1035,12 @@ function GlassCard({
       />
 
       {label && (
-        <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider">
+        <div className="flex items-center justify-between gap-2 mb-3">
+          <span className="text-xs font-semibold text-zinc-500 uppercase tracking-wider whitespace-nowrap">
             {label}
           </span>
           {badge && (
-            <span className="text-xs uppercase tracking-wider px-2 py-0.5 rounded-full text-zinc-400 bg-zinc-800/60 border border-zinc-700/30">
+            <span className="text-xs uppercase tracking-wider px-2 py-0.5 rounded-full text-zinc-400 bg-zinc-800/60 border border-zinc-700/30 whitespace-nowrap flex-shrink-0">
               {badge}
             </span>
           )}

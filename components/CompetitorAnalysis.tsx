@@ -136,7 +136,7 @@ export default function CompetitorAnalysis({
             {competitors.map((competitor, compIndex) => (
               <motion.div
                 key={competitor.domain}
-                className="bg-white/[0.02] border border-white/10 rounded-2xl overflow-hidden backdrop-blur-xl hover:border-white/20 transition-colors cursor-pointer"
+                className="bg-zinc-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-colors cursor-pointer"
                 variants={itemVariants}
               >
                 {/* Competitor Header Card */}
@@ -144,17 +144,15 @@ export default function CompetitorAnalysis({
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
                     {/* Avatar and Name */}
                     <div className="flex items-center gap-4">
-                      <motion.div
-                        className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold text-white/90"
+                      <div
+                        className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold text-white/90 hover:scale-110 transition-transform duration-300"
                         style={{
                           background: competitor.logoColor,
                           boxShadow: `0 0 32px ${competitor.logoColor}40`,
                         }}
-                        whileHover={{ scale: 1.1 }}
-                        transition={{ duration: 0.3 }}
                       >
                         {competitor.name[0].toUpperCase()}
-                      </motion.div>
+                      </div>
                       <div>
                         <h3 className="text-xl md:text-2xl font-bold text-white">
                           {competitor.name}
@@ -168,21 +166,19 @@ export default function CompetitorAnalysis({
                     {/* Stats Row */}
                     <div className="w-full md:w-auto flex flex-wrap gap-3">
                       {/* Ad Spend Badge */}
-                      <motion.div
-                        className="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-sm font-medium text-blue-200 flex items-center gap-2 whitespace-nowrap"
-                        whileHover={{ scale: 1.05 }}
+                      <div
+                        className="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-sm font-medium text-blue-200 flex items-center gap-2 whitespace-nowrap hover:scale-105 transition-transform"
                       >
                         <TrendingUp size={16} />
                         <span>{competitor.adSpend} spent</span>
-                      </motion.div>
+                      </div>
 
                       {/* Top Platform Badge */}
-                      <motion.div
-                        className="px-4 py-2 rounded-full bg-eds-40/10 border border-eds-40/30 text-sm font-medium text-eds-80 whitespace-nowrap"
-                        whileHover={{ scale: 1.05 }}
+                      <div
+                        className="px-4 py-2 rounded-full bg-eds-40/10 border border-eds-40/30 text-sm font-medium text-eds-80 whitespace-nowrap hover:scale-105 transition-transform"
                       >
                         {competitor.topPlatform}
-                      </motion.div>
+                      </div>
                     </div>
                   </div>
 
@@ -289,7 +285,7 @@ export default function CompetitorAnalysis({
             <div className="grid md:grid-cols-3 gap-6">
               {/* Your Brand Card */}
               <motion.div
-                className="bg-gradient-to-br from-blue-600/20 to-blue-400/5 border border-blue-500/40 rounded-2xl p-6 backdrop-blur-xl"
+                className="bg-blue-950/60 border border-blue-500/40 rounded-2xl p-6"
                 variants={itemVariants}
               >
                 <h3 className="text-lg font-bold text-white mb-4">
@@ -315,7 +311,7 @@ export default function CompetitorAnalysis({
 
               {/* Key Metrics */}
               <motion.div
-                className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 backdrop-blur-xl"
+                className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6"
                 variants={itemVariants}
               >
                 <h3 className="text-lg font-bold text-white mb-4">
@@ -343,7 +339,7 @@ export default function CompetitorAnalysis({
 
               {/* Average Insights */}
               <motion.div
-                className="bg-white/[0.02] border border-white/10 rounded-2xl p-6 backdrop-blur-xl"
+                className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6"
                 variants={itemVariants}
               >
                 <h3 className="text-lg font-bold text-white mb-4">
@@ -372,22 +368,15 @@ export default function CompetitorAnalysis({
 
         {/* Sticky Continue CTA */}
         <motion.div
-          className="sticky bottom-0 z-30 px-6 sm:px-8 md:px-12 py-5 border-t border-white/5"
-          style={{
-            background: "linear-gradient(to top, rgba(9,9,11,0.95) 0%, rgba(9,9,11,0.85) 100%)",
-            backdropFilter: "blur(12px)",
-          }}
+          className="sticky bottom-0 z-30 px-6 sm:px-8 md:px-12 py-5 border-t border-white/5 bg-zinc-950/95"
           variants={itemVariants}
           initial="hidden"
           animate="visible"
         >
           <div className="max-w-6xl mx-auto flex justify-center">
-            <motion.button
+            <button
               onClick={onContinue}
-              className="group relative px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center gap-3 overflow-hidden"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.98 }}
-              transition={{ duration: 0.2 }}
+              className="group relative px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center gap-3 overflow-hidden hover:scale-105 active:scale-[0.98] transition-transform duration-200"
             >
               {/* Button background with gradient */}
               <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-100 group-hover:opacity-110 transition-opacity" />
@@ -402,7 +391,7 @@ export default function CompetitorAnalysis({
                   <ArrowRight size={20} />
                 </span>
               </span>
-            </motion.button>
+            </button>
           </div>
         </motion.div>
       </div>
@@ -446,13 +435,10 @@ function CompetitorAdCard({
   const sentimentStyle = sentimentConfig[ad.sentiment];
 
   return (
-    <motion.div
-      className={`group bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors ${
+    <div
+      className={`group bg-zinc-900/80 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 ${
         horizontal ? "flex flex-col md:flex-row" : ""
       }`}
-      variants={variants}
-      initial="rest"
-      whileHover="hover"
     >
       {/* Visual Mockup Area */}
       <div className={`relative overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 ${
@@ -482,7 +468,7 @@ function CompetitorAdCard({
         </div>
 
         {/* Thumbnail description overlay on hover */}
-        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute inset-0 bg-black/60 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <p className="text-center text-sm text-white font-medium px-4">
             {ad.thumbnailDesc}
           </p>
@@ -576,7 +562,7 @@ function CompetitorAdCard({
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
