@@ -1,7 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, lazy, Suspense } from "react"
 import { motion, AnimatePresence } from "framer-motion"
+
+const Orb = lazy(() => import("@/components/Orb"))
 
 export type UserType = "oem" | "dealer-group" | "single-dealer" | null
 
@@ -88,10 +90,30 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
   useEffect(() => {
     if (!isLoading) { setSayingIndex(0); return }
     setSayingIndex(Math.floor(Math.random() * LOADING_SAYINGS.length))
-    const interval = setInterval(() => {
-      setSayingIndex((prev) => (prev + 1) % LOADING_SAYINGS.length)
-    }, 2800)
-    return () => clearInterval(interval)
+
+    let interval: ReturnType<typeof setInterval> | null = null
+
+    const start = () => {
+      if (interval) return
+      interval = setInterval(() => {
+        setSayingIndex((prev) => (prev + 1) % LOADING_SAYINGS.length)
+      }, 2800)
+    }
+
+    const onVisChange = () => {
+      if (document.hidden) {
+        if (interval) { clearInterval(interval); interval = null }
+      } else {
+        start()
+      }
+    }
+
+    start()
+    document.addEventListener("visibilitychange", onVisChange)
+    return () => {
+      if (interval) clearInterval(interval)
+      document.removeEventListener("visibilitychange", onVisChange)
+    }
   }, [isLoading])
 
   const handleScenarioClick = (scenario: typeof SCENARIOS[0]) => {
@@ -127,38 +149,11 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             className="relative z-10 flex flex-col items-center"
             aria-live="polite"
           >
-            {/* Morphing Orb — pure CSS, GPU-composited */}
+            {/* WebGL Orb — reactbits.dev */}
             <div className="relative w-48 h-48 mb-10">
-              {/* Ambient glow */}
-              <div className="absolute inset-[-30px] animate-[orb-glow_6s_ease-in-out_infinite] rounded-full bg-eds-50/15 blur-[60px]" />
-              {/* Main body — fluid morph */}
-              <div
-                className="absolute inset-0 animate-[orb-morph_8s_ease-in-out_infinite]"
-                style={{
-                  background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
-                  boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
-                }}
-              />
-              {/* Travelling highlight — gives liquid feel */}
-              <div
-                className="absolute inset-0 animate-[orb-morph_8s_ease-in-out_infinite] overflow-hidden"
-                style={{ animationDelay: "-1s" }}
-              >
-                <div
-                  className="absolute w-[60%] h-[60%] rounded-full blur-2xl animate-[orb-highlight_6s_ease-in-out_infinite]"
-                  style={{ background: "radial-gradient(circle, rgba(163,200,255,0.5), transparent 70%)" }}
-                />
-              </div>
-              {/* Surface sheen — slow rotation */}
-              <div
-                className="absolute inset-0 animate-[orb-morph_8s_ease-in-out_infinite] overflow-hidden"
-                style={{ animationDelay: "-2.5s" }}
-              >
-                <div
-                  className="absolute inset-[-20%] animate-[orb-sheen_12s_linear_infinite] opacity-30"
-                  style={{ background: "conic-gradient(from 0deg, transparent, rgba(163,200,255,0.4) 10%, transparent 20%)" }}
-                />
-              </div>
+              <Suspense fallback={<div className="w-full h-full rounded-full bg-eds-50/20 blur-xl animate-pulse" />}>
+                <Orb hue={220} hoverIntensity={0.3} rotateOnHover forceHoverState backgroundColor="#09090b" />
+              </Suspense>
             </div>
 
             <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-zinc-200 mb-3">

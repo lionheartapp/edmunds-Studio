@@ -58,10 +58,29 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
   const [msgIndex, setMsgIndex] = useState(() => Math.floor(Math.random() * messages.length))
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setMsgIndex(prev => (prev + 1) % messages.length)
-    }, 3000)
-    return () => clearInterval(interval)
+    let interval: ReturnType<typeof setInterval> | null = null
+
+    const start = () => {
+      if (interval) return
+      interval = setInterval(() => {
+        setMsgIndex(prev => (prev + 1) % messages.length)
+      }, 3000)
+    }
+
+    const onVisChange = () => {
+      if (document.hidden) {
+        if (interval) { clearInterval(interval); interval = null }
+      } else {
+        start()
+      }
+    }
+
+    start()
+    document.addEventListener("visibilitychange", onVisChange)
+    return () => {
+      if (interval) clearInterval(interval)
+      document.removeEventListener("visibilitychange", onVisChange)
+    }
   }, [messages.length])
 
   return (
