@@ -88,7 +88,8 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
       <div
         role="status"
         aria-live="polite"
-        className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden bg-zinc-900/80"
+        className="relative rounded-2xl border p-8 overflow-hidden bg-zinc-900/80"
+        style={{ borderColor: "var(--t-card-border)" }}
       >
         <div className="flex items-center gap-5">
           {/* Animated blob — pure CSS */}
@@ -125,12 +126,56 @@ export default function BrandDNACard({
   socialAdsLoading,
   onContinue,
 }: BrandDNACardProps) {
+  const [isDark, setIsDark] = useState(true)
+
+  const themeVars = isDark ? {
+    '--t-card-bg': 'rgba(24,24,27,0.9)',
+    '--t-card-shadow': '0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)',
+    '--t-card-border': 'rgba(255,255,255,0.04)',
+    '--t-highlight': 'linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 50%, transparent)',
+  } : {
+    '--t-card-bg': 'rgba(255,255,255,0.9)',
+    '--t-card-shadow': '0 1px 3px rgba(0,0,0,0.05), 0 4px 20px rgba(0,0,0,0.04)',
+    '--t-card-border': 'rgba(0,0,0,0.08)',
+    '--t-highlight': 'linear-gradient(90deg, transparent, rgba(0,0,0,0.04) 50%, transparent)',
+  }
+
   return (
-    <div className="relative min-h-screen py-10 px-4 md:px-8">
+    <div
+      data-theme={isDark ? 'dark' : 'light'}
+      className={`relative min-h-screen py-10 px-4 md:px-8 transition-colors duration-300 ${isDark ? '' : 'bg-slate-50'}`}
+      style={themeVars as React.CSSProperties}
+    >
+      {/* Theme toggle */}
+      <button
+        onClick={() => setIsDark(d => !d)}
+        className="absolute top-4 right-4 z-20 flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-200 cursor-pointer"
+        style={{
+          background: isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.05)',
+          color: isDark ? '#a1a1aa' : '#475569',
+          border: `1px solid ${isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)'}`,
+        }}
+      >
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          {isDark ? (
+            <>
+              <circle cx="12" cy="12" r="5" />
+              <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </>
+          ) : (
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />
+          )}
+        </svg>
+        {isDark ? 'Light' : 'Dark'}
+      </button>
+
       {/* Background ambient glow — consistent UI color, not brand-dependent */}
       <div
-        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl opacity-[0.07] pointer-events-none"
-        style={{ background: "radial-gradient(circle, #2070E8, #4E91F5, transparent)" }}
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] rounded-full blur-3xl pointer-events-none"
+        style={{
+          background: "radial-gradient(circle, #2070E8, #4E91F5, transparent)",
+          opacity: isDark ? 0.07 : 0.05,
+        }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto">
@@ -327,7 +372,7 @@ export default function BrandDNACard({
 
           {/* ── No Edmunds Ads — Sales Pitch ── */}
           {!edmundsAdsLoading && (!edmundsAds || !edmundsAds.models || edmundsAds.models.length === 0) && (
-            <div className="col-span-12 relative rounded-2xl overflow-hidden animate-[fade-in-up_0.5s_ease-out_both]">
+            <div data-theme="dark" className="col-span-12 relative rounded-2xl overflow-hidden animate-[fade-in-up_0.5s_ease-out_both]">
               {/* Animated gradient border */}
               <div
                 className="absolute -inset-px rounded-2xl"
@@ -460,6 +505,7 @@ export default function BrandDNACard({
         {/* Continue Button */}
         <div className="mt-6 animate-[fade-in-up_0.5s_ease-out_0.3s_both]">
           <button
+            data-theme="dark"
             onClick={onContinue}
             className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 hover:scale-[1.005] active:scale-[0.98]"
             style={{
@@ -555,15 +601,16 @@ function EdmundsModelCard({
 
   return (
     <div
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
-        background: "rgba(24, 24, 27, 0.9)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        background: "var(--t-card-bg)",
+        boxShadow: "var(--t-card-shadow)",
+        borderColor: "var(--t-card-border)",
         animationDelay: `${300 + index * 100}ms`,
       }}
     >
       {/* Vehicle Image or Gradient Fallback */}
-      <div className="relative w-full h-48 overflow-hidden border-b border-white/[0.04] bg-zinc-900">
+      <div className="relative w-full h-48 overflow-hidden border-b bg-zinc-900" style={{ borderColor: "var(--t-card-border)" }}>
         {currentImage && !allFailed ? (
           <img
             src={currentImage}
@@ -675,10 +722,11 @@ function SocialAdCard({
 
   return (
     <div
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
-        background: "rgba(24, 24, 27, 0.9)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        background: "var(--t-card-bg)",
+        boxShadow: "var(--t-card-shadow)",
+        borderColor: "var(--t-card-border)",
         animationDelay: `${300 + index * 100}ms`,
       }}
     >
@@ -857,12 +905,13 @@ function AdMockupCard({
 
   return (
     <div
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border
                  overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl
                  animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
-        background: "rgba(24, 24, 27, 0.9)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        background: "var(--t-card-bg)",
+        boxShadow: "var(--t-card-shadow)",
+        borderColor: "var(--t-card-border)",
         animationDelay: `${500 + index * 100}ms`,
       }}
     >
@@ -1005,18 +1054,17 @@ function GlassCard({
 }) {
   return (
     <div
-      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors hover:border-white/[0.08] animate-[fade-in-up_0.5s_ease-out_both] ${className}`}
+      className={`relative p-5 rounded-2xl border overflow-hidden transition-all animate-[fade-in-up_0.5s_ease-out_both] ${className}`}
       style={{
-        background: "rgba(24, 24, 27, 0.9)",
-        boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        background: "var(--t-card-bg)",
+        boxShadow: "var(--t-card-shadow)",
+        borderColor: "var(--t-card-border)",
       }}
     >
       {/* Subtle top highlight */}
       <div
         className="absolute top-0 left-0 right-0 h-px"
-        style={{
-          background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.06) 50%, transparent)",
-        }}
+        style={{ background: "var(--t-highlight)" }}
       />
 
       {label && (

@@ -385,6 +385,34 @@ textarea::placeholder {
   animation: spinner-brief 1s linear infinite;
 }
 
+/* ── Light theme preview (scoped to BrandDNACard toggle) ── */
+
+/* Text color remapping */
+[data-theme="light"] [class*="text-white"] { color: #0f172a !important; }
+[data-theme="light"] [class*="text-zinc-100"] { color: #1e293b !important; }
+[data-theme="light"] [class*="text-zinc-200"] { color: #1e293b !important; }
+[data-theme="light"] [class*="text-zinc-300"] { color: #334155 !important; }
+[data-theme="light"] [class*="text-zinc-400"] { color: #475569 !important; }
+[data-theme="light"] [class*="text-zinc-500"] { color: #64748b !important; }
+[data-theme="light"] [class*="text-zinc-600"] { color: #94a3b8 !important; }
+
+/* Background remapping */
+[data-theme="light"] [class*="bg-zinc-800"] { background-color: #f1f5f9 !important; }
+[data-theme="light"] [class*="bg-zinc-900"] { background-color: #f8fafc !important; }
+[data-theme="light"] [class*="bg-black/"] { background-color: rgba(0,0,0,0.04) !important; }
+
+/* Border remapping */
+[data-theme="light"] [class*="border-zinc-700"] { border-color: #e2e8f0 !important; }
+[data-theme="light"] [class*="border-white/"] { border-color: #e2e8f0 !important; }
+
+/* Restore dark-mode colors inside dark islands (sales pitch, CTA, etc.) */
+[data-theme="light"] [data-theme="dark"] [class*="text-white"] { color: #ffffff !important; }
+[data-theme="light"] [data-theme="dark"] [class*="text-zinc-300"] { color: #d4d4d8 !important; }
+[data-theme="light"] [data-theme="dark"] [class*="text-zinc-400"] { color: #a1a1aa !important; }
+[data-theme="light"] [data-theme="dark"] [class*="text-zinc-500"] { color: #71717a !important; }
+[data-theme="light"] [data-theme="dark"] [class*="bg-zinc-800"] { background-color: #27272a !important; }
+[data-theme="light"] [data-theme="dark"] [class*="border-white/"] { border-color: rgba(255,255,255,0.04) !important; }
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
