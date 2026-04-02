@@ -144,7 +144,7 @@ export interface SocialAdsData {
   totalCount: number
   pageId?: string
   pageName?: string
-  source: "meta_api" | "mock"
+  source: "meta_api" | "meta_scrape" | "mock"
 }
 
 export interface SocialAdFormatted {
@@ -156,6 +156,7 @@ export interface SocialAdFormatted {
   format: string
   imageUrl?: string
   snapshotUrl?: string
+  screenshotUrl?: string
   dateSpotted: string
   impressionsRange?: string
   spendRange?: string

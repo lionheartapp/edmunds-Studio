@@ -1,11 +1,16 @@
-// lib/meta-ads.ts — Meta Ad Library API Integration
+// lib/meta-ads.ts — Meta Ad Library Integration (API + Public Scraper)
 // ═══════════════════════════════════════════════════════════════
 // Pulls real active ads from the Meta Ad Library for any brand.
-// API Docs: https://www.facebook.com/ads/library/api
 //
-// Requires a Meta (Facebook) access token with ads_read permission.
-// Set META_AD_LIBRARY_TOKEN in your environment.
+// Two data paths:
+//   1. Graph API  — requires META_AD_LIBRARY_TOKEN (fast, structured)
+//   2. Web scraper — no token needed, scrapes public Ad Library site
+//
+// Falls back to mock data if both paths fail.
 // ═══════════════════════════════════════════════════════════════
+
+import { scrapeMetaAdLibrary, type ScrapedAd } from "./meta-ads-scraper"
+import { saveScreenshot } from "./supabase-storage"
 
 const META_ACCESS_TOKEN = process.env.META_AD_LIBRARY_TOKEN || ""
 const META_API_VERSION = "v21.0"
@@ -44,7 +49,7 @@ export interface MetaAdResult {
   totalCount: number
   pageId?: string
   pageName?: string
-  source: "meta_api" | "mock"
+  source: "meta_api" | "meta_scrape" | "mock"
 }
 
 export interface MetaAdFormatted {
@@ -56,6 +61,7 @@ export interface MetaAdFormatted {
   format: string
   imageUrl?: string
   snapshotUrl?: string
+  screenshotUrl?: string
   dateSpotted: string
   impressionsRange?: string
   spendRange?: string
@@ -79,8 +85,8 @@ export async function searchMetaAds(
   const { country = "US", limit = 10, adType = "ALL" } = options
 
   if (!isMetaAdsConfigured()) {
-    console.log("[meta-ads] No META_AD_LIBRARY_TOKEN configured, returning mock data")
-    return buildMockMetaAds(brandName)
+    console.log("[meta-ads] No META_AD_LIBRARY_TOKEN configured, trying web scraper")
+    return scrapeAndFormat(brandName, { country, limit })
   }
 
   try {
@@ -222,6 +228,11 @@ function formatMetaAd(raw: MetaAd): MetaAdFormatted {
     ? `$${formatCompact(parseInt(raw.spend.lower_bound))} - $${formatCompact(parseInt(raw.spend.upper_bound))}`
     : undefined
 
+  // Build screenshot API URL — only for real ads with snapshot URLs
+  const screenshotUrl = raw.ad_snapshot_url
+    ? `/api/ad-screenshot?adId=${encodeURIComponent(raw.id)}&snapshotUrl=${encodeURIComponent(raw.ad_snapshot_url)}`
+    : undefined
+
   return {
     id: raw.id,
     headline,
@@ -230,6 +241,7 @@ function formatMetaAd(raw: MetaAd): MetaAdFormatted {
     platform,
     format,
     snapshotUrl: raw.ad_snapshot_url,
+    screenshotUrl,
     dateSpotted: raw.ad_delivery_start_time?.split("T")[0] || "",
     impressionsRange,
     spendRange,
@@ -242,6 +254,93 @@ function formatCompact(n: number): string {
   if (n >= 1000000) return `${(n / 1000000).toFixed(1)}M`
   if (n >= 1000) return `${(n / 1000).toFixed(0)}K`
   return n.toString()
+}
+
+// ─── Scraper Path ───────────────────────────────────────────
+
+/**
+ * Scrape the public Meta Ad Library website and return formatted results.
+ * Falls back to mock data if scraping yields nothing.
+ */
+async function scrapeAndFormat(
+  brandName: string,
+  options: { country?: string; limit?: number }
+): Promise<MetaAdResult> {
+  try {
+    const { ads, screenshotBuffers } = await scrapeMetaAdLibrary(brandName, options)
+
+    if (ads.length === 0) {
+      console.log("[meta-ads] Scraper returned no ads, falling back to mock")
+      return buildMockMetaAds(brandName)
+    }
+
+    const formatted = ads.map((ad) => formatScrapedAd(ad, screenshotBuffers))
+
+    // Upload pre-captured screenshots to Supabase in the background
+    uploadScreenshotsInBackground(screenshotBuffers)
+
+    return {
+      ads: formatted,
+      totalCount: ads.length,
+      pageId: undefined,
+      pageName: ads[0]?.pageName || brandName,
+      source: "meta_scrape",
+    }
+  } catch (err) {
+    console.error(
+      "[meta-ads] Scraper path failed:",
+      err instanceof Error ? err.message : err
+    )
+    return buildMockMetaAds(brandName)
+  }
+}
+
+function formatScrapedAd(
+  ad: ScrapedAd,
+  screenshotBuffers: Map<string, Buffer>
+): MetaAdFormatted {
+  const cta =
+    ad.bodyText.match(
+      /(?:Shop|Learn|Get|Buy|Discover|Explore|See|Visit|Build|Configure|Schedule|Reserve)\s.{0,30}/i
+    )?.[0] || "Learn More"
+
+  const format = ad.bodyText.length > 200 ? "Carousel" : "Image"
+
+  // If we have a pre-captured screenshot, point at the cache endpoint
+  const hasScreenshot = screenshotBuffers.has(ad.id)
+  const screenshotUrl = ad.snapshotUrl
+    ? `/api/ad-screenshot?adId=${encodeURIComponent(ad.id)}&snapshotUrl=${encodeURIComponent(ad.snapshotUrl)}`
+    : undefined
+
+  return {
+    id: ad.id,
+    headline: ad.headline || ad.linkCaption,
+    bodyText: ad.bodyText,
+    cta,
+    platform: ad.platform,
+    format,
+    snapshotUrl: ad.snapshotUrl || undefined,
+    screenshotUrl: hasScreenshot ? screenshotUrl : screenshotUrl,
+    dateSpotted: ad.startDate,
+    isActive: ad.isActive,
+  }
+}
+
+/**
+ * Fire-and-forget upload of pre-captured screenshots to Supabase.
+ * Failures are logged but never block the response.
+ */
+function uploadScreenshotsInBackground(
+  buffers: Map<string, Buffer>
+): void {
+  for (const [adId, buffer] of buffers) {
+    saveScreenshot(adId, buffer).catch((err) => {
+      console.warn(
+        `[meta-ads] Background screenshot upload failed for ${adId}:`,
+        err instanceof Error ? err.message : err
+      )
+    })
+  }
 }
 
 // ─── Mock Data ──────────────────────────────────────────────

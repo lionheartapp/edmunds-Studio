@@ -114,7 +114,7 @@ export default function OnboardPage() {
         (async () => {
           try {
             const ctrl = new AbortController()
-            const timer = setTimeout(() => ctrl.abort(), 15000)
+            const timer = setTimeout(() => ctrl.abort(), 55000)
             const res = await fetch("/api/social-ads", {
               method: "POST",
               headers: { "Content-Type": "application/json" },

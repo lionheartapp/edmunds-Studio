@@ -713,8 +713,8 @@ function SocialAdCard({
   colors: BrandDNA["colors"]
   index: number
 }) {
-  const [iframeLoaded, setIframeLoaded] = useState(false)
-  const [iframeFailed, setIframeFailed] = useState(false)
+  const [imageLoaded, setImageLoaded] = useState(false)
+  const [imageFailed, setImageFailed] = useState(false)
 
   const platformIcon = useMemo(() => {
     if (ad.platform === "Instagram") return "IG"
@@ -728,15 +728,7 @@ function SocialAdCard({
   }, [ad.platform])
 
   const hasValidSnapshot = ad.snapshotUrl && ad.snapshotUrl !== "https://www.facebook.com/ads/library/?id=mock"
-
-  // Timeout: if iframe hasn't loaded in 5s, show fallback
-  useEffect(() => {
-    if (!hasValidSnapshot) return
-    const timer = setTimeout(() => {
-      if (!iframeLoaded) setIframeFailed(true)
-    }, 5000)
-    return () => clearTimeout(timer)
-  }, [hasValidSnapshot, iframeLoaded])
+  const hasScreenshot = !!ad.screenshotUrl
 
   return (
     <motion.div
@@ -752,30 +744,30 @@ function SocialAdCard({
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
       }}
     >
-      {/* Visual Header — Embedded Ad or gradient fallback */}
+      {/* Visual Header — Screenshot image, or gradient fallback */}
       <div
         className="relative w-full overflow-hidden border-b border-white/[0.04]"
-        style={{ minHeight: hasValidSnapshot && !iframeFailed ? "320px" : "144px" }}
+        style={{ minHeight: hasScreenshot && !imageFailed ? "280px" : "144px" }}
       >
-        {/* Try iframe embed if we have a valid snapshot URL */}
-        {hasValidSnapshot && !iframeFailed && (
+        {/* Screenshot image from /api/ad-screenshot pipeline */}
+        {hasScreenshot && !imageFailed && (
           <>
-            <iframe
-              src={ad.snapshotUrl}
-              title={`${ad.headline || "Ad"} — ${ad.platform}`}
-              className="w-full border-0 bg-white"
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={ad.screenshotUrl}
+              alt={`${ad.headline || "Ad"} — ${ad.platform}`}
+              className="w-full object-cover object-top"
               style={{
-                height: "320px",
-                opacity: iframeLoaded ? 1 : 0,
+                height: "280px",
+                opacity: imageLoaded ? 1 : 0,
                 transition: "opacity 0.3s ease",
               }}
-              sandbox="allow-scripts allow-same-origin allow-popups"
               loading="lazy"
-              onLoad={() => setIframeLoaded(true)}
-              onError={() => setIframeFailed(true)}
+              onLoad={() => setImageLoaded(true)}
+              onError={() => setImageFailed(true)}
             />
-            {/* Loading shimmer while iframe loads */}
-            {!iframeLoaded && (
+            {/* Shimmer skeleton while image loads */}
+            {!imageLoaded && (
               <div className="absolute inset-0 bg-zinc-900 flex items-center justify-center">
                 <div className="flex flex-col items-center gap-2">
                   <div className="w-8 h-8 rounded-full border-2 border-eds-50/30 border-t-eds-50 animate-spin-slow" />
@@ -786,8 +778,8 @@ function SocialAdCard({
           </>
         )}
 
-        {/* Gradient fallback — shown when no snapshot or iframe failed */}
-        {(!hasValidSnapshot || iframeFailed) && (
+        {/* Gradient fallback — shown when no screenshot or image failed */}
+        {(!hasScreenshot || imageFailed) && (
           <div
             className="w-full h-36"
             style={{

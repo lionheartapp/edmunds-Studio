@@ -7,6 +7,10 @@
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 60
+    },
+    "app/api/ad-screenshot/route.ts": {
+      "maxDuration": 60,
+      "memory": 1024
     }
   }
 }
