@@ -588,7 +588,11 @@ function EdmundsModelCard({
   const [imgIndex, setImgIndex] = useState(0)
   const [allFailed, setAllFailed] = useState(false)
   const images = model.vehicleImages || []
-  const currentImage = images[imgIndex]
+  const rawImage = images[imgIndex]
+  // Proxy edmunds-media.com images to avoid CORS blocks
+  const currentImage = rawImage?.includes("edmunds-media.com")
+    ? `/api/image-proxy?url=${encodeURIComponent(rawImage)}`
+    : rawImage
 
   const handleImageError = () => {
     if (imgIndex < images.length - 1) {
