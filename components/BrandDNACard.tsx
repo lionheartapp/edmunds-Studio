@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "framer-motion"
 import { BrandDNA, AdSample, EdmundsAdsData, SocialAdsData, SocialAdFormatted } from "@/lib/types"
 import { useEffect, useMemo, useState } from "react"
 import SkeletonCard from "@/components/SkeletonCard"
@@ -66,13 +65,7 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
   }, [messages.length])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -12 }}
-      transition={{ duration: 0.4 }}
-      className="col-span-12"
-    >
+    <div className="col-span-12 animate-[fade-in-up_0.4s_ease-out_both]">
       <div
         role="status"
         aria-live="polite"
@@ -88,41 +81,21 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
 
           <div className="flex flex-col gap-1.5 min-w-0">
             <span className="text-xs text-zinc-500 uppercase tracking-wider">{label}</span>
-            <motion.span
+            <span
               key={msgIndex}
-              initial={{ opacity: 0, y: 6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.3 }}
-              className="text-sm text-zinc-300 font-medium"
+              className="text-sm text-zinc-300 font-medium animate-[fade-in-up_0.3s_ease-out_both]"
             >
               {messages[msgIndex]}
-            </motion.span>
+            </span>
             <span className="text-xs text-zinc-600 mt-1">Usually takes about 5-10 seconds</span>
           </div>
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
-const stagger = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: { staggerChildren: 0.07 },
-  },
-}
-
-const cardVariant = {
-  hidden: { opacity: 0, y: 16, scale: 0.97 },
-  show: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] as const },
-  },
-}
+/* CSS stagger helper — use style={{ animationDelay: `${i * 70}ms` }} */
 
 export default function BrandDNACard({
   brandDna,
@@ -141,12 +114,7 @@ export default function BrandDNACard({
         style={{ background: "radial-gradient(circle, #2070E8, #4E91F5, transparent)" }}
       />
 
-      <motion.div
-        variants={stagger}
-        initial="hidden"
-        animate="show"
-        className="relative z-10 max-w-6xl mx-auto"
-      >
+      <div className="relative z-10 max-w-6xl mx-auto">
         {/* ── Bento Grid ──────────────────────────── */}
         <div className="grid grid-cols-12 gap-3 auto-rows-auto">
 
@@ -170,17 +138,15 @@ export default function BrandDNACard({
           <GlassCard className="col-span-12 md:col-span-5" label="Voice" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.voice.map((attr, i) => (
-                <motion.span
+                <span
                   key={attr}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.08 }}
                   className="px-3 py-1.5 bg-eds-50/10 text-eds-60 rounded-lg text-sm font-medium
-                           border border-eds-50/20 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform"
-                  style={{ boxShadow: "0 0 20px rgba(32, 112, 232, 0.05)" }}
+                           border border-eds-50/20 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform
+                           animate-[fade-in-up_0.4s_ease-out_both]"
+                  style={{ boxShadow: "0 0 20px rgba(32, 112, 232, 0.05)", animationDelay: `${300 + i * 80}ms` }}
                 >
                   {attr}
-                </motion.span>
+                </span>
               ))}
             </div>
           </GlassCard>
@@ -189,16 +155,15 @@ export default function BrandDNACard({
           <GlassCard className="col-span-12 md:col-span-4" label="Visual Style" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.visualStyle.map((style, i) => (
-                <motion.span
+                <span
                   key={style}
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.3 + i * 0.08 }}
                   className="px-3 py-1.5 bg-zinc-800/80 text-zinc-300 rounded-lg text-sm font-medium
-                           border border-zinc-700/50 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform"
+                           border border-zinc-700/50 cursor-default hover:scale-105 hover:-translate-y-0.5 transition-transform
+                           animate-[fade-in-up_0.4s_ease-out_both]"
+                  style={{ animationDelay: `${300 + i * 80}ms` }}
                 >
                   {style}
-                </motion.span>
+                </span>
               ))}
             </div>
           </GlassCard>
@@ -337,7 +302,7 @@ export default function BrandDNACard({
 
           {/* ── No Edmunds Ads — visual opportunity showcase ── */}
           {!edmundsAdsLoading && (!edmundsAds || !edmundsAds.models || edmundsAds.models.length === 0) && (
-            <motion.div variants={cardVariant} className="col-span-12">
+            <div className="col-span-12 animate-[fade-in-up_0.5s_ease-out_both]">
               {/* Section header */}
               <div className="flex items-center gap-2.5 mb-4">
                 <svg width="18" height="13" viewBox="0 0 260 175" fill="none" className="text-eds-60 flex-shrink-0">
@@ -425,7 +390,7 @@ export default function BrandDNACard({
                   </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           )}
 
           {/* ── Social Ad Intelligence — Real Meta ads or AI fallback ── */}
@@ -495,7 +460,7 @@ export default function BrandDNACard({
         </div>
 
         {/* Continue Button */}
-        <motion.div variants={cardVariant} className="mt-6">
+        <div className="mt-6 animate-[fade-in-up_0.5s_ease-out_0.3s_both]">
           <button
             onClick={onContinue}
             className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 hover:scale-[1.005] active:scale-[0.98]"
@@ -508,8 +473,8 @@ export default function BrandDNACard({
           <p className="text-center text-xs text-zinc-600 mt-3">
             Review your brand analysis above before continuing
           </p>
-        </motion.div>
-      </motion.div>
+        </div>
+      </div>
     </div>
   )
 }
@@ -591,14 +556,12 @@ function EdmundsModelCard({
     : "0"
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl"
+    <div
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
         background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        animationDelay: `${300 + index * 100}ms`,
       }}
     >
       {/* Vehicle Image or Gradient Fallback */}
@@ -680,7 +643,7 @@ function EdmundsModelCard({
           </div>
         )}
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -713,14 +676,12 @@ function SocialAdCard({
   const hasScreenshot = !!ad.screenshotUrl
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.3 + index * 0.1, duration: 0.5 }}
-      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl"
+    <div
+      className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04] overflow-hidden transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.01] hover:shadow-2xl animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
         background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        animationDelay: `${300 + index * 100}ms`,
       }}
     >
       {/* Visual Header — Screenshot image, or gradient fallback */}
@@ -808,7 +769,7 @@ function SocialAdCard({
         )}
 
         {/* CTA Button — white outline, fills brand primary on hover */}
-        <motion.button
+        <button
           className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
                    transition-all duration-300 mt-1 border"
           style={{
@@ -828,7 +789,7 @@ function SocialAdCard({
           }}
         >
           {ad.cta}
-        </motion.button>
+        </button>
 
         {/* Stats footer */}
         <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
@@ -863,7 +824,7 @@ function SocialAdCard({
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -897,19 +858,18 @@ function AdMockupCard({
   }, [index])
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
+    <div
       className="group relative w-80 md:w-full flex-shrink-0 md:flex-shrink rounded-2xl border border-white/[0.04]
-                 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl"
+                 overflow-hidden transition-all duration-300 hover:-translate-y-2 hover:scale-[1.02] hover:shadow-2xl
+                 animate-[fade-in-up_0.5s_ease-out_both]"
       style={{
         background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
+        animationDelay: `${500 + index * 100}ms`,
       }}
     >
-      {/* Animated glow on hover */}
-      <motion.div
+      {/* Glow on hover */}
+      <div
         className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none"
         style={{
           background: `radial-gradient(circle at 50% 0%, ${colors.primary}20, transparent 70%)`,
@@ -972,11 +932,11 @@ function AdMockupCard({
         )}
 
         {/* CTA Button — white outline, fills brand primary on hover */}
-        <motion.button
+        <button
           className="relative w-full py-2.5 rounded-lg font-medium text-sm overflow-hidden
                    transition-all duration-300 mt-2 group/btn border"
           style={{
-            borderColor: `rgba(255,255,255,0.25)`,
+            borderColor: "rgba(255,255,255,0.25)",
             color: "white",
             background: "transparent",
           }}
@@ -995,7 +955,7 @@ function AdMockupCard({
             {ad.cta}
             <span className="group-hover/btn:translate-x-0.5 transition-transform">→</span>
           </span>
-        </motion.button>
+        </button>
 
         {/* Footer Stats */}
         <div className="flex items-center justify-between pt-2 border-t border-white/[0.04]">
@@ -1028,7 +988,7 @@ function AdMockupCard({
       >
         <span className="text-sm font-medium text-white">View Full Details</span>
       </div>
-    </motion.div>
+    </div>
   )
 }
 
@@ -1046,9 +1006,8 @@ function GlassCard({
   badge?: string
 }) {
   return (
-    <motion.div
-      variants={cardVariant}
-      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors hover:border-white/[0.08] ${className}`}
+    <div
+      className={`relative p-5 rounded-2xl border border-white/[0.04] overflow-hidden transition-colors hover:border-white/[0.08] animate-[fade-in-up_0.5s_ease-out_both] ${className}`}
       style={{
         background: "rgba(24, 24, 27, 0.9)",
         boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.04)",
@@ -1075,6 +1034,6 @@ function GlassCard({
         </div>
       )}
       {children}
-    </motion.div>
+    </div>
   )
 }
