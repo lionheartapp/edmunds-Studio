@@ -169,119 +169,27 @@ export default function BrandDNACard({
         animate="show"
         className="relative z-10 max-w-6xl mx-auto"
       >
-        {/* Header */}
-        <motion.div variants={cardVariant} className="mb-6 flex items-end justify-between">
-          <div className="flex items-center gap-5">
-            {/* Brand Logo or color dot */}
-            {brandDna.logoUrl ? (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="w-16 h-16 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10 flex items-center justify-center p-2 overflow-hidden"
-              >
-                <img
-                  src={brandDna.logoUrl}
-                  alt={`${brandDna.name} logo`}
-                  className="w-full h-full object-contain"
-                  onError={(e) => { (e.target as HTMLImageElement).style.display = "none" }}
-                />
-              </motion.div>
-            ) : (
-              <div
-                className="w-3 h-3 rounded-full bg-eds-50 animate-logo-dot-scale"
-                style={{ boxShadow: "0 0 12px rgba(32, 112, 232, 0.4)" }}
-              />
-            )}
-            <div>
-              <div className="flex items-center gap-3 mb-1">
-                {!brandDna.logoUrl && (
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
-                    Brand DNA
-                  </span>
-                )}
-                {brandDna.logoUrl && (
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
-                    Brand DNA
-                  </span>
-                )}
-              </div>
-              <h2 className="text-4xl font-bold tracking-tight">{brandDna.name}</h2>
-              <p className="text-zinc-500 mt-1 text-sm">{brandDna.domain}</p>
-            </div>
-          </div>
-        </motion.div>
-
         {/* ── Bento Grid ──────────────────────────── */}
         <div className="grid grid-cols-12 gap-3 auto-rows-auto">
 
-          {/* Colors — spans 5 cols */}
-          <GlassCard className="col-span-12 md:col-span-5" label="Colors" badge="AI-Inferred">
-            <div className="flex gap-4 mt-1">
-              {(["primary", "secondary"] as const).map((name) => {
-                const hex = brandDna.colors[name]
-                return (
-                  <motion.div
-                    key={name}
-                    whileHover={{ scale: 1.08, y: -4 }}
-                    className="flex flex-col items-center gap-2 flex-1"
-                  >
-                    <div
-                      className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
-                      style={{
-                        backgroundColor: hex,
-                        boxShadow: `0 8px 32px ${hex}30`,
-                      }}
-                    />
-                    <span className="text-xs text-zinc-500 capitalize">{name}</span>
-                    <span className="text-xs font-mono text-zinc-600">{hex}</span>
-                  </motion.div>
-                )
-              })}
+          {/* Row 1: Brand Color + Voice + Visual Style */}
+
+          {/* Brand Color — single swatch, spans 2 cols */}
+          <GlassCard className="col-span-12 md:col-span-2" label="Brand Color" badge="AI-Inferred">
+            <div className="flex flex-col items-center gap-2 mt-1">
+              <div
+                className="w-full aspect-square rounded-2xl border border-white/5 shadow-lg"
+                style={{
+                  backgroundColor: brandDna.colors.primary,
+                  boxShadow: `0 8px 32px ${brandDna.colors.primary}30`,
+                }}
+              />
+              <span className="text-xs font-mono text-zinc-500">{brandDna.colors.primary}</span>
             </div>
           </GlassCard>
 
-          {/* Typography — spans 4 cols */}
-          <GlassCard className="col-span-12 md:col-span-4" label="Typography" badge="AI-Inferred">
-            <div className="flex flex-col justify-center h-full">
-              <p
-                className="text-3xl text-zinc-100 tracking-tight"
-                style={{ fontWeight: parseInt(brandDna.typography.headingWeight) || 700 }}
-              >
-                {brandDna.typography.primaryFont}
-              </p>
-              <div className="flex items-center gap-3 mt-3">
-                <span className="text-xs px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
-                  {brandDna.typography.fallback}
-                </span>
-                <span className="text-xs px-2 py-1 bg-zinc-800 rounded-md text-zinc-400 border border-zinc-700/50">
-                  Weight {brandDna.typography.headingWeight}
-                </span>
-              </div>
-            </div>
-          </GlassCard>
-
-          {/* Competitors — spans 3 cols */}
-          <GlassCard className="col-span-12 md:col-span-3" label="Competitors">
-            <div className="flex flex-col gap-2">
-              {brandDna.competitors.map((comp, i) => (
-                <motion.div
-                  key={comp}
-                  initial={{ opacity: 0, x: 10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 + i * 0.1 }}
-                  className="flex items-center gap-2.5 px-3 py-2 bg-zinc-800/50 rounded-lg border border-zinc-700/30"
-                >
-                  <div className="w-6 h-6 rounded-full bg-zinc-700 flex items-center justify-center text-xs font-bold text-zinc-400">
-                    {i + 1}
-                  </div>
-                  <span className="text-sm text-zinc-300">{comp}</span>
-                </motion.div>
-              ))}
-            </div>
-          </GlassCard>
-
-          {/* Voice — spans 6 cols */}
-          <GlassCard className="col-span-12 md:col-span-6" label="Voice" badge="AI-Inferred">
+          {/* Voice — spans 5 cols */}
+          <GlassCard className="col-span-12 md:col-span-5" label="Voice" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.voice.map((attr, i) => (
                 <motion.span
@@ -300,8 +208,8 @@ export default function BrandDNACard({
             </div>
           </GlassCard>
 
-          {/* Visual Style — spans 6 cols */}
-          <GlassCard className="col-span-12 md:col-span-6" label="Visual Style" badge="AI-Inferred">
+          {/* Visual Style — spans 5 cols */}
+          <GlassCard className="col-span-12 md:col-span-5" label="Visual Style" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.visualStyle.map((style, i) => (
                 <motion.span

@@ -254,11 +254,9 @@ export default function CompetitorAnalysis({
                     Recent Campaigns ({(competitor.ads || []).length})
                   </h4>
                   <div className={`grid gap-6 ${
-                    (competitor.ads || []).length === 1
+                    (competitor.ads || []).length <= 2
                       ? "grid-cols-1"
-                      : (competitor.ads || []).length === 2
-                        ? "md:grid-cols-2"
-                        : "md:grid-cols-2 lg:grid-cols-3"
+                      : "md:grid-cols-2 lg:grid-cols-3"
                   }`}>
                     {(competitor.ads || []).map((ad, adIndex) => (
                       <CompetitorAdCard
@@ -266,7 +264,7 @@ export default function CompetitorAnalysis({
                         ad={ad}
                         competitor={competitor}
                         variants={cardHoverVariants}
-                        horizontal={(competitor.ads || []).length === 1}
+                        horizontal={(competitor.ads || []).length <= 2}
                       />
                     ))}
                   </div>
