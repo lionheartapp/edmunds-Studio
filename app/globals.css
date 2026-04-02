@@ -260,6 +260,28 @@ textarea::placeholder {
   50% { transform: scale(1.2); }
 }
 
+/* Loading orb — fluid morph & effects */
+@keyframes orb-glow {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 1; }
+}
+@keyframes orb-morph {
+  0%   { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; transform: rotate(0deg) scale(1); }
+  25%  { border-radius: 50% 50% 30% 70% / 50% 60% 40% 50%; transform: rotate(90deg) scale(1.04); }
+  50%  { border-radius: 30% 60% 70% 40% / 50% 30% 60% 70%; transform: rotate(180deg) scale(0.98); }
+  75%  { border-radius: 60% 40% 50% 50% / 30% 70% 40% 60%; transform: rotate(270deg) scale(1.03); }
+  100% { border-radius: 40% 60% 60% 40% / 60% 30% 70% 40%; transform: rotate(360deg) scale(1); }
+}
+@keyframes orb-highlight {
+  0%, 100% { top: 10%; left: 15%; }
+  33% { top: 20%; left: 55%; }
+  66% { top: 50%; left: 25%; }
+}
+@keyframes orb-sheen {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
 /* Background orb rotations */
 @keyframes orb-rotate-20s {
   from { transform: rotate(0deg); }
