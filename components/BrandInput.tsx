@@ -120,41 +120,102 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
           /* ── Loading State ─────────────────────────── */
           <motion.div
             key="loading"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 1.1 }}
-            transition={{ duration: 0.5 }}
+            transition={{ duration: 0.3 }}
             className="relative z-10 flex flex-col items-center"
             aria-live="polite"
           >
-            {/* Morphing Orb — 3 layers with framer-motion */}
+            {/* Morphing Orb — drops in from top, bounces, then starts orbiting */}
             <div className="relative w-48 h-48 mb-10">
-              {/* Layer 1: Outer glow */}
+              {/* Layer 1: Outer glow — fades in after landing */}
               <motion.div
+                initial={{ opacity: 0, scale: 0.5 }}
                 animate={{
+                  opacity: 1,
                   scale: [1, 1.15, 1],
                   borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
                 }}
-                transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                transition={{
+                  opacity: { delay: 0.5, duration: 0.4 },
+                  scale: { delay: 1.2, duration: 4, repeat: Infinity, ease: "easeInOut" },
+                  borderRadius: { delay: 1.2, duration: 4, repeat: Infinity, ease: "easeInOut" },
+                }}
                 className="absolute inset-[-20px] bg-eds-50/20 blur-3xl"
               />
-              {/* Layer 2: Morphing shape */}
+
+              {/* Layer 2: Main blob — drops from above, squash-stretches on impact, then morphs */}
               <motion.div
-                animate={{
-                  scale: [1, 1.06, 1],
-                  borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
+                initial={{
+                  y: -300,
+                  scale: 1,
+                  borderRadius: "50%",
+                  opacity: 1,
                 }}
-                transition={{ duration: 3, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
+                animate={{
+                  y: [null, 0, -12, 0, -4, 0],
+                  scaleX: [1, 1.2, 0.95, 1.05, 0.98, 1],
+                  scaleY: [1, 0.8, 1.08, 0.97, 1.02, 1],
+                  borderRadius: [
+                    "50%",
+                    "50% 50% 45% 45%",
+                    "45% 55% 55% 45%",
+                    "50%",
+                    "50%",
+                    "50%",
+                  ],
+                }}
+                transition={{
+                  y: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1], times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
+                  scaleX: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
+                  scaleY: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
+                  borderRadius: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
+                }}
                 className="absolute inset-0 overflow-hidden"
                 style={{
                   background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
                   boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
                 }}
-              />
-              {/* Layer 3: Orbiting dot */}
+              >
+                {/* After landing, start the organic morph loop */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.9 }}
+                  className="absolute inset-0"
+                >
+                  <motion.div
+                    animate={{
+                      scale: [1, 1.06, 1],
+                      borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
+                    }}
+                    transition={{ delay: 1.0, duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                    className="absolute inset-0"
+                    style={{
+                      background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
+                      boxShadow: "inset 0 -30px 50px rgba(0,0,0,0.35)",
+                    }}
+                  />
+                </motion.div>
+              </motion.div>
+
+              {/* Impact flash — brief white ring on landing */}
               <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                initial={{ opacity: 0, scale: 0.3 }}
+                animate={{ opacity: [0, 0.6, 0], scale: [0.3, 1.4, 1.8] }}
+                transition={{ delay: 0.5, duration: 0.5, ease: "easeOut" }}
+                className="absolute inset-[-10px] rounded-full border-2 border-white/30"
+              />
+
+              {/* Layer 3: Orbiting dot — starts after landing */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1, rotate: 360 }}
+                transition={{
+                  opacity: { delay: 1.0, duration: 0.3 },
+                  rotate: { delay: 1.0, duration: 10, repeat: Infinity, ease: "linear" },
+                }}
                 className="absolute inset-[-12px]"
               >
                 <div
