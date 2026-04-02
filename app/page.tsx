@@ -26,7 +26,7 @@ export default function Home() {
       // Clear stale data from any previous brand search
       sessionStorage.removeItem("eds_edmunds_ads")
       sessionStorage.removeItem("eds_social_ads")
-      sessionStorage.removeItem("eds_competitors_fetching")
+      sessionStorage.removeItem("eds_strategic_edge")
 
       // Store brand DNA, Edmunds market data, and user type for downstream pages
       sessionStorage.setItem("eds_brand_dna", JSON.stringify(brandDna))
