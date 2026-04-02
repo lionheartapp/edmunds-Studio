@@ -298,7 +298,8 @@ export default function Orb({
 
       function resize() {
         if (disposed || !container) return
-        const dpr = window.devicePixelRatio || 1
+        // Cap DPR at 1.5 to prevent GPU overload on large orbs (28rem @ 2x = 896px)
+        const dpr = Math.min(window.devicePixelRatio || 1, 1.5)
         const width = container.clientWidth
         const height = container.clientHeight
         renderer.setSize(width * dpr, height * dpr)
