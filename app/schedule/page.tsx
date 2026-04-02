@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import ScheduleCalendar from "@/components/ScheduleCalendar"
 import { ScheduleSlot } from "@/lib/types"
@@ -44,6 +44,7 @@ const DEFAULT_SLOTS: ScheduleSlot[] = [
 export default function SchedulePage() {
   const router = useRouter()
   const [slots, setSlots] = useState<ScheduleSlot[]>(DEFAULT_SLOTS)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const handleUpdateSlot = (index: number, updates: Partial<ScheduleSlot>) => {
     setSlots((prev) =>
@@ -53,8 +54,14 @@ export default function SchedulePage() {
 
   const handleScheduleAll = () => {
     setSlots((prev) => prev.map((slot) => ({ ...slot, status: "scheduled" as const })))
-    setTimeout(() => router.push("/dashboard"), 1000)
+    timeoutRef.current = setTimeout(() => router.push("/dashboard"), 1000)
   }
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   return (
     <div className="min-h-screen flex items-center justify-center">

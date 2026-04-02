@@ -187,10 +187,8 @@ export default function BrandDNACard({
                 />
               </motion.div>
             ) : (
-              <motion.div
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ repeat: Infinity, duration: 3, ease: "easeInOut" }}
-                className="w-3 h-3 rounded-full bg-eds-50"
+              <div
+                className="w-3 h-3 rounded-full bg-eds-50 animate-logo-dot-scale"
                 style={{ boxShadow: "0 0 12px rgba(32, 112, 232, 0.4)" }}
               />
             )}
@@ -952,16 +950,12 @@ function AdMockupCard({
       >
         {/* Geometric shapes for visual interest */}
         <div className="absolute inset-0 opacity-20">
-          <motion.div
-            animate={{ rotate: 360 }}
-            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
-            className="absolute -top-20 -right-20 w-40 h-40 rounded-full border border-current"
+          <div
+            className="absolute -top-20 -right-20 w-40 h-40 rounded-full border border-current animate-orb-rotate-20s"
             style={{ color: colors.primary }}
           />
-          <motion.div
-            animate={{ rotate: -360 }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full border border-current"
+          <div
+            className="absolute -bottom-10 -left-10 w-32 h-32 rounded-full border border-current animate-orb-rotate-25s"
             style={{ color: colors.accent }}
           />
         </div>
@@ -979,11 +973,12 @@ function AdMockupCard({
         </div>
 
         {/* Shimmer effect on hover */}
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100"
-          initial={false}
-          animate={{ background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)" }}
-          transition={{ duration: 0.6, repeat: Infinity }}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-100 animate-shimmer-effect"
+          style={{
+            background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent)",
+            backgroundSize: "200% 100%",
+          }}
         />
       </div>
 

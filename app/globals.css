@@ -226,6 +226,131 @@ textarea::placeholder {
   100% { transform: translateX(200%); }
 }
 
+/* Float animations for background gradient orbs */
+@keyframes float-up {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-30px); }
+}
+
+@keyframes float-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(30px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+}
+
+.animate-float-up {
+  animation: float-up 8s ease-in-out infinite;
+}
+
+.animate-float-down {
+  animation: float-down 10s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Logo dot scale animation */
+@keyframes logo-dot-scale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* Background orb rotations */
+@keyframes orb-rotate-20s {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes orb-rotate-25s {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(-360deg); }
+}
+
+/* Shimmer effect for ad cards */
+@keyframes shimmer-effect {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.animate-logo-dot-scale {
+  animation: logo-dot-scale 3s ease-in-out infinite;
+}
+
+.animate-orb-rotate-20s {
+  animation: orb-rotate-20s 20s linear infinite;
+}
+
+.animate-orb-rotate-25s {
+  animation: orb-rotate-25s 25s linear infinite;
+}
+
+.animate-shimmer-effect {
+  animation: shimmer-effect 0.6s infinite;
+}
+
+/* Glow pulse for dashboard brand indicator (boxShadow animation) */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 30px rgba(99, 102, 241, 0.8);
+  }
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Shimmer shine effect for campaign cards */
+@keyframes shimmer-shine {
+  0% { background-position: 0% 0%; }
+  100% { background-position: 100% 100%; }
+}
+
+.animate-shimmer-shine {
+  animation: shimmer-shine 3s ease-in-out infinite;
+}
+
+/* Pulse scale for campaign selection indicator */
+@keyframes pulse-scale {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+.animate-pulse-scale {
+  animation: pulse-scale 1.5s ease-in-out infinite;
+}
+
+/* Spinner for pipeline status current stage */
+@keyframes spinner-pipeline {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spinner-pipeline {
+  animation: spinner-pipeline 2s linear infinite;
+}
+
+/* Spinner for brief form loading state */
+@keyframes spinner-brief {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.animate-spinner-brief {
+  animation: spinner-brief 1s linear infinite;
+}
+
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

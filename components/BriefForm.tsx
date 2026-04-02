@@ -187,10 +187,8 @@ export default function BriefForm({ brandName, onSubmit, isLoading, userType }: 
         >
           {isLoading ? (
             <span className="flex items-center justify-center gap-3">
-              <motion.span
-                animate={{ rotate: 360 }}
-                transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
-                className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full"
+              <span
+                className="inline-block w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spinner-brief"
               />
               Generating creative brief...
             </span>

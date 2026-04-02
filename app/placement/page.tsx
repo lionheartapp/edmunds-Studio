@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import AdPlacement from "@/components/AdPlacement"
@@ -11,6 +11,7 @@ export default function PlacementPage() {
   const [brandDna, setBrandDna] = useState<BrandDNA | null>(null)
   const [campaign, setCampaign] = useState<PreBuiltCampaign | null>(null)
   const [placed, setPlaced] = useState(false)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
     const storedDna = sessionStorage.getItem("eds_brand_dna")
@@ -26,13 +27,17 @@ export default function PlacementPage() {
     if (storedCampaign) {
       setCampaign(JSON.parse(storedCampaign))
     }
+
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
   }, [router])
 
   const handlePlace = (config: unknown) => {
     console.log("Placing ad:", config)
     setPlaced(true)
     // After a moment, redirect back to dashboard
-    setTimeout(() => {
+    timeoutRef.current = setTimeout(() => {
       router.push("/dashboard")
     }, 3000)
   }

@@ -50,11 +50,7 @@ export default function CampaignDashboard({
           {/* Brand Section */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <motion.div
-                className="w-4 h-4 rounded-full bg-eds-50"
-                animate={{ boxShadow: "0 0 20px rgba(99,102,241,0.5)" }}
-                transition={{ duration: 2, repeat: Infinity }}
-              />
+              <div className="w-4 h-4 rounded-full bg-eds-50 animate-glow-pulse" />
               <h1 className="font-bold text-lg">{brandDna.name}</h1>
             </div>
           </div>
@@ -364,10 +360,8 @@ function CampaignCard({
         className="relative overflow-hidden h-32 rounded-t-lg"
         style={{ background: gradient }}
       >
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity"
-          animate={{ backgroundPosition: ['0% 0%', '100% 100%'] }}
-          transition={{ duration: 3, repeat: Infinity }}
+        <div
+          className="absolute inset-0 opacity-0 group-hover:opacity-20 transition-opacity animate-shimmer-shine"
           style={{
             backgroundImage: `linear-gradient(45deg, transparent 30%, white 50%, transparent 70%)`,
             backgroundSize: '200% 200%',
@@ -468,12 +462,9 @@ function CampaignCard({
 
         {/* Selection Indicator */}
         {isSelected && (
-          <motion.div
-            layoutId="selected-indicator"
-            className="absolute top-3 right-3 w-2 h-2 rounded-full"
+          <div
+            className="absolute top-3 right-3 w-2 h-2 rounded-full animate-pulse-scale"
             style={{ backgroundColor: brandColor }}
-            animate={{ scale: [1, 1.2, 1] }}
-            transition={{ duration: 1.5, repeat: Infinity }}
           />
         )}
       </div>

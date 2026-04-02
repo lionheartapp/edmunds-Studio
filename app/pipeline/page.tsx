@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useCallback } from "react"
+import { useEffect, useState, useCallback, useRef } from "react"
 import { useRouter } from "next/navigation"
 import PipelineStatusView from "@/components/PipelineStatus"
 import { BrandDNA, PipelineStage } from "@/lib/types"
@@ -11,6 +11,7 @@ export default function PipelinePage() {
   const [completedStages, setCompletedStages] = useState<PipelineStage[]>([])
   const [stageOutputs, setStageOutputs] = useState<Record<string, unknown>>({})
   const [error, setError] = useState<string>()
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   const runPipeline = useCallback(async () => {
     const brandDnaStr = sessionStorage.getItem("eds_brand_dna")
@@ -68,7 +69,7 @@ export default function PipelinePage() {
               "eds_campaign_output",
               JSON.stringify(data.output)
             )
-            setTimeout(() => router.push("/review"), 1500)
+            timeoutRef.current = setTimeout(() => router.push("/review"), 1500)
           }
         }
       }
@@ -79,7 +80,16 @@ export default function PipelinePage() {
 
   useEffect(() => {
     runPipeline()
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
   }, [runPipeline])
+
+  useEffect(() => {
+    return () => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+    }
+  }, [])
 
   return (
     <div className="min-h-screen flex items-center justify-center">

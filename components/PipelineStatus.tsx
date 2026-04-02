@@ -78,10 +78,8 @@ export default function PipelineStatusView({
                       </svg>
                     </motion.div>
                   ) : isCurrent ? (
-                    <motion.div
-                      animate={{ rotate: 360 }}
-                      transition={{ repeat: Infinity, duration: 2, ease: "linear" }}
-                      className="w-8 h-8 border-3 border-eds-50 border-t-transparent rounded-full"
+                    <div
+                      className="w-8 h-8 border-3 border-eds-50 border-t-transparent rounded-full animate-spinner-pipeline"
                     />
                   ) : (
                     <div className="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-sm">

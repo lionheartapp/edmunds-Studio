@@ -96,19 +96,15 @@ export default function StrategicEdgeComponent({
 }: StrategicEdgeProps) {
   return (
     <div className="relative w-full bg-gradient-to-b from-zinc-950 to-zinc-900 text-white overflow-hidden">
-      {/* Animated background elements — consistent UI accent */}
+      {/* Animated background elements — consistent UI accent (GPU-accelerated CSS animations) */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <motion.div
-          className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-20"
+        <div
+          className="absolute -top-40 -right-40 w-80 h-80 rounded-full opacity-20 animate-float-up"
           style={{ background: "radial-gradient(circle, rgba(99,102,241,0.2), transparent)" }}
-          animate={{ y: [0, 30, 0] }}
-          transition={{ duration: 8, repeat: Infinity }}
         />
-        <motion.div
-          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-15"
+        <div
+          className="absolute -bottom-40 -left-40 w-80 h-80 rounded-full opacity-15 animate-float-down"
           style={{ background: "radial-gradient(circle, rgba(139,92,246,0.2), transparent)" }}
-          animate={{ y: [0, -30, 0] }}
-          transition={{ duration: 10, repeat: Infinity }}
         />
       </div>
 
@@ -274,12 +270,10 @@ export default function StrategicEdgeComponent({
                   whileTap={{ scale: 0.95 }}
                   variants={itemVariants}
                 >
-                  {/* Pulsing glow effect */}
-                  <motion.div
-                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100"
+                  {/* Pulsing glow effect (GPU-accelerated CSS animation) */}
+                  <div
+                    className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 group-hover:animate-pulse-glow"
                     style={{ background: "radial-gradient(circle, rgba(99,102,241,0.5), transparent)" }}
-                    animate={{ scale: [1, 1.1, 1] }}
-                    transition={{ duration: 2, repeat: Infinity }}
                   />
                   <span className="relative z-10 flex items-center gap-2">
                     Launch Your Campaign Dashboard
