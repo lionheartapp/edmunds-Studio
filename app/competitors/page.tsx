@@ -26,7 +26,9 @@ export default function CompetitorsPage() {
 
   const fetchCompetitors = useCallback(async (brand: BrandDNA) => {
     const competitors = brand.competitors || []
+    console.log("[competitors] brand.competitors:", competitors)
     if (competitors.length === 0) {
+      console.warn("[competitors] No competitor names in brand DNA — skipping fetch")
       setIsLoading(false)
       return
     }
@@ -46,6 +48,10 @@ export default function CompetitorsPage() {
       })
       clearTimeout(timer)
 
+      if (!res.ok) {
+        throw new Error(`Competitors API returned ${res.status}`)
+      }
+
       const data = await res.json()
       const profiles = (data.competitorProfiles || []).map(
         (cp: Record<string, unknown>) => ({
@@ -59,9 +65,14 @@ export default function CompetitorsPage() {
         })
       )
 
-      const updated = { ...brand, competitorProfiles: profiles }
-      setBrandDna(updated)
-      sessionStorage.setItem("eds_brand_dna", JSON.stringify(updated))
+      // Only cache if we actually got data
+      if (profiles.length > 0) {
+        const updated = { ...brand, competitorProfiles: profiles }
+        setBrandDna(updated)
+        sessionStorage.setItem("eds_brand_dna", JSON.stringify(updated))
+      } else {
+        setFetchError("No competitor data returned. Try again.")
+      }
     } catch (err) {
       if (err instanceof Error && err.name !== "AbortError") {
         console.error("Failed to fetch competitor profiles:", err)

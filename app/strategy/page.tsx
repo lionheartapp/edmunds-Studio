@@ -44,6 +44,8 @@ export default function StrategyPage() {
       if (data.edge) {
         sessionStorage.setItem("eds_strategic_edge", JSON.stringify(data.edge))
         setEdge(data.edge)
+      } else {
+        setFetchError("Strategic analysis returned no data. Try again.")
       }
     } catch (err) {
       if (err instanceof Error && err.name !== "AbortError") {
