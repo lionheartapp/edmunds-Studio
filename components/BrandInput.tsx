@@ -150,19 +150,19 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
             aria-live="polite"
           >
             {/* WebGL Orb — reactbits.dev */}
-            <div className="relative w-48 h-48 mb-10">
+            <div className="relative w-72 h-72 mb-12">
               <Suspense fallback={<div className="w-full h-full rounded-full bg-eds-50/20 blur-xl animate-pulse" />}>
-                <Orb hue={220} hoverIntensity={0.3} rotateOnHover forceHoverState backgroundColor="#09090b" />
+                <Orb hue={0} hoverIntensity={0.3} rotateOnHover forceHoverState backgroundColor="#09090b" />
               </Suspense>
             </div>
 
-            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-xl font-semibold text-zinc-200 mb-3">
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-2xl font-semibold text-zinc-200 mb-4">
               Analyzing <span className="accent-gradient-text">{brand}</span>
             </motion.p>
-            <div className="h-6 overflow-hidden">
+            <div className="h-7 overflow-hidden">
               <AnimatePresence mode="wait">
                 <motion.p key={sayingIndex} initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -15 }}
-                  transition={{ duration: 0.3 }} className="text-sm text-zinc-500 text-center">
+                  transition={{ duration: 0.3 }} className="text-base text-zinc-500 text-center">
                   {LOADING_SAYINGS[sayingIndex]}
                 </motion.p>
               </AnimatePresence>
