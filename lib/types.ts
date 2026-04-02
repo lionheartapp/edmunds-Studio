@@ -46,6 +46,7 @@ export interface CompetitorProfile {
   name: string
   domain: string
   logoColor: string // hex color for the avatar placeholder
+  logoUrl?: string // real logo from Brandfetch (when available)
   adSpend: string // e.g. "$50k-100k/mo"
   topPlatform: string
   audienceOverlap: number // 0-100%

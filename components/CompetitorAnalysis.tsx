@@ -144,15 +144,37 @@ export default function CompetitorAnalysis({
                   <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-6">
                     {/* Avatar and Name */}
                     <div className="flex items-center gap-4">
-                      <div
-                        className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold text-white/90 hover:scale-110 transition-transform duration-300"
-                        style={{
-                          background: competitor.logoColor,
-                          boxShadow: `0 0 32px ${competitor.logoColor}40`,
-                        }}
-                      >
-                        {competitor.name[0].toUpperCase()}
-                      </div>
+                      {competitor.logoUrl ? (
+                        <div
+                          className="w-16 h-16 rounded-full overflow-hidden bg-zinc-800 border border-white/10 flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                          style={{ boxShadow: `0 0 32px ${competitor.logoColor}40` }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={competitor.logoUrl}
+                            alt={`${competitor.name} logo`}
+                            className="w-10 h-10 object-contain"
+                            onError={(e) => {
+                              const el = e.target as HTMLImageElement
+                              const parent = el.parentElement
+                              if (parent) {
+                                parent.style.background = competitor.logoColor
+                                parent.innerHTML = `<span class="text-white text-xl font-bold">${competitor.name[0].toUpperCase()}</span>`
+                              }
+                            }}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold text-white/90 hover:scale-110 transition-transform duration-300"
+                          style={{
+                            background: competitor.logoColor,
+                            boxShadow: `0 0 32px ${competitor.logoColor}40`,
+                          }}
+                        >
+                          {competitor.name[0].toUpperCase()}
+                        </div>
+                      )}
                       <div>
                         <h3 className="text-xl md:text-2xl font-bold text-white">
                           {competitor.name}

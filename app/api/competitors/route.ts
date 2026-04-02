@@ -13,6 +13,7 @@ import {
   getMarketData,
   getDataSource,
 } from "@/lib/edmunds"
+import { fetchBrand, getBestLogoUrl } from "@/lib/brandfetch"
 
 export const maxDuration = 60
 
@@ -20,6 +21,7 @@ interface CompetitorProfile {
   name: string
   domain: string
   logoColor: string
+  logoUrl?: string
   adSpend: string
   topPlatform: string
   audienceOverlap: number
@@ -79,21 +81,38 @@ export async function POST(request: NextRequest) {
 
     console.log(`[competitors] Fetching profiles for ${competitors.join(", ")} (brand: ${brandName})`)
 
-    // ── Fetch real Edmunds data for each competitor in parallel ──
+    // ── Fetch real Edmunds data + Brandfetch logos for each competitor in parallel ──
     const competitorNames = competitors.slice(0, 3)
-    const edmundsResults = await Promise.allSettled(
-      competitorNames.map(async (name: string) => {
-        const [inv, mkt] = await Promise.allSettled([
-          getInventorySummary(name),
-          getMarketData(name),
-        ])
-        return {
-          name,
-          inventory: inv.status === "fulfilled" ? inv.value : null,
-          market: mkt.status === "fulfilled" ? mkt.value : null,
-        }
-      })
-    )
+    const [edmundsResults, logoResults] = await Promise.all([
+      Promise.allSettled(
+        competitorNames.map(async (name: string) => {
+          const [inv, mkt] = await Promise.allSettled([
+            getInventorySummary(name),
+            getMarketData(name),
+          ])
+          return {
+            name,
+            inventory: inv.status === "fulfilled" ? inv.value : null,
+            market: mkt.status === "fulfilled" ? mkt.value : null,
+          }
+        })
+      ),
+      // Fetch logos via Brandfetch (fire-and-forget, never blocks)
+      Promise.allSettled(
+        competitorNames.map(async (name: string) => {
+          const bf = await withTimeout(fetchBrand(name), 5000, `logo:${name}`)
+          return { name, logoUrl: bf ? getBestLogoUrl(bf) : null }
+        })
+      ),
+    ])
+
+    // Build a name → logoUrl map
+    const logoMap = new Map<string, string>()
+    for (const r of logoResults) {
+      if (r.status === "fulfilled" && r.value.logoUrl) {
+        logoMap.set(r.value.name, r.value.logoUrl)
+      }
+    }
 
     const competitorEdmundsData = edmundsResults
       .filter(r => r.status === "fulfilled")
@@ -131,7 +150,7 @@ export async function POST(request: NextRequest) {
     )
 
     if (result && result.competitorProfiles) {
-      // Ensure safe defaults on each profile
+      // Ensure safe defaults on each profile + attach logos
       const profiles = result.competitorProfiles.map((cp) => ({
         ...cp,
         ads: cp.ads || [],
@@ -140,6 +159,7 @@ export async function POST(request: NextRequest) {
         audienceOverlap: cp.audienceOverlap || 0,
         adSpend: cp.adSpend || "Unknown",
         topPlatform: cp.topPlatform || "Unknown",
+        logoUrl: logoMap.get(cp.name) || undefined,
       }))
 
       console.log(`[competitors] Success: ${profiles.length} profiles in ${Date.now() - startTime}ms`)
