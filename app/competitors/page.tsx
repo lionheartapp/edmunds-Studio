@@ -29,27 +29,10 @@ function EdgeLoader() {
   return (
     <div className="flex flex-col items-center text-center">
       <div className="relative w-16 h-16 mb-6">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-[-4px] bg-eds-50/20 blur-md"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.15, 1],
-            borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-          className="absolute inset-0 bg-eds-50/25"
-        />
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80"
-        />
+        {/* All CSS animations — zero JS thread usage */}
+        <div className="absolute inset-[-4px] bg-eds-50/20 blur-md animate-blob-glow" />
+        <div className="absolute inset-0 bg-eds-50/25 animate-blob-morph" />
+        <div className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80 animate-spin-slow" />
       </div>
       <p className="text-zinc-200 font-medium mb-2">Strategic Edge</p>
       <div className="h-5 overflow-hidden">

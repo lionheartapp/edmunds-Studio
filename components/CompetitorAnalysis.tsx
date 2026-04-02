@@ -253,13 +253,20 @@ export default function CompetitorAnalysis({
                   <h4 className="text-lg font-semibold text-white mb-6">
                     Recent Campaigns ({(competitor.ads || []).length})
                   </h4>
-                  <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  <div className={`grid gap-6 ${
+                    (competitor.ads || []).length === 1
+                      ? "grid-cols-1"
+                      : (competitor.ads || []).length === 2
+                        ? "md:grid-cols-2"
+                        : "md:grid-cols-2 lg:grid-cols-3"
+                  }`}>
                     {(competitor.ads || []).map((ad, adIndex) => (
                       <CompetitorAdCard
                         key={adIndex}
                         ad={ad}
                         competitor={competitor}
                         variants={cardHoverVariants}
+                        horizontal={(competitor.ads || []).length === 1}
                       />
                     ))}
                   </div>
@@ -410,10 +417,12 @@ function CompetitorAdCard({
   ad,
   competitor,
   variants,
+  horizontal = false,
 }: {
   ad: CompetitorAd;
   competitor: CompetitorProfile;
   variants: any;
+  horizontal?: boolean;
 }) {
   const sentimentConfig = {
     positive: {
@@ -440,13 +449,17 @@ function CompetitorAdCard({
 
   return (
     <motion.div
-      className="group bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors"
+      className={`group bg-white/[0.02] border border-white/10 rounded-xl overflow-hidden hover:border-white/20 transition-colors ${
+        horizontal ? "flex flex-col md:flex-row" : ""
+      }`}
       variants={variants}
       initial="rest"
       whileHover="hover"
     >
       {/* Visual Mockup Area */}
-      <div className="relative h-48 overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900">
+      <div className={`relative overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 ${
+        horizontal ? "h-48 md:h-auto md:w-80 flex-shrink-0" : "h-48"
+      }`}>
         {/* Abstract visual using competitor's color and CSS gradients */}
         <div
           className="absolute inset-0"
@@ -465,27 +478,21 @@ function CompetitorAdCard({
 
         {/* Format Badge */}
         <div className="absolute top-3 right-3 z-10">
-          <motion.div
-            className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-xs font-bold text-white"
-            whileHover={{ scale: 1.05 }}
-          >
+          <div className="px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-white/20 text-xs font-bold text-white">
             {ad.format}
-          </motion.div>
+          </div>
         </div>
 
         {/* Thumbnail description overlay on hover */}
-        <motion.div
-          className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-          whileHover={{ opacity: 1 }}
-        >
+        <div className="absolute inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
           <p className="text-center text-sm text-white font-medium px-4">
             {ad.thumbnailDesc}
           </p>
-        </motion.div>
+        </div>
       </div>
 
       {/* Content Area */}
-      <div className="p-4 md:p-5">
+      <div className={`p-4 md:p-5 ${horizontal ? "flex-1 min-w-0" : ""}`}>
         {/* Platform and Date */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
@@ -495,12 +502,12 @@ function CompetitorAdCard({
         </div>
 
         {/* Headline */}
-        <h4 className="font-bold text-white text-sm md:text-base mb-2 line-clamp-2">
+        <h4 className={`font-bold text-white mb-2 ${horizontal ? "text-base md:text-lg" : "text-sm md:text-base line-clamp-2"}`}>
           {ad.headline}
         </h4>
 
         {/* Body Text */}
-        <p className="text-xs md:text-sm text-zinc-400 mb-4 line-clamp-2">
+        <p className={`text-xs md:text-sm text-zinc-400 mb-4 ${horizontal ? "line-clamp-3" : "line-clamp-2"}`}>
           {ad.bodyText}
         </p>
 
@@ -510,7 +517,7 @@ function CompetitorAdCard({
         </div>
 
         {/* Stats Row */}
-        <div className="grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-white/5">
+        <div className={`grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-white/5 ${horizontal ? "md:grid-cols-3" : ""}`}>
           {/* Impressions */}
           <div>
             <p className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
@@ -532,34 +539,43 @@ function CompetitorAdCard({
               {ad.engagementRate}%
             </p>
           </div>
+
+          {/* Sentiment — inline in horizontal mode */}
+          {horizontal && (
+            <div>
+              <p className="text-xs text-zinc-500 mb-1">Sentiment</p>
+              <div
+                className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full font-semibold text-xs ${sentimentStyle.bg} border ${sentimentStyle.border} ${sentimentStyle.text}`}
+              >
+                <span>{sentimentStyle.icon}</span>
+                <span className="capitalize">{ad.sentiment}</span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Sentiment Badge */}
-        <div className="mb-3">
-          <motion.div
-            className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-xs ${sentimentStyle.bg} border ${sentimentStyle.border} ${sentimentStyle.text}`}
-            whileHover={{ scale: 1.05 }}
-          >
-            <span>{sentimentStyle.icon}</span>
-            <span className="capitalize">
-              {ad.sentiment} Sentiment
-            </span>
-          </motion.div>
-        </div>
+        {/* Sentiment Badge — only in vertical mode */}
+        {!horizontal && (
+          <div className="mb-3">
+            <div
+              className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-xs ${sentimentStyle.bg} border ${sentimentStyle.border} ${sentimentStyle.text}`}
+            >
+              <span>{sentimentStyle.icon}</span>
+              <span className="capitalize">
+                {ad.sentiment} Sentiment
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Why It Works Callout */}
         {ad.whyItWorks && (
-          <motion.div
-            className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-blue-200/90 italic"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            transition={{ delay: 0.2 }}
-          >
+          <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-blue-200/90 italic">
             <p className="flex items-start gap-2">
               <span className="text-blue-400 font-bold mt-0.5">💡</span>
               <span>{ad.whyItWorks}</span>
             </p>
-          </motion.div>
+          </div>
         )}
       </div>
     </motion.div>
@@ -615,29 +631,11 @@ function CompetitorLoader() {
       exit={{ opacity: 0, y: -20 }}
       className="flex flex-col items-center justify-center py-24"
     >
-      {/* Animated blob — framer-motion (only visible during loading, not a perf concern) */}
+      {/* Animated blob — CSS animations (zero JS thread usage) */}
       <div className="relative w-20 h-20 mb-8">
-        <motion.div
-          animate={{
-            scale: [1, 1.2, 1],
-            borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
-          }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute inset-[-6px] bg-eds-50/20 blur-md"
-        />
-        <motion.div
-          animate={{
-            scale: [1, 1.15, 1],
-            borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
-          }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-          className="absolute inset-0 bg-eds-50/25"
-        />
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-          className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80"
-        />
+        <div className="absolute inset-[-6px] bg-eds-50/20 blur-md animate-blob-glow" />
+        <div className="absolute inset-0 bg-eds-50/25 animate-blob-morph" />
+        <div className="absolute inset-2 rounded-full border-2 border-eds-60/30 border-t-eds-60/80 animate-spin-slow" />
         {/* Crosshair / target icon */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
           <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" className="opacity-80">
