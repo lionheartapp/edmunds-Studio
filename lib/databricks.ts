@@ -809,39 +809,110 @@ export function getDisplayModelName(rawModel: string): string {
 }
 
 /**
- * Build Edmunds media CDN URLs for a vehicle.
- * Pattern: https://media.ed.edmunds-media.com/{make}/{model}/{year}/oem/{year}_{make}_{model}_{angle}_oem_{seq}_{size}.jpg
- *
- * Angle codes: f34 (front 3/4), r34 (rear 3/4), sd (side), ft (front), bk (back)
+ * Build Edmunds media CDN URL for a vehicle.
+ * Real CDN pattern: {make}/{model}/{year}/oem/{year}_{make}_{model}_{bodyStyle}_{trim}_fq_oem_{seq}_{size}.jpg
  */
 export function getEdmundsVehicleImageUrl(
   make: string,
   model: string,
   year: number | string,
-  angle: "f34" | "r34" | "sd" | "ft" | "bk" = "f34",
-  size: 600 | 1600 = 600
+  bodyTrim: string,
+  size: 600 | 1600 = 600,
+  seq: number = 1
 ): string {
   const m = make.toLowerCase().replace(/[^a-z0-9-]/g, "")
   const mod = normalizeModelSlug(model)
-  return `https://media.ed.edmunds-media.com/${m}/${mod}/${year}/oem/${year}_${m}_${mod}_${angle}_oem_1_${size}.jpg`
+  return `https://media.ed.edmunds-media.com/${m}/${mod}/${year}/oem/${year}_${m}_${mod}_${bodyTrim}_fq_oem_${seq}_${size}.jpg`
 }
 
+// Default body-style + trim combos per model, verified against the CDN.
+// The CDN requires {bodyStyle}_{trim} — images without them 404.
+// First entry is the most likely to exist; frontend cascades through on error.
+const BODY_TRIM_CANDIDATES: Record<string, string[]> = {
+  // Trucks
+  "f-150": ["crew-cab-pickup_stx", "crew-cab-pickup_lariat"],
+  "silverado-1500": ["crew-cab-pickup_lt", "crew-cab-pickup_custom"],
+  "ram-1500": ["crew-cab-pickup_big-horn", "crew-cab-pickup_laramie"],
+  "tacoma": ["crew-cab-pickup_limited", "crew-cab-pickup_sr5"],
+  "tundra": ["extended-cab-pickup_sr5", "crew-cab-pickup_limited"],
+  "f-250-super-duty": ["crew-cab-pickup_lariat"],
+  "f-350-super-duty": ["crew-cab-pickup_lariat"],
+  "colorado": ["crew-cab-pickup_lt", "crew-cab-pickup_z71"],
+  "ranger": ["crew-cab-pickup_xlt", "crew-cab-pickup_lariat"],
+  "frontier": ["crew-cab-pickup_sv", "crew-cab-pickup_pro-x"],
+  "gladiator": ["crew-cab-pickup_sport", "crew-cab-pickup_rubicon"],
+  // SUVs
+  "explorer": ["4dr-suv_st", "4dr-suv_platinum", "4dr-suv_xlt"],
+  "bronco": ["convertible-suv_big-bend", "convertible-suv_raptor"],
+  "bronco-sport": ["4dr-suv_badlands", "4dr-suv_outer-banks"],
+  "escape": ["4dr-suv_plug-in-hybrid", "4dr-suv_active"],
+  "expedition": ["4dr-suv_max-platinum", "4dr-suv_xlt"],
+  "rav4": ["4dr-suv_limited", "4dr-suv_xle"],
+  "highlander": ["4dr-suv_platinum", "4dr-suv_xle"],
+  "4runner": ["4dr-suv_limited", "4dr-suv_trd-off-road"],
+  "cr-v": ["4dr-suv_ex-l", "4dr-suv_sport"],
+  "pilot": ["4dr-suv_elite", "4dr-suv_exl"],
+  "tucson": ["4dr-suv_hybrid-limited", "4dr-suv_sel"],
+  "santa-fe": ["4dr-suv_calligraphy", "4dr-suv_sel"],
+  "cx-5": ["4dr-suv_preferred", "4dr-suv_select"],
+  "cx-50": ["4dr-suv_preferred", "4dr-suv_select"],
+  "equinox": ["4dr-suv_lt", "4dr-suv_rs"],
+  "tahoe": ["4dr-suv_high-country", "4dr-suv_lt"],
+  "suburban": ["4dr-suv_high-country", "4dr-suv_lt"],
+  "grand-cherokee": ["4dr-suv_summit", "4dr-suv_overland"],
+  "wrangler": ["convertible-suv_rubicon-x", "convertible-suv_sport"],
+  "tiguan": ["4dr-suv_se", "4dr-suv_sel"],
+  "atlas": ["4dr-suv_se", "4dr-suv_sel"],
+  "outback": ["4dr-suv_touring-xt", "4dr-suv_premium"],
+  "forester": ["4dr-suv_sport", "4dr-suv_premium"],
+  "rogue": ["4dr-suv_dark-armor", "4dr-suv_sv"],
+  "pathfinder": ["4dr-suv_sv", "4dr-suv_sl"],
+  "telluride": ["4dr-suv_lx", "4dr-suv_ex"],
+  "palisade": ["4dr-suv_calligraphy", "4dr-suv_sel"],
+  // Sedans
+  "camry": ["sedan_nightshade", "sedan_se", "sedan_le"],
+  "civic": ["sedan_si", "sedan_sport"],
+  "accord": ["sedan_lx", "sedan_sport"],
+  "corolla": ["sedan_le", "sedan_se"],
+  "altima": ["sedan_sv", "sedan_sl"],
+  "mustang": ["coupe_gt", "coupe_ecoboost", "fastback_gt"],
+  "model-y": ["4dr-suv_long-range", "4dr-suv_performance"],
+  "model-3": ["sedan_long-range", "sedan_performance"],
+  // EVs
+  "mustang-mach-e": ["4dr-suv_select", "4dr-suv_premium"],
+  "f-150-lightning": ["crew-cab-pickup_lariat", "crew-cab-pickup_xlt"],
+  "ioniq-5": ["4dr-suv_se", "4dr-suv_sel"],
+  "ev6": ["4dr-suv_light", "4dr-suv_wind"],
+  "id.4": ["4dr-suv_standard", "4dr-suv_pro-s"],
+  "blazer-ev": ["4dr-suv_lt", "4dr-suv_rs"],
+}
+
+// Generic fallbacks when model isn't in the map
+const GENERIC_BODY_TRIMS = ["4dr-suv_limited", "4dr-suv_sel", "sedan_se", "crew-cab-pickup_lariat"]
+
 /**
- * Get multiple candidate image URLs for a vehicle — tries multiple years and angles
- * so the frontend can cascade through them on error.
+ * Get multiple candidate image URLs for a vehicle — tries body/trim combos
+ * across multiple years so the frontend can cascade through them on error.
  */
 export function getEdmundsVehicleImages(make: string, model: string, year: number | string): string[] {
   const numYear = typeof year === "string" ? parseInt(year, 10) : year
   const currentYear = new Date().getFullYear()
-  // Try the given year, then current year, then previous year
   const years = [...new Set([numYear, currentYear, currentYear + 1, currentYear - 1].filter(y => y > 2018))]
 
+  const mod = normalizeModelSlug(model)
+  const bodyTrims = BODY_TRIM_CANDIDATES[mod] || GENERIC_BODY_TRIMS
+
   const urls: string[] = []
-  for (const y of years) {
-    urls.push(getEdmundsVehicleImageUrl(make, model, y, "f34", 600))
+  // Primary: try each body/trim combo for the target year
+  for (const bt of bodyTrims) {
+    urls.push(getEdmundsVehicleImageUrl(make, model, years[0], bt, 600))
   }
-  // Also add a side view for the primary year
-  urls.push(getEdmundsVehicleImageUrl(make, model, years[0], "sd", 600))
+  // Secondary: try first body/trim for other years
+  for (const y of years.slice(1)) {
+    urls.push(getEdmundsVehicleImageUrl(make, model, y, bodyTrims[0], 600))
+  }
+  // Also try seq 2 for the primary combo (different color)
+  urls.push(getEdmundsVehicleImageUrl(make, model, years[0], bodyTrims[0], 600, 2))
   return urls
 }
 
