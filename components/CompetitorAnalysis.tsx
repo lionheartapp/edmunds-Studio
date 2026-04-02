@@ -1,16 +1,12 @@
 "use client";
 
 import React, { useMemo } from "react";
-import { motion } from "framer-motion";
 import { BrandDNA, CompetitorProfile, CompetitorAd } from "@/lib/types";
 import {
   TrendingUp,
-  Share2,
-  MessageSquare,
   Heart,
   AlertCircle,
   CheckCircle,
-  ArrowRight,
 } from "lucide-react";
 
 interface CompetitorAnalysisProps {
@@ -24,47 +20,15 @@ export default function CompetitorAnalysis({
 }: CompetitorAnalysisProps) {
   const competitors = brandDna.competitorProfiles || [];
 
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2,
-      },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5, ease: "easeOut" as const },
-    },
-  };
-
-  const cardHoverVariants = {
-    rest: { y: 0, boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)" },
-    hover: {
-      y: -8,
-      boxShadow: "0 20px 25px rgba(0, 0, 0, 0.3)",
-      transition: { duration: 0.3, ease: "easeOut" as const },
-    },
-  };
-
-  // Calculate metrics for competitive summary
   const competitorMetrics = useMemo(() => {
     const avgOverlap = competitors.length > 0
       ? competitors.reduce((sum, c) => sum + (c.audienceOverlap || 0), 0) / competitors.length
       : 0;
-    const totalAdSpend = competitors.length;
     const totalAds = competitors.reduce(
       (sum, c) => sum + (c.ads?.length || 0),
       0
     );
-
-    return { avgOverlap, totalAdSpend, totalAds };
+    return { avgOverlap, totalAds };
   }, [competitors]);
 
   return (
@@ -77,60 +41,37 @@ export default function CompetitorAnalysis({
 
       <div className="relative z-10">
         {/* Header Section */}
-        <motion.div
-          className="px-6 sm:px-8 md:px-12 py-12 md:py-16 border-b border-white/5"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
+        <div
+          className="px-6 sm:px-8 md:px-12 py-12 md:py-16 border-b border-white/5 animate-[fade-in-up_0.5s_ease-out_both]"
         >
-          <motion.div
-            className="max-w-6xl mx-auto"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.h1
-              className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent"
-              variants={itemVariants}
-            >
+          <div className="max-w-6xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">
               Competitive Landscape
-            </motion.h1>
-            <motion.div
-              className="flex items-center gap-3 text-lg md:text-xl text-zinc-400"
-              variants={itemVariants}
-            >
+            </h1>
+            <div className="flex items-center gap-3 text-lg md:text-xl text-zinc-400">
               {brandDna.logoUrl && (
                 <img src={brandDna.logoUrl} alt={brandDna.name} className="w-8 h-8 object-contain" />
               )}
               <span>{brandDna.name} vs. the competition</span>
-            </motion.div>
-          </motion.div>
-        </motion.div>
+            </div>
+          </div>
+        </div>
 
         {/* Competitor Sections */}
-        <motion.div
-          className="px-6 sm:px-8 md:px-12 py-12"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="px-6 sm:px-8 md:px-12 py-12">
           <div className="max-w-6xl mx-auto space-y-16">
             {competitors.length === 0 && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-20"
-              >
+              <div className="text-center py-20 animate-[fade-in_0.4s_ease-out_both]">
                 <p className="text-zinc-400 text-lg">No competitor data available yet.</p>
                 <p className="text-zinc-500 text-sm mt-2">You can still continue to the strategy phase.</p>
-              </motion.div>
+              </div>
             )}
 
             {competitors.map((competitor, compIndex) => (
-              <motion.div
+              <div
                 key={competitor.domain}
-                className="bg-zinc-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-colors cursor-pointer"
-                variants={itemVariants}
+                className="bg-zinc-900/80 border border-white/10 rounded-2xl overflow-hidden hover:border-white/20 transition-colors animate-[fade-in-up_0.5s_ease-out_both]"
+                style={{ animationDelay: `${compIndex * 150}ms` }}
               >
                 {/* Competitor Header Card */}
                 <div className="p-6 md:p-8 border-b border-white/5">
@@ -139,14 +80,14 @@ export default function CompetitorAnalysis({
                     <div className="flex items-center gap-4">
                       {competitor.logoUrl ? (
                         <div
-                          className="w-16 h-16 rounded-full overflow-hidden bg-zinc-800 border border-white/10 flex items-center justify-center hover:scale-110 transition-transform duration-300"
+                          className="w-16 h-16 rounded-full overflow-hidden bg-zinc-800 border border-white/10 flex items-center justify-center"
                           style={{ boxShadow: `0 0 32px ${competitor.logoColor}40` }}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
                             src={competitor.logoUrl}
                             alt={`${competitor.name} logo`}
-                            className="w-10 h-10 object-contain"
+                            className="w-full h-full object-contain p-2"
                             onError={(e) => {
                               const el = e.target as HTMLImageElement
                               const parent = el.parentElement
@@ -159,7 +100,7 @@ export default function CompetitorAnalysis({
                         </div>
                       ) : (
                         <div
-                          className="w-16 h-16 rounded-full flex items-center justify-center text-white text-xl font-bold text-white/90 hover:scale-110 transition-transform duration-300"
+                          className="w-16 h-16 rounded-full flex items-center justify-center text-xl font-bold text-white/90"
                           style={{
                             background: competitor.logoColor,
                             boxShadow: `0 0 32px ${competitor.logoColor}40`,
@@ -180,18 +121,11 @@ export default function CompetitorAnalysis({
 
                     {/* Stats Row */}
                     <div className="w-full md:w-auto flex flex-wrap gap-3">
-                      {/* Ad Spend Badge */}
-                      <div
-                        className="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-sm font-medium text-blue-200 flex items-center gap-2 whitespace-nowrap hover:scale-105 transition-transform"
-                      >
+                      <div className="px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/30 text-sm font-medium text-blue-200 flex items-center gap-2 whitespace-nowrap">
                         <TrendingUp size={16} />
                         <span>{competitor.adSpend} spent</span>
                       </div>
-
-                      {/* Top Platform Badge */}
-                      <div
-                        className="px-4 py-2 rounded-full bg-eds-40/10 border border-eds-40/30 text-sm font-medium text-eds-80 whitespace-nowrap hover:scale-105 transition-transform"
-                      >
+                      <div className="px-4 py-2 rounded-full bg-eds-40/10 border border-eds-40/30 text-sm font-medium text-eds-80 whitespace-nowrap">
                         {competitor.topPlatform}
                       </div>
                     </div>
@@ -208,18 +142,15 @@ export default function CompetitorAnalysis({
                       </span>
                     </div>
                     <div className="w-full h-2 bg-white/5 rounded-full overflow-hidden">
-                      <motion.div
-                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-400"
-                        initial={{ width: 0 }}
-                        animate={{ width: `${competitor.audienceOverlap}%` }}
-                        transition={{ duration: 0.8, ease: "easeOut" as const }}
+                      <div
+                        className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 animate-[grow-width_0.8s_ease-out_0.3s_both]"
+                        style={{ "--target-width": `${competitor.audienceOverlap}%` } as React.CSSProperties}
                       />
                     </div>
                   </div>
 
                   {/* Strengths and Weaknesses */}
                   <div className="grid md:grid-cols-2 gap-6">
-                    {/* Strengths */}
                     <div>
                       <h4 className="text-sm font-semibold text-emerald-300 mb-3 flex items-center gap-2">
                         <CheckCircle size={16} />
@@ -227,18 +158,15 @@ export default function CompetitorAnalysis({
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {competitor.strengths.map((strength, idx) => (
-                          <motion.div
+                          <div
                             key={idx}
                             className="px-3 py-1.5 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-xs font-medium text-emerald-200"
-                            variants={itemVariants}
                           >
                             {strength}
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     </div>
-
-                    {/* Weaknesses */}
                     <div>
                       <h4 className="text-sm font-semibold text-amber-300 mb-3 flex items-center gap-2">
                         <AlertCircle size={16} />
@@ -246,13 +174,12 @@ export default function CompetitorAnalysis({
                       </h4>
                       <div className="flex flex-wrap gap-2">
                         {competitor.weaknesses.map((weakness, idx) => (
-                          <motion.div
+                          <div
                             key={idx}
                             className="px-3 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/40 text-xs font-medium text-amber-200"
-                            variants={itemVariants}
                           >
                             {weakness}
-                          </motion.div>
+                          </div>
                         ))}
                       </div>
                     </div>
@@ -274,24 +201,18 @@ export default function CompetitorAnalysis({
                         key={adIndex}
                         ad={ad}
                         competitor={competitor}
-                        variants={cardHoverVariants}
                         horizontal={(competitor.ads || []).length <= 2}
                       />
                     ))}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.div>
+        </div>
 
         {/* Competitive Summary Section */}
-        <motion.div
-          className="px-6 sm:px-8 md:px-12 py-12"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
+        <div className="px-6 sm:px-8 md:px-12 py-12 animate-[fade-in-up_0.5s_ease-out_0.2s_both]">
           <div className="max-w-6xl mx-auto">
             <h2 className="text-3xl font-bold text-white mb-8">
               Competitive Summary
@@ -299,10 +220,7 @@ export default function CompetitorAnalysis({
 
             <div className="grid md:grid-cols-3 gap-6">
               {/* Your Brand Card */}
-              <motion.div
-                className="bg-blue-950/60 border border-blue-500/40 rounded-2xl p-6"
-                variants={itemVariants}
-              >
+              <div className="bg-blue-950/60 border border-blue-500/40 rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4">
                   {brandDna.name}
                 </h3>
@@ -314,57 +232,43 @@ export default function CompetitorAnalysis({
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-zinc-400 mb-1">
-                      Campaign Strategy
-                    </p>
+                    <p className="text-xs text-zinc-400 mb-1">Campaign Strategy</p>
                     <p className="text-sm font-medium text-blue-200">
                       {brandDna.voice.join(", ")}
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Key Metrics */}
-              <motion.div
-                className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6"
-                variants={itemVariants}
-              >
+              <div className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4">
                   Market Overview
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs text-zinc-400 mb-1">
-                      Competitors Tracked
-                    </p>
+                    <p className="text-xs text-zinc-400 mb-1">Competitors Tracked</p>
                     <p className="text-2xl font-bold text-white">
                       {competitors.length}
                     </p>
                   </div>
                   <div>
-                    <p className="text-xs text-zinc-400 mb-1">
-                      Total Active Ads
-                    </p>
+                    <p className="text-xs text-zinc-400 mb-1">Total Active Ads</p>
                     <p className="text-2xl font-bold text-white">
                       {competitorMetrics.totalAds}
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
 
               {/* Average Insights */}
-              <motion.div
-                className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6"
-                variants={itemVariants}
-              >
+              <div className="bg-zinc-900/80 border border-white/10 rounded-2xl p-6">
                 <h3 className="text-lg font-bold text-white mb-4">
                   Audience Insights
                 </h3>
                 <div className="space-y-3">
                   <div>
-                    <p className="text-xs text-zinc-400 mb-1">
-                      Avg Audience Overlap
-                    </p>
+                    <p className="text-xs text-zinc-400 mb-1">Avg Audience Overlap</p>
                     <p className="text-2xl font-bold text-white">
                       {Math.round(competitorMetrics.avgOverlap)}%
                     </p>
@@ -376,82 +280,53 @@ export default function CompetitorAnalysis({
                     </p>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </div>
-        </motion.div>
+        </div>
 
-        {/* Sticky Continue CTA */}
-        <motion.div
-          className="sticky bottom-0 z-30 px-6 sm:px-8 md:px-12 py-5 border-t border-white/5 bg-zinc-950/95"
-          variants={itemVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="max-w-6xl mx-auto flex justify-center">
+        {/* Continue CTA */}
+        <div className="px-6 sm:px-8 md:px-12 py-10 animate-[fade-in-up_0.5s_ease-out_0.3s_both]">
+          <div className="max-w-6xl mx-auto">
             <button
               onClick={onContinue}
-              className="group relative px-8 py-4 rounded-lg font-semibold text-white text-lg flex items-center gap-3 overflow-hidden hover:scale-105 active:scale-[0.98] transition-transform duration-200"
+              className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 hover:scale-[1.005] active:scale-[0.98]"
+              style={{ boxShadow: "0 0 30px rgba(32, 112, 232, 0.25)" }}
             >
-              {/* Button background with gradient */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 opacity-100 group-hover:opacity-110 transition-opacity" />
-
-              {/* Animated glow effect on hover */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-cyan-300 opacity-0 group-hover:opacity-30 blur-xl transition-opacity duration-300" />
-
-              {/* Button content */}
-              <span className="relative z-10 flex items-center gap-2">
-                See Your Strategic Edge
-                <span className="inline-block animate-nudge-right">
-                  <ArrowRight size={20} />
-                </span>
-              </span>
+              See Your Strategic Edge →
             </button>
+            <p className="text-center text-xs text-zinc-600 mt-3">
+              Review the competitive landscape above before continuing
+            </p>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
 }
 
-// Competitor Ad Card Component
+/* ── Competitor Ad Card ── */
+
 function CompetitorAdCard({
   ad,
   competitor,
-  variants,
   horizontal = false,
 }: {
   ad: CompetitorAd;
   competitor: CompetitorProfile;
-  variants: any;
   horizontal?: boolean;
 }) {
   const sentimentConfig = {
-    positive: {
-      bg: "bg-emerald-500/10",
-      border: "border-emerald-500/40",
-      text: "text-emerald-200",
-      icon: "✓",
-    },
-    neutral: {
-      bg: "bg-amber-500/10",
-      border: "border-amber-500/40",
-      text: "text-amber-200",
-      icon: "→",
-    },
-    negative: {
-      bg: "bg-red-500/10",
-      border: "border-red-500/40",
-      text: "text-red-200",
-      icon: "!",
-    },
+    positive: { bg: "bg-emerald-500/10", border: "border-emerald-500/40", text: "text-emerald-200", icon: "✓" },
+    neutral: { bg: "bg-amber-500/10", border: "border-amber-500/40", text: "text-amber-200", icon: "→" },
+    negative: { bg: "bg-red-500/10", border: "border-red-500/40", text: "text-red-200", icon: "!" },
   };
 
   const sentimentStyle = sentimentConfig[ad.sentiment];
 
   return (
     <div
-      className={`group bg-zinc-900/80 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:-translate-y-2 hover:shadow-2xl transition-all duration-300 ${
+      className={`group bg-zinc-900/80 border border-white/10 rounded-xl overflow-hidden hover:border-white/20 hover:-translate-y-1 hover:shadow-xl transition-all duration-300 ${
         horizontal ? "flex flex-col md:flex-row" : ""
       }`}
     >
@@ -459,15 +334,12 @@ function CompetitorAdCard({
       <div className={`relative overflow-hidden bg-gradient-to-br from-zinc-800 to-zinc-900 ${
         horizontal ? "h-48 md:h-auto md:w-80 flex-shrink-0" : "h-48"
       }`}>
-        {/* Abstract visual using competitor's color and CSS gradients */}
         <div
           className="absolute inset-0"
           style={{
             background: `linear-gradient(135deg, ${competitor.logoColor}15 0%, ${competitor.logoColor}05 100%)`,
           }}
         />
-
-        {/* Static decorative elements — no infinite JS animation */}
         <div
           className="absolute inset-0 opacity-30"
           style={{
@@ -492,7 +364,6 @@ function CompetitorAdCard({
 
       {/* Content Area */}
       <div className={`p-4 md:p-5 ${horizontal ? "flex-1 min-w-0" : ""}`}>
-        {/* Platform and Date */}
         <div className="flex items-center justify-between mb-3">
           <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">
             {ad.platform}
@@ -500,24 +371,20 @@ function CompetitorAdCard({
           <span className="text-xs text-zinc-500">{ad.dateSpotted}</span>
         </div>
 
-        {/* Headline */}
         <h4 className={`font-bold text-white mb-2 ${horizontal ? "text-base md:text-lg" : "text-sm md:text-base line-clamp-2"}`}>
           {ad.headline}
         </h4>
 
-        {/* Body Text */}
         <p className={`text-xs md:text-sm text-zinc-400 mb-4 ${horizontal ? "line-clamp-3" : "line-clamp-2"}`}>
           {ad.bodyText}
         </p>
 
-        {/* CTA */}
         <div className="mb-4 inline-block px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-white/80">
           {ad.cta}
         </div>
 
         {/* Stats Row */}
         <div className={`grid grid-cols-2 gap-3 mb-4 pb-4 border-b border-white/5 ${horizontal ? "md:grid-cols-3" : ""}`}>
-          {/* Impressions */}
           <div>
             <p className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
               <Eye size={14} />
@@ -527,8 +394,6 @@ function CompetitorAdCard({
               {ad.estimatedImpressions}
             </p>
           </div>
-
-          {/* Engagement Rate */}
           <div>
             <p className="text-xs text-zinc-500 mb-1 flex items-center gap-1">
               <Heart size={14} />
@@ -538,8 +403,6 @@ function CompetitorAdCard({
               {ad.engagementRate}%
             </p>
           </div>
-
-          {/* Sentiment — inline in horizontal mode */}
           {horizontal && (
             <div>
               <p className="text-xs text-zinc-500 mb-1">Sentiment</p>
@@ -553,21 +416,18 @@ function CompetitorAdCard({
           )}
         </div>
 
-        {/* Sentiment Badge — only in vertical mode */}
+        {/* Sentiment Badge — vertical mode */}
         {!horizontal && (
           <div className="mb-3">
             <div
               className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-full font-semibold text-xs ${sentimentStyle.bg} border ${sentimentStyle.border} ${sentimentStyle.text}`}
             >
               <span>{sentimentStyle.icon}</span>
-              <span className="capitalize">
-                {ad.sentiment} Sentiment
-              </span>
+              <span className="capitalize">{ad.sentiment} Sentiment</span>
             </div>
           </div>
         )}
 
-        {/* Why It Works Callout */}
         {ad.whyItWorks && (
           <div className="p-3 rounded-lg bg-blue-500/5 border border-blue-500/20 text-xs text-blue-200/90 italic">
             <p className="flex items-start gap-2">
@@ -581,22 +441,11 @@ function CompetitorAdCard({
   );
 }
 
-// Icon component (Eye icon used in stats)
 function Eye({ size = 24 }: { size?: number }) {
   return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
       <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
       <circle cx="12" cy="12" r="3" />
     </svg>
   );
 }
-
