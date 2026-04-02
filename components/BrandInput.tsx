@@ -152,7 +152,7 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                 className="absolute inset-[-20px] bg-eds-50/20 blur-3xl"
               />
 
-              {/* Layer 2: Main blob — drops from above, squash-stretches on impact, then morphs wildly */}
+              {/* Layer 2a: Drop-in blob — visible during drop, fades out after landing */}
               <motion.div
                 initial={{
                   y: -300,
@@ -172,63 +172,65 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
                     "50%",
                     "50%",
                   ],
+                  opacity: [1, 1, 1, 1, 1, 1],
                 }}
                 transition={{
                   y: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1], times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
                   scaleX: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
                   scaleY: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
                   borderRadius: { duration: 0.8, ease: "easeOut", times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
+                  opacity: { duration: 0.8, times: [0, 0.4, 0.55, 0.7, 0.85, 1] },
                 }}
-                className="absolute inset-0 overflow-hidden"
+                className="absolute inset-0"
                 style={{
                   background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
                   boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
                 }}
+              />
+
+              {/* Layer 2b: Morphing blob — fades in after landing, morphs wildly (NOT clipped by parent) */}
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.85, duration: 0.3 }}
+                className="absolute inset-0"
               >
-                {/* After landing, start aggressive organic morph loop */}
                 <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.9 }}
+                  animate={{
+                    scaleX: [1, 1.12, 0.92, 1.08, 0.96, 1.04, 1],
+                    scaleY: [1, 0.9, 1.1, 0.94, 1.06, 0.98, 1],
+                    borderRadius: [
+                      "50% 50% 50% 50%",
+                      "25% 75% 65% 35% / 55% 30% 70% 45%",
+                      "65% 35% 30% 70% / 40% 65% 35% 60%",
+                      "35% 65% 55% 45% / 70% 40% 60% 30%",
+                      "55% 45% 40% 60% / 30% 55% 45% 70%",
+                      "40% 60% 65% 35% / 55% 45% 55% 45%",
+                      "50% 50% 50% 50%",
+                    ],
+                    rotate: [0, 3, -2, 4, -3, 1, 0],
+                  }}
+                  transition={{ delay: 1.0, duration: 5, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute inset-0"
-                >
-                  <motion.div
-                    animate={{
-                      scaleX: [1, 1.12, 0.92, 1.08, 0.96, 1.04, 1],
-                      scaleY: [1, 0.9, 1.1, 0.94, 1.06, 0.98, 1],
-                      borderRadius: [
-                        "50% 50% 50% 50%",
-                        "25% 75% 65% 35% / 55% 30% 70% 45%",
-                        "65% 35% 30% 70% / 40% 65% 35% 60%",
-                        "35% 65% 55% 45% / 70% 40% 60% 30%",
-                        "55% 45% 40% 60% / 30% 55% 45% 70%",
-                        "40% 60% 65% 35% / 55% 45% 55% 45%",
-                        "50% 50% 50% 50%",
-                      ],
-                      rotate: [0, 3, -2, 4, -3, 1, 0],
-                    }}
-                    transition={{ delay: 1.0, duration: 5, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute inset-0"
-                    style={{
-                      background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
-                      boxShadow: "inset 0 -30px 50px rgba(0,0,0,0.35)",
-                    }}
-                  />
-                  {/* Wandering specular highlight */}
-                  <motion.div
-                    animate={{
-                      x: ["-10%", "15%", "-5%", "10%", "-10%"],
-                      y: ["-10%", "5%", "15%", "-5%", "-10%"],
-                      opacity: [0.4, 0.6, 0.35, 0.55, 0.4],
-                    }}
-                    transition={{ delay: 1.0, duration: 7, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-[15%] left-[20%] w-[40%] h-[40%] rounded-full"
-                    style={{
-                      background: "radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%)",
-                      filter: "blur(8px)",
-                    }}
-                  />
-                </motion.div>
+                  style={{
+                    background: "radial-gradient(circle at 35% 30%, #A3C8FF, #4E91F5 25%, #2070E8 45%, #1358BF 70%, #033E96 100%)",
+                    boxShadow: "0 0 80px rgba(32, 112, 232, 0.5), 0 0 160px rgba(32, 112, 232, 0.15), inset 0 -30px 50px rgba(0,0,0,0.35)",
+                  }}
+                />
+                {/* Wandering specular highlight */}
+                <motion.div
+                  animate={{
+                    x: ["-10%", "15%", "-5%", "10%", "-10%"],
+                    y: ["-10%", "5%", "15%", "-5%", "-10%"],
+                    opacity: [0.4, 0.6, 0.35, 0.55, 0.4],
+                  }}
+                  transition={{ delay: 1.0, duration: 7, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute top-[15%] left-[20%] w-[40%] h-[40%] rounded-full"
+                  style={{
+                    background: "radial-gradient(circle, rgba(255,255,255,0.35) 0%, transparent 70%)",
+                    filter: "blur(8px)",
+                  }}
+                />
               </motion.div>
 
               {/* Impact flash — brief white ring on landing */}
