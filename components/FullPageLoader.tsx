@@ -48,9 +48,9 @@ export default function FullPageLoader({ title, messages }: FullPageLoaderProps)
   return (
     <div className="min-h-screen flex flex-col">
       <StepIndicator />
-      <div className="flex-1 flex flex-col items-center justify-center px-6">
-        {/* WebGL Orb */}
-        <div className="relative w-72 h-72 mb-12">
+      <div className="flex-1 flex items-center justify-center px-6">
+        {/* Orb container — text overlaid inside */}
+        <div className="relative w-[28rem] h-[28rem]">
           <Suspense
             fallback={
               <div className="w-full h-full rounded-full bg-eds-50/20 blur-xl animate-pulse" />
@@ -64,31 +64,27 @@ export default function FullPageLoader({ title, messages }: FullPageLoaderProps)
               backgroundColor="#09090b"
             />
           </Suspense>
-        </div>
 
-        {/* Title */}
-        <motion.p
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          className="text-2xl font-semibold text-zinc-200 mb-4"
-        >
-          {title}
-        </motion.p>
-
-        {/* Cycling messages */}
-        <div className="h-7 overflow-hidden">
-          <AnimatePresence mode="wait">
-            <motion.p
-              key={msgIndex}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -15 }}
-              transition={{ duration: 0.3 }}
-              className="text-base text-zinc-500 text-center"
-            >
-              {messages[msgIndex]}
-            </motion.p>
-          </AnimatePresence>
+          {/* Centered text overlay */}
+          <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none px-8">
+            <p className="text-xl font-semibold text-zinc-200 mb-3 text-center animate-[fade-in_0.5s_ease-out_both]">
+              {title}
+            </p>
+            <div className="h-6 overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.p
+                  key={msgIndex}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-sm text-zinc-500 text-center"
+                >
+                  {messages[msgIndex]}
+                </motion.p>
+              </AnimatePresence>
+            </div>
+          </div>
         </div>
       </div>
     </div>
