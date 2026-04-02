@@ -79,29 +79,11 @@ function SectionLoader({ messages, label }: { messages: string[]; label: string 
         className="relative rounded-2xl border border-white/[0.04] p-8 overflow-hidden bg-zinc-900/80"
       >
         <div className="flex items-center gap-5">
-          {/* Animated blob */}
+          {/* Animated blob — pure CSS */}
           <div className="relative w-12 h-12 flex-shrink-0">
-            <motion.div
-              animate={{
-                scale: [1, 1.2, 1],
-                borderRadius: ["30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%"],
-              }}
-              transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-              className="absolute inset-0 bg-eds-50/20 blur-sm"
-            />
-            <motion.div
-              animate={{
-                scale: [1, 1.15, 1],
-                borderRadius: ["50% 50% 50% 50%", "30% 70% 70% 30% / 30% 30% 70% 70%", "50% 50% 50% 50%"],
-              }}
-              transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.3 }}
-              className="absolute inset-1 bg-eds-50/30"
-            />
-            <motion.div
-              animate={{ rotate: 360 }}
-              transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
-              className="absolute inset-2 rounded-full border border-eds-60/30 border-t-eds-60/80"
-            />
+            <div className="absolute inset-0 bg-eds-50/20 blur-sm animate-[orb-morph_3s_ease-in-out_infinite]" />
+            <div className="absolute inset-1 bg-eds-50/30 animate-[orb-morph_2.5s_ease-in-out_infinite_0.3s]" />
+            <div className="absolute inset-2 rounded-full border border-eds-60/30 border-t-eds-60/80 animate-[orb-sheen_8s_linear_infinite]" />
           </div>
 
           <div className="flex flex-col gap-1.5 min-w-0">
@@ -171,7 +153,7 @@ export default function BrandDNACard({
           {/* Row 1: Brand Color + Voice + Visual Style */}
 
           {/* Brand Color — wider card to fit label, thin swatch */}
-          <GlassCard className="col-span-12 md:col-span-3 self-start" label="Brand Color" badge="AI-Inferred">
+          <GlassCard className="col-span-12 md:col-span-3" label="Brand Color" badge="AI-Inferred">
             <div className="flex items-center gap-3">
               <div
                 className="w-16 h-10 rounded-lg border border-white/5 shadow-lg flex-shrink-0"
@@ -185,7 +167,7 @@ export default function BrandDNACard({
           </GlassCard>
 
           {/* Voice — spans remaining cols, compact */}
-          <GlassCard className="col-span-12 md:col-span-5 self-start" label="Voice" badge="AI-Inferred">
+          <GlassCard className="col-span-12 md:col-span-5" label="Voice" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.voice.map((attr, i) => (
                 <motion.span
@@ -204,7 +186,7 @@ export default function BrandDNACard({
           </GlassCard>
 
           {/* Visual Style — spans remaining cols, compact */}
-          <GlassCard className="col-span-12 md:col-span-4 self-start" label="Visual Style" badge="AI-Inferred">
+          <GlassCard className="col-span-12 md:col-span-4" label="Visual Style" badge="AI-Inferred">
             <div className="flex flex-wrap gap-2">
               {brandDna.visualStyle.map((style, i) => (
                 <motion.span
@@ -514,8 +496,7 @@ export default function BrandDNACard({
 
         {/* Continue Button */}
         <motion.div variants={cardVariant} className="mt-6">
-          <motion.button
-            whileTap={{ scale: 0.995 }}
+          <button
             onClick={onContinue}
             className="w-full py-4 font-semibold rounded-xl transition-all text-base text-white bg-eds-50 hover:bg-eds-60 hover:scale-[1.005] active:scale-[0.98]"
             style={{
@@ -523,7 +504,7 @@ export default function BrandDNACard({
             }}
           >
             See What Your Competitors Are Doing →
-          </motion.button>
+          </button>
           <p className="text-center text-xs text-zinc-600 mt-3">
             Review your brand analysis above before continuing
           </p>
