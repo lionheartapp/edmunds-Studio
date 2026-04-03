@@ -403,7 +403,7 @@ export default function BrandDNACard({
                     {brandDna.name} shoppers are on Edmunds.
                   </h3>
                   <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-zinc-500 leading-[1.15] mb-8 max-w-2xl">
-                    {brandDna.name} ads aren&apos;t.
+                    {brandDna.name}{' '}ads aren&apos;t.
                   </h3>
 
                   {/* Supporting proof — three stats in a row, not overwhelming */}
@@ -424,10 +424,21 @@ export default function BrandDNACard({
                     </div>
                   </div>
 
-                  {/* CTA */}
-                  <p className="text-sm text-zinc-400 max-w-lg">
+                  {/* Supporting text + CTA */}
+                  <p className="text-sm text-zinc-400 max-w-lg mb-8">
                     Display, Spotlight, Native, Video Pre-Roll — reach shoppers at the moment they&apos;re deciding which {brandDna.name} to buy.
                   </p>
+
+                  <a
+                    href="https://www.edmunds.com/advertising/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold text-sm text-white bg-eds-50 hover:bg-eds-60 transition-all hover:scale-[1.02] active:scale-[0.98]"
+                    style={{ boxShadow: "0 0 24px rgba(32,112,232,0.3)" }}
+                  >
+                    Start Advertising on Edmunds
+                    <span className="text-base">&#8594;</span>
+                  </a>
                 </div>
               </div>
             </div>
