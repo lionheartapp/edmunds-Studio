@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import type { CtaSuggestion, CtaScoreResponse } from "@/lib/oem-types"
 
 interface CtaScorecardProps {
@@ -21,6 +21,9 @@ export default function CtaScorecard({
   const [result, setResult] = useState<CtaScoreResponse | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const hasFetched = useRef(false)
+  const onLoadedRef = useRef(onLoaded)
+  onLoadedRef.current = onLoaded
 
   const fetchScore = useCallback(async () => {
     setLoading(true)
@@ -37,15 +40,17 @@ export default function CtaScorecard({
 
       const data: CtaScoreResponse = await response.json()
       setResult(data)
-      onLoaded(data.suggestions)
+      onLoadedRef.current(data.suggestions)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Scoring failed")
     } finally {
       setLoading(false)
     }
-  }, [cta, brandName, vehicleSegment, onLoaded])
+  }, [cta, brandName, vehicleSegment])
 
   useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     fetchScore()
   }, [fetchScore])
 

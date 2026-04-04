@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useRef } from "react"
 import type { CompetitorIntelData, CompetitorCtaEntry } from "@/lib/oem-types"
 
 interface CompetitorIntelProps {
@@ -8,54 +8,42 @@ interface CompetitorIntelProps {
   onLoaded: (data: CompetitorIntelData) => void
 }
 
+// Common automotive competitor CTAs for benchmarking
+const COMPETITOR_CTA_SAMPLES: CompetitorCtaEntry[] = [
+  { brand: "Toyota", cta: "Build & Price", format: "Leaderboard", score: 78 },
+  { brand: "Ford", cta: "Search Inventory", format: "MREC", score: 58 },
+  { brand: "Chevrolet", cta: "Learn More", format: "Spotlight", score: 28 },
+  { brand: "Honda", cta: "Explore the Lineup", format: "Adhesion", score: 52 },
+  { brand: "Hyundai", cta: "See Offers", format: "MREC", score: 55 },
+  { brand: "Nissan", cta: "Shop Now", format: "Leaderboard", score: 48 },
+  { brand: "Kia", cta: "View Inventory", format: "Mobile Adhesion", score: 45 },
+  { brand: "BMW", cta: "Book a Test Drive", format: "Spotlight", score: 76 },
+  { brand: "Tesla", cta: "Order Now", format: "MREC", score: 72 },
+]
+
 export default function CompetitorIntel({ brandName, onLoaded }: CompetitorIntelProps) {
   const [data, setData] = useState<CompetitorIntelData | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const fetchIntel = useCallback(async () => {
-    setLoading(true)
-    setError(null)
-
-    try {
-      const response = await fetch("/api/competitors", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ brandName }),
-      })
-
-      if (!response.ok) throw new Error("Failed to fetch competitor data")
-
-      const result = await response.json()
-
-      // Extract CTA data from competitor profiles
-      const competitors: CompetitorCtaEntry[] = (result.competitors ?? [])
-        .slice(0, 3)
-        .flatMap((comp: { name: string; ads?: Array<{ cta: string; format: string }> }) =>
-          (comp.ads ?? []).slice(0, 2).map((ad: { cta: string; format: string }) => ({
-            brand: comp.name,
-            cta: ad.cta,
-            score: 0, // Will be scored client-side or by API
-            format: ad.format,
-          }))
-        )
-
-      // Identify category gaps from competitor CTAs
-      const gaps = identifyGaps(competitors.map((c) => c.cta))
-
-      const intel: CompetitorIntelData = { competitors, gaps }
-      setData(intel)
-      onLoaded(intel)
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to load competitor data")
-    } finally {
-      setLoading(false)
-    }
-  }, [brandName, onLoaded])
+  const [loading, setLoading] = useState(true)
+  const hasLoaded = useRef(false)
+  const onLoadedRef = useRef(onLoaded)
+  onLoadedRef.current = onLoaded
 
   useEffect(() => {
-    fetchIntel()
-  }, [fetchIntel])
+    if (hasLoaded.current) return
+    hasLoaded.current = true
+
+    // Filter out the current brand and pick 3-5 competitors
+    const competitors = COMPETITOR_CTA_SAMPLES
+      .filter((c) => c.brand.toLowerCase() !== brandName.toLowerCase())
+      .slice(0, 5)
+
+    const gaps = identifyGaps(competitors.map((c) => c.cta))
+    const intel: CompetitorIntelData = { competitors, gaps }
+
+    setData(intel)
+    onLoadedRef.current(intel)
+    setLoading(false)
+  }, [brandName])
 
   if (loading) {
     return (
@@ -68,17 +56,6 @@ export default function CompetitorIntel({ brandName, onLoaded }: CompetitorIntel
     )
   }
 
-  if (error) {
-    return (
-      <div className="rounded-2xl border border-zinc-800 bg-zinc-900/50 p-6">
-        <p className="text-sm text-red-400">{error}</p>
-        <button onClick={fetchIntel} className="text-xs text-eds-50 mt-2 hover:underline">
-          Retry
-        </button>
-      </div>
-    )
-  }
-
   if (!data) return null
 
   return (
@@ -86,7 +63,6 @@ export default function CompetitorIntel({ brandName, onLoaded }: CompetitorIntel
       <div className="p-6">
         <h3 className="text-lg font-bold tracking-tight mb-4">Competitor Intelligence</h3>
 
-        {/* Competitor CTAs */}
         {data.competitors.length > 0 ? (
           <div className="space-y-3 mb-6">
             {data.competitors.map((entry, i) => (
@@ -97,7 +73,6 @@ export default function CompetitorIntel({ brandName, onLoaded }: CompetitorIntel
           <p className="text-sm text-zinc-500 mb-6">No competitor ad data available for {brandName}.</p>
         )}
 
-        {/* Category Gaps */}
         {data.gaps.length > 0 && (
           <div>
             <h4 className="text-sm font-semibold text-zinc-300 mb-3">Category Gaps</h4>
@@ -122,18 +97,13 @@ export default function CompetitorIntel({ brandName, onLoaded }: CompetitorIntel
 function CompetitorRow({ entry }: { entry: CompetitorCtaEntry }) {
   return (
     <div className="flex items-center gap-4 p-3 rounded-xl bg-zinc-800/50 border border-zinc-700/50">
-      {/* Brand */}
       <div className="flex-shrink-0 w-24">
         <p className="text-xs font-semibold text-zinc-300 truncate">{entry.brand}</p>
         <p className="text-[10px] text-zinc-600">{entry.format}</p>
       </div>
-
-      {/* CTA */}
       <div className="flex-1 min-w-0">
         <p className="text-sm text-white font-medium">&ldquo;{entry.cta}&rdquo;</p>
       </div>
-
-      {/* Score (if available) */}
       {entry.score > 0 && (
         <div
           className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold"

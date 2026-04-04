@@ -60,13 +60,24 @@ export async function POST(request: Request) {
     const ext = file.name.split(".").pop() || "bin"
     const path = `${fileId}/${type}_${Date.now()}.${ext}`
 
+    // Check Supabase config before attempting upload
+    const hasUrl = !!process.env.SUPABASE_URL
+    const hasKey = !!process.env.SUPABASE_ANON_KEY
+    if (!hasUrl || !hasKey) {
+      console.error("[api/oem/upload] Missing env vars — SUPABASE_URL:", hasUrl, "SUPABASE_ANON_KEY:", hasKey)
+      return NextResponse.json(
+        { error: `Supabase not configured (URL: ${hasUrl}, Key: ${hasKey})` },
+        { status: 500 }
+      )
+    }
+
     // Upload to Supabase Storage
     const buffer = Buffer.from(await file.arrayBuffer())
     const url = await uploadOemAsset(buffer, path, file.type)
 
     if (!url) {
       return NextResponse.json(
-        { error: "Upload failed — check Supabase configuration" },
+        { error: "Upload to Supabase Storage failed — check bucket permissions" },
         { status: 500 }
       )
     }

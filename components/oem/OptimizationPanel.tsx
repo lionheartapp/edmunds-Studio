@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect, useCallback } from "react"
+import { useState, useEffect, useCallback, useRef } from "react"
 import type { OemCopy, OptimizationSet, Optimization } from "@/lib/oem-types"
 
 interface OptimizationPanelProps {
@@ -28,6 +28,9 @@ export default function OptimizationPanel({
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [activeTab, setActiveTab] = useState<Tab>("demographic")
+  const hasFetched = useRef(false)
+  const onLoadedRef = useRef(onLoaded)
+  onLoadedRef.current = onLoaded
 
   const fetchOptimizations = useCallback(async () => {
     setLoading(true)
@@ -44,15 +47,17 @@ export default function OptimizationPanel({
 
       const result: OptimizationSet = await response.json()
       setData(result)
-      onLoaded(result)
+      onLoadedRef.current(result)
     } catch (err) {
       setError(err instanceof Error ? err.message : "Optimization failed")
     } finally {
       setLoading(false)
     }
-  }, [brandName, copy, vehicleSegment, onLoaded])
+  }, [brandName, copy, vehicleSegment])
 
   useEffect(() => {
+    if (hasFetched.current) return
+    hasFetched.current = true
     fetchOptimizations()
   }, [fetchOptimizations])
 
