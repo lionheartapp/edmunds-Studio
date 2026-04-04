@@ -9,6 +9,7 @@ export type UserType = "oem" | "dealer-group" | "single-dealer" | null
 
 interface BrandInputProps {
   onSubmit: (brandName: string, userType?: UserType) => void
+  onOemRedirect?: () => void
   isLoading?: boolean
 }
 
@@ -23,7 +24,7 @@ const SCENARIOS = [
         <path d="M9 3v18" /><path d="M3 9h6" /><path d="M3 15h6" />
       </svg>
     ),
-    desc: "Launch a national brand campaign",
+    desc: "Upload your agency-prepared assets and preview your Edmunds ads instantly",
     example: "e.g. Rivian, Ford, Toyota USA",
     color: "#4E91F5",
     inputPrompt: "What OEM are you running for?",
@@ -82,7 +83,7 @@ const LOADING_SAYINGS = [
   "Making your future ads jealous...",
 ]
 
-export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
+export default function BrandInput({ onSubmit, onOemRedirect, isLoading }: BrandInputProps) {
   const [selectedScenario, setSelectedScenario] = useState<typeof SCENARIOS[0] | null>(null)
   const [brand, setBrand] = useState("")
   const [sayingIndex, setSayingIndex] = useState(0)
@@ -117,6 +118,11 @@ export default function BrandInput({ onSubmit, isLoading }: BrandInputProps) {
   }, [isLoading])
 
   const handleScenarioClick = (scenario: typeof SCENARIOS[0]) => {
+    // OEM scenario redirects to the dedicated upload flow
+    if (scenario.type === "oem" && onOemRedirect) {
+      onOemRedirect()
+      return
+    }
     setSelectedScenario(scenario)
     setBrand("")
   }

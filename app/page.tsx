@@ -43,5 +43,11 @@ export default function Home() {
     }
   }
 
-  return <BrandInput onSubmit={handleBrandSubmit} isLoading={isLoading} />
+  return (
+    <BrandInput
+      onSubmit={handleBrandSubmit}
+      onOemRedirect={() => router.push("/oem")}
+      isLoading={isLoading}
+    />
+  )
 }
